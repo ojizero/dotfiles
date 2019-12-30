@@ -28,9 +28,9 @@ eval "$(rbenv init -)"
 alias g='\git'
 alias k='\kubectl'
 if type gls > /dev/null; then
-    alias l='\gls -lhtA --color=auto'
+  alias l='\gls -lhtA --color=auto'
 else
-    alias l='\ls -lhtA'
+  alias l='\ls -lhtA'
 fi
 alias d='\dirs -v'
 alias p='\pushd'
