@@ -1,0 +1,9 @@
+{
+  "telemetry.enableTelemetry": false,
+  "files.trimTrailingWhitespace": true,
+  "files.trimFinalNewlines": true,
+  "files.insertFinalNewline": true,
+  "editor.scrollBeyondLastLine": false,
+  "editor.tabSize": 2,
+  "editor.renderWhitespace": "all"
+}

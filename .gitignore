@@ -1,0 +1,60 @@
+# Created by https://www.gitignore.io/api/git,zsh,visualstudiocode
+# Edit at https://www.gitignore.io/?templates=git,zsh,visualstudiocode
+
+### Git ###
+# Created by git for backups. To disable backups in Git:
+# $ git config --global mergetool.keepBackup false
+*.orig
+
+# Created by git when using merge tools for conflicts
+*.BACKUP.*
+*.BASE.*
+*.LOCAL.*
+*.REMOTE.*
+*_BACKUP_*.txt
+*_BASE_*.txt
+*_LOCAL_*.txt
+*_REMOTE_*.txt
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+
+### Zsh ###
+# Zsh compiled script + zrecompile backup
+*.zwc
+*.zwc.old
+
+# Zsh completion-optimization dumpfile
+*zcompdump*
+
+# Zsh zcalc history
+.zcalc_history
+
+# A popular plugin manager's files
+._zplugin
+.zplugin_lstupd
+
+# zdharma/zshelldoc tool's files
+zsdoc/data
+
+# robbyrussell/oh-my-zsh/plugins/per-directory-history plugin's files
+# (when set-up to store the history in the local directory)
+.directory_history
+
+# MichaelAquilina/zsh-autoswitch-virtualenv plugin's files
+# (for Zsh plugins using Python)
+.venv
+
+# Zunit tests' output
+/tests/_output/*
+!/tests/_output/.gitkeep
+
+# End of https://www.gitignore.io/api/git,zsh,visualstudiocode
