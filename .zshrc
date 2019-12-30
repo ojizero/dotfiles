@@ -27,8 +27,19 @@ eval "$(rbenv init -)"
 
 alias g='\git'
 alias k='\kubectl'
-alias l='\ls -lhtA'
+if type gls > /dev/null; then
+    alias l='\gls -lhtA --color=auto'
+else
+    alias l='\ls -lhtA'
+fi
 alias d='\dirs -v'
 alias p='\pushd'
 alias pp='\popd'
 alias mkdir='\mkdir -vp'
+
+# Options
+#
+
+# Disable auto `pushd` when using `cd`
+unsetopt auto_pushd
+unsetopt pushd_ignore_dups
