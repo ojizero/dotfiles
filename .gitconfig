@@ -33,3 +33,6 @@
 
 	d = diff
 	dn = !git --no-pager diff --name-only
+
+	l = !git --no-pager log -1
+	ll = log
