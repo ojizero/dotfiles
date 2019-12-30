@@ -1,0 +1,30 @@
+[user]
+	# TODO: Move outside this file
+	name = ojizero
+	email = z.acnts.816@pm.me
+
+[alias]
+	s = status
+
+	a = add
+	ac = add .
+
+	cl = clone
+
+	co = checkout
+	cob = checkout -b
+
+	c = commit
+	cm = commit --message
+	cam = commit --all --message
+	caa = commit --all --amend --no-edit
+
+	pl = pull
+	ps = push
+	psf = push --force
+	pso = push --set-upstream origin HEAD
+
+	st = stash
+	sp = stash push
+	sa = stash pop
+	sl = stash list
