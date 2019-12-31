@@ -7,8 +7,6 @@ export ZSH_THEME="avit"
 export DISABLE_UPDATE_PROMPT="true"
 export UPDATE_ZSH_DAYS=13
 
-export ENABLE_CORRECTION="true"
-
 export COMPLETION_WAITING_DOTS="true"
 
 plugins=(git)
