@@ -44,3 +44,6 @@
 
 	ri = rebase -i
 	remaster = rebase master
+
+[push]
+	followTags = true
