@@ -49,6 +49,16 @@ function _git {
 alias git='_git'
 alias g='_git'
 
+function _npm {
+  if [[ $# -gt 0 ]]; then
+    \npm "$@"
+  else
+    \npm install
+  fi
+}
+alias npm='_npm'
+alias n='_npm'
+
 # Options
 #
 
