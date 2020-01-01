@@ -8,8 +8,9 @@ export DISABLE_UPDATE_PROMPT="true"
 export UPDATE_ZSH_DAYS=13
 
 export COMPLETION_WAITING_DOTS="true"
+export ENABLE_CORRECTION="false"
 
-plugins=(git)
+plugins=(git z)
 
 source $ZSH/oh-my-zsh.sh
 
