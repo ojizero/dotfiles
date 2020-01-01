@@ -34,10 +34,14 @@ alias d='\dirs -v'
 alias p='\pushd'
 alias pp='\popd'
 alias mkdir='\mkdir -vp'
+alias ipglobal='dig +short myip.opendns.com @resolver1.opendns.com'
+alias nsenter='\docker run -it --rm --privileged --pid=host justincormack/nsenter1'
+alias dockerdive='docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive'
+alias dockerclean='docker rmi --force $(docker images -q)'
 
 # Options
 #
 
-# Disable auto `pushd` when using `cd`
+# More sane `pushd` settings
 unsetopt auto_pushd
-unsetopt pushd_ignore_dups
+setopt pushd_ignore_dups

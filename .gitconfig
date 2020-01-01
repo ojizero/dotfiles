@@ -18,6 +18,8 @@
 	cm = commit --message
 	cam = commit --all --message
 	caa = commit --all --amend --no-edit
+	am = commit --amend
+	amm = commit --amend --message
 
 	pl = pull
 	ps = push
@@ -36,3 +38,8 @@
 
 	l = !git --no-pager log -1
 	ll = log
+
+	ignore = "!gi() { curl -L -s https://www.gitignore.io/api/$@ ;}; gi >> .gitignore"
+
+	ri = rebase -i
+	remaster = rebase master
