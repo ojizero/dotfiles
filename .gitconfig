@@ -4,7 +4,8 @@
 	email = z.acnts.816@pm.me
 
 [alias]
-	s = status
+	s = status --short --branch
+	sl = status
 
 	a = add
 	ac = add .
