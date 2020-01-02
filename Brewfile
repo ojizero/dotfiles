@@ -31,6 +31,7 @@ cask "docker"
 cask "dotnet-sdk"
 cask "firefox"
 cask "flycut"
+cask "google-chrome"
 cask "gpg-suite"
 cask "imageoptim"
 cask "iterm2"
@@ -39,6 +40,7 @@ cask "megasync"
 cask "powershell"
 cask "tableplus"
 cask "visual-studio-code"
+cask "zoomus"
 mas "1Password 7", id: 1333542190
 mas "Jira", id: 1475897096
 mas "Wire", id: 931134707
