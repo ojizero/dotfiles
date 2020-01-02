@@ -26,6 +26,7 @@
 	ps = push
 	psf = push --force
 	pso = push --set-upstream origin HEAD
+	psu = "!gpsu() { upstream=${1-upstream}; \\git push --set-upstream $upstream HEAD; }; gpsu"
 
 	st = stash
 	sp = stash push
