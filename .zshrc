@@ -42,7 +42,7 @@ alias dockerclean='docker rmi --force $(docker images -q)'
 
 function _git {
   if [[ $# -gt 0 ]]; then
-    \git "$@"
+    \git $@
   else
     \git status --short --branch
   fi
@@ -52,7 +52,7 @@ alias g='_git'
 
 function _npm {
   if [[ $# -gt 0 ]]; then
-    \npm "$@"
+    \npm $@
   else
     \npm install
   fi
