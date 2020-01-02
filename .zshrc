@@ -14,12 +14,13 @@ plugins=(git z)
 
 source $ZSH/oh-my-zsh.sh
 
-# Languages tooling
+# Toolings
 #
 
 eval "$(nodenv init -)"
 eval "$(goenv init -)"
 eval "$(rbenv init -)"
+eval "$(thefuck --alias)"
 
 # Aliases
 #
