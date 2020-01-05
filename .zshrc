@@ -25,6 +25,7 @@ eval "$(thefuck --alias)"
 # Aliases
 #
 
+alias f='\fuck'
 alias k='\kubectl'
 if type gls > /dev/null; then
   alias l='\gls -lhtA --color=auto'
