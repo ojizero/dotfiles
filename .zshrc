@@ -69,5 +69,3 @@ compdef _npm _unpm
 # More sane `pushd` settings
 unsetopt auto_pushd
 setopt pushd_ignore_dups
-
-fpath=(/Users/oji/workspace/self/dotfiles $fpath)
