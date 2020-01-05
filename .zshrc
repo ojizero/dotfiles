@@ -41,25 +41,27 @@ alias nsenter='\docker run -it --rm --privileged --pid=host justincormack/nsente
 alias dockerdive='docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive'
 alias dockerclean='docker rmi --force $(docker images -q)'
 
-function _git {
+function _ugit {
   if [[ $# -gt 0 ]]; then
     \git $@
   else
     \git status --short --branch
   fi
 }
-alias git='_git'
-alias g='_git'
+alias git='_ugit'
+alias g='_ugit'
+compdef _git _ugit
 
-function _npm {
+function _unpm {
   if [[ $# -gt 0 ]]; then
     \npm $@
   else
     \npm install
   fi
 }
-alias npm='_npm'
-alias n='_npm'
+alias npm='_unpm'
+alias n='_unpm'
+compdef _npm _unpm
 
 # Options
 #
@@ -67,3 +69,5 @@ alias n='_npm'
 # More sane `pushd` settings
 unsetopt auto_pushd
 setopt pushd_ignore_dups
+
+fpath=(/Users/oji/workspace/self/dotfiles $fpath)
