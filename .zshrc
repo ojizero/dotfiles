@@ -27,6 +27,7 @@ eval "$(thefuck --alias)"
 
 alias f='\fuck'
 alias k='\kubectl'
+alias v='\vagrant'
 if type gls > /dev/null; then
   alias l='\gls -lhtA --color=auto'
 else
@@ -38,8 +39,8 @@ alias pp='\popd'
 alias mkdir='\mkdir -vp'
 alias ipglobal='dig +short myip.opendns.com @resolver1.opendns.com'
 alias nsenter='\docker run -it --rm --privileged --pid=host justincormack/nsenter1'
-alias dockerdive='docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive'
-alias dockerclean='docker rmi --force $(docker images -q)'
+alias dockerdive='\docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive'
+alias dockerclean='\docker rmi --force $(docker images -q)'
 
 function _ugit {
   if [[ $# -gt 0 ]]; then
