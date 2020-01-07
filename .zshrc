@@ -42,27 +42,23 @@ alias nsenter='\docker run -it --rm --privileged --pid=host justincormack/nsente
 alias dockerdive='\docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive'
 alias dockerclean='\docker rmi --force $(docker images -q)'
 
-function _ugit {
+function git {
   if [[ $# -gt 0 ]]; then
-    \git $@
+    /usr/bin/env git $@
   else
-    \git status --short --branch
+    /usr/bin/env git status --short --branch
   fi
 }
-alias git='_ugit'
-alias g='_ugit'
-compdef _git _ugit
+alias g='git'
 
-function _unpm {
+function npm {
   if [[ $# -gt 0 ]]; then
-    \npm $@
+    /usr/bin/env npm $@
   else
-    \npm install
+    /usr/bin/env npm install
   fi
 }
-alias npm='_unpm'
-alias n='_unpm'
-compdef _npm _unpm
+alias n='npm'
 
 # Options
 #
