@@ -56,4 +56,5 @@ cask "visual-studio-code"
 cask "zoomus"
 mas "1Password 7", id: 1333542190
 mas "Jira", id: 1475897096
+mas "Microsoft Remote Desktop", id: 1295203466
 mas "Wire", id: 931134707
