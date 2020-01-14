@@ -86,3 +86,10 @@ Temporary Items
 .apdisk
 
 # End of https://www.gitignore.io/api/git,zsh,visualstudiocode
+
+### AWSCLI ###
+# Credentials
+.aws/credentials
+
+# Config
+.aws/config
