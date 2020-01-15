@@ -19,7 +19,7 @@
 	cm = commit --message
 	cam = commit --all --message
 	caa = commit --all --amend --no-edit
-	am = commit --amend
+	amn = commit --amend
 	amm = commit --amend --message
 
 	pl = pull
