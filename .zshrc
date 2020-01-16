@@ -29,9 +29,10 @@ alias f='\fuck'
 alias k='\kubectl'
 alias v='\vagrant'
 if type gls > /dev/null; then
-  alias l='\gls -lhtA --color=auto'
+  alias ls='\gls -G --color=auto'
+  alias l='\gls -lhA --color=auto --group-directories-first'
 else
-  alias l='\ls -lhtA'
+  alias l='\ls -lhA'
 fi
 alias d='\dirs -v'
 alias p='\pushd'
