@@ -48,5 +48,7 @@
 
 	ini = init
 
+	newgh = "!ghnew() { \\git init ; \\hub create $@ }; ghnew"
+
 [push]
 	followTags = true
