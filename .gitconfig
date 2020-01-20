@@ -5,7 +5,7 @@
 
 [alias]
 	s = status --short --branch
-	sl = status
+	ss = status
 
 	a = add
 	ac = add .
