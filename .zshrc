@@ -27,7 +27,6 @@ eval "$(thefuck --alias)"
 
 alias f='\fuck'
 alias k='\kubectl'
-alias v='\vagrant'
 if type gls > /dev/null; then
   alias ls='\gls -G --color=auto'
   alias l='\gls -lhA --color=auto --group-directories-first'
@@ -70,6 +69,15 @@ function npm {
   fi
 }
 alias n='npm'
+
+function vagrant {
+  if [[ $# -gt 0 ]]; then
+    /usr/bin/env vagrant $@
+  else
+    /usr/bin/env vagrant up
+  fi
+}
+alias v='vagrant'
 
 # Options
 #
