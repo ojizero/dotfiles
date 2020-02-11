@@ -12,7 +12,13 @@ export ENABLE_CORRECTION="false"
 
 plugins=(git z)
 
-source $ZSH/oh-my-zsh.sh
+source "${ZSH}/oh-my-zsh.sh"
+
+# Define custom environment variables
+#
+
+export ZSH_PROFILE="${HOME}/.zshrc"
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 # Toolings
 #
@@ -21,6 +27,8 @@ eval "$(nodenv init -)"
 eval "$(goenv init -)"
 eval "$(rbenv init -)"
 eval "$(thefuck --alias)"
+
+source $(dirname $(readlink "${ZSH_PROFILE}"))/.docker_shims.zsh
 
 # Aliases and functions
 #
