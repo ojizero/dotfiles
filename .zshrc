@@ -28,7 +28,7 @@ eval "$(goenv init -)"
 eval "$(rbenv init -)"
 eval "$(thefuck --alias)"
 
-source $(dirname $(readlink "${ZSH_PROFILE}"))/.docker_shims.zsh
+source "$(dirname $(readlink "${ZSH_PROFILE}"))/.docker_shims.zsh"
 
 # Aliases and functions
 #

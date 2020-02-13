@@ -3,7 +3,7 @@ function docker-into {
   local _path="${2}"
   local args="${3}"
 
-  zsh -c "/usr/bin/env docker ${dopts} run -it --rm --volume "${_path}:${_path}" --workdir "${_path}" ${args}"
+  eval "/usr/bin/env docker ${dopts} run -it --rm --volume "${_path}:${_path}" --workdir "${_path}" ${args}"
 }
 
 function docker-build {
@@ -13,7 +13,7 @@ function docker-build {
   local default_tag="$(basename ${PWD})"
 
   if [[ "${args}" != *'--help'* ]] || [[ "${args}" != *'-h'* ]]; then
-    zsh -c "/usr/bin/env docker ${dopts} build ${args}"
+    eval "/usr/bin/env docker ${dopts} build ${args}"
 
     return $?
   fi
@@ -28,7 +28,7 @@ function docker-build {
 
   # TODO: loop and build each named target individually
 
-  zsh -c "/usr/bin/env docker ${dopts} build ${args}"
+  eval "/usr/bin/env docker ${dopts} build ${args}"
 }
 
 function docker {
@@ -70,7 +70,7 @@ function docker {
   done
 
   if [[ $# -eq 0 ]]; then
-    zsh -c "/usr/bin/env docker ${dopts} --help"
+    eval "/usr/bin/env docker ${dopts} --help"
 
     return $?
   fi
@@ -86,15 +86,19 @@ function docker {
       ;;
     here) docker-into "${dopts}" "${PWD}" "${@}"
       ;;
+    dive) /usr/bin/env docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive
+      ;;
+    nsenter|enter) /usr/bin/env docker run --rm -it --privileged --pid=host justincormack/nsenter1
+      ;;
     bld|build) docker-build "${dopts}" "${@}"
       ;;
-    net) zsh -c "/usr/bin/env docker ${dopts} network ${@}"
+    net) eval "/usr/bin/env docker ${dopts} network ${@}"
       ;;
-    ctx) zsh -c "/usr/bin/env docker ${dopts} context ${@}"
+    ctx) eval "/usr/bin/env docker ${dopts} context ${@}"
       ;;
-    ls) zsh -c "/usr/bin/env docker ${dopts} images ${@}"
+    ls) eval "/usr/bin/env docker ${dopts} images ${@}"
       ;;
-    *) zsh -c "/usr/bin/env docker ${dopts} ${cmd} ${@}"
+    *) eval "/usr/bin/env docker ${dopts} ${cmd} ${@}"
       ;;
   esac
 
