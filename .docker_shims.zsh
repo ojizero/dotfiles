@@ -86,9 +86,9 @@ function docker {
       ;;
     here) docker-into "${dopts}" "${PWD}" "${@}"
       ;;
-    dive) /usr/bin/env docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive -- ${@}
+    dive) eval "/usr/bin/env docker ${dopts} run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive -- ${@}"
       ;;
-    nsenter|enter) /usr/bin/env docker run --rm -it --privileged --pid=host justincormack/nsenter1
+    nsenter|enter) eval "/usr/bin/env docker ${dopts} run --rm -it --privileged --pid=host justincormack/nsenter1"
       ;;
     bld|build) docker-build "${dopts}" "${@}"
       ;;
