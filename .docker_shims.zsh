@@ -12,7 +12,7 @@ function docker-build {
 
   local default_tag="$(basename ${PWD})"
 
-  if [[ "${args}" != *'--help'* ]] || [[ "${args}" != *'-h'* ]]; then
+  if [[ "${args}" = *'--help'* ]] || [[ "${args}" = *'-h'* ]]; then
     eval "/usr/bin/env docker ${dopts} build ${args}"
 
     return $?
@@ -26,9 +26,27 @@ function docker-build {
     args="--force-rm ${args}"
   fi
 
-  # TODO: loop and build each named target individually
+  local targets=$(cat Dockerfile | grep -E '^FROM .* AS .*$' | sed -e 's/FROM .* AS //')
+  local caches=''
+  local base_tag=$(echo "${args}" | grep -oE ' (--tag|-t)(=| )?([^ ])*')
 
-  eval "/usr/bin/env docker ${dopts} build ${args}"
+  if [[ "${args}" != *'--no-progressive-build'* ]]; then
+    echo '=== Automatically build multistages in a progressive way'
+    echo '=== Each named target will be build independently and used to cache next targets'
+
+    for t in $(echo ${targets}); do
+      echo "=== Building target ${t}"
+
+      local target_tag="${default_tag}:${t}"
+      local args_changes=" --tag ${target_tag} --target ${t} ${caches}"
+
+      eval "/usr/bin/env docker ${dopts} build $(echo ${args} | sed -e 's/'${base_tag}'/'${args_changes}'/')"
+
+      caches="${caches} --cache-from ${target_tag}"
+    done
+  fi
+
+  eval "/usr/bin/env docker ${dopts} build ${caches} ${args}"
 }
 
 function docker {
