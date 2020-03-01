@@ -6,6 +6,20 @@ function docker-into {
   eval "/usr/bin/env docker ${dopts} run -it --rm --volume "${_path}:${_path}" --workdir "${_path}" ${args}"
 }
 
+function docker-run {
+  local dopts="${1}"
+  local args="${2}"
+
+  if [[ "${args}" = *'--no-rm'* ]]; then
+    # --no-rm isn't a real flag so we remove it
+    args=$(echo "${args}" | sed -e 's/--no-rm//g')
+  elif [[ "${args}" != *'--rm'* ]]; then
+    args="--rm ${args}"
+  fi
+
+  eval "/usr/bin/env docker ${dopts} run ${args}"
+}
+
 function docker-build {
   local dopts="${1}"
   local args="${2}"
@@ -22,7 +36,10 @@ function docker-build {
     args="--tag ${default_tag} ${args}"
   fi
 
-  if [[ "${args}" != *'--force-rm'* ]] && [[ "${args}" != *'--no-force-rm'* ]]; then
+  if [[ "${args}" = *'--no-force-rm'* ]]; then
+    # --no-force-rm isn't a real flag so we remove it
+    args=$(echo "${args}" | sed -e 's/--no-force-rm//g')
+  elif [[ "${args}" != *'--force-rm'* ]]; then
     args="--force-rm ${args}"
   fi
 
@@ -44,6 +61,9 @@ function docker-build {
 
       caches="${caches} --cache-from ${target_tag}"
     done
+  else
+    # --no-progressive-build isn't a real flag so we remove it
+    args=$(echo "${args}" | sed -e 's/--no-progressive-build//g')
   fi
 
   eval "/usr/bin/env docker ${dopts} build ${caches} ${args}"
@@ -81,11 +101,23 @@ function docker {
         shift
         ;;
 
+      --no-shim)
+        __no_shim='__true__'
+        shift
+        echo 'The command will be run as is without Shim function intervening' >&2
+        ;;
+
       *)
         break
         ;;
     esac
   done
+
+  if [[ "${__no_shim}" = '__true__' ]]; then
+    echo "Evaluating the command [[ /usr/bin/env docker ${dopts} ${@} ]] as is" >&2
+    eval "/usr/bin/env docker ${dopts} ${@}"
+    return $?
+  fi
 
   if [[ $# -eq 0 ]]; then
     eval "/usr/bin/env docker ${dopts} --help"
@@ -109,6 +141,8 @@ function docker {
     nsenter|enter) eval "/usr/bin/env docker ${dopts} run --rm -it --privileged --pid=host justincormack/nsenter1"
       ;;
     bld|build) docker-build "${dopts}" "${@}"
+      ;;
+    run) docker-run "${dopts}" "${@}"
       ;;
     net) eval "/usr/bin/env docker ${dopts} network ${@}"
       ;;

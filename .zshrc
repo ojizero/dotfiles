@@ -36,14 +36,16 @@ source "$(dirname $(readlink "${ZSH_PROFILE}"))/.docker_shims.zsh"
 alias f='\fuck'
 alias k='\kubectl'
 if type gls > /dev/null; then
-  alias ls='\gls -G --color=auto'
   alias l='\gls -lhA --color=auto --group-directories-first'
+  alias ls='\gls -lhA --color=auto --group-directories-first'
 else
   alias l='\ls -lhA'
+  alias ls='\ls -lhA'
 fi
 alias d='\dirs -v'
 alias p='\pushd'
 alias pp='\popd'
+alias tf='\terraform'
 alias mkdir='\mkdir -vp'
 alias ipglobal='\dig +short myip.opendns.com @resolver1.opendns.com'
 alias nsenter='\docker run -it --rm --privileged --pid=host justincormack/nsenter1'
