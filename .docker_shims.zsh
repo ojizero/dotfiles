@@ -48,11 +48,11 @@ function docker-build {
   local base_tag=$(echo "${args}" | grep -oE ' (--tag|-t)(=| )?([^ ])*')
 
   if [[ "${args}" != *'--no-progressive-build'* ]]; then
-    echo '=== Automatically build multistages in a progressive way'
-    echo '=== Each named target will be build independently and used to cache next targets'
+    echo '=== Automatically build multistages in a progressive way' >&2
+    echo '=== Each named target will be build independently and used to cache next targets' >&2
 
     for t in $(echo ${targets}); do
-      echo "=== Building target ${t}"
+      echo "=== Building target ${t}" >&2
 
       local target_tag="${default_tag}:${t}"
       local args_changes=" --tag ${target_tag} --target ${t} ${caches}"
@@ -104,7 +104,7 @@ function docker {
       --no-shim)
         __no_shim='__true__'
         shift
-        echo 'The command will be run as is without Shim function intervening' >&2
+        echo '=== The command will be run as is without Shim function intervening' >&2
         ;;
 
       *)
@@ -114,7 +114,7 @@ function docker {
   done
 
   if [[ "${__no_shim}" = '__true__' ]]; then
-    echo "Evaluating the command [[ /usr/bin/env docker ${dopts} ${@} ]] as is" >&2
+    echo "=== Evaluating the command [[ /usr/bin/env docker ${dopts} ${@} ]] as is" >&2
     eval "/usr/bin/env docker ${dopts} ${@}"
     return $?
   fi
