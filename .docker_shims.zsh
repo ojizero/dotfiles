@@ -1,14 +1,23 @@
 function docker-into {
-  local dopts="${1}"
-  local _path="${2}"
-  local args="${3}"
+  local input="${@}"
+
+  local dopts="${input% // *}"
+  local dopts="${dopts% // *}"
+
+  local _path="${input% // *}"
+  local _path="${_path#* // }"
+
+  local args="${input#* // }"
+  local args="${args#* // }"
 
   eval "/usr/bin/env docker ${dopts} run -it --rm --volume "${_path}:${_path}" --workdir "${_path}" ${args}"
 }
 
 function docker-run {
-  local dopts="${1}"
-  local args="${2}"
+  local input="${@}"
+
+  local dopts="${input% // *}"
+  local args="${input#* // }"
 
   if [[ "${args}" = *'--no-rm'* ]]; then
     # --no-rm isn't a real flag so we remove it
@@ -21,8 +30,10 @@ function docker-run {
 }
 
 function docker-build {
-  local dopts="${1}"
-  local args="${2}"
+  local input="${@}"
+
+  local dopts="${input% // *}"
+  local args="${input#* // }"
 
   local default_tag="$(basename ${PWD})"
 
@@ -71,7 +82,7 @@ function docker-build {
 
 function docker {
   if [[ $# -eq 0 ]]; then
-    docker-build "" "${PWD}"
+    docker-build "" // "${PWD}"
 
     return $?
   fi
@@ -102,7 +113,7 @@ function docker {
         ;;
 
       --no-shim)
-        __no_shim='__true__'
+        local __no_shim='__true__'
         shift
         echo '=== The command will be run as is without Shim function intervening' >&2
         ;;
@@ -132,17 +143,17 @@ function docker {
     into)
       local _path="${1}"
       shift
-      docker-into "${dopts}" "${_path}" "${@}"
+      docker-into "${dopts}" // "${_path}" // "${@}"
       ;;
-    here) docker-into "${dopts}" "${PWD}" "${@}"
+    here) docker-into "${dopts}" // "${PWD}" // "${@}"
       ;;
-    dive) eval "/usr/bin/env docker ${dopts} run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive -- ${@}"
+    dive) eval "/usr/bin/env docker ${dopts} run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive // ${@}"
       ;;
     nsenter|enter) eval "/usr/bin/env docker ${dopts} run --rm -it --privileged --pid=host justincormack/nsenter1"
       ;;
-    bld|build) docker-build "${dopts}" "${@}"
+    bld|build) docker-build "${dopts}" // "${@}"
       ;;
-    run) docker-run "${dopts}" "${@}"
+    run) docker-run "${dopts}" // "${@}"
       ;;
     net) eval "/usr/bin/env docker ${dopts} network ${@}"
       ;;

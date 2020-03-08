@@ -48,6 +48,7 @@ alias pp='\popd'
 alias tf='\terraform'
 alias mkdir='\mkdir -vp'
 alias ipglobal='\dig +short myip.opendns.com @resolver1.opendns.com'
+alias sudo='sudo ' # This allows for using aliases under sudo
 alias nsenter='\docker run -it --rm --privileged --pid=host justincormack/nsenter1'
 alias dockerdive='\docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive'
 alias dockerclean='\docker rmi --force $(docker images -q)'
