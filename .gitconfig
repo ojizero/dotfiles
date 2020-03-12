@@ -41,7 +41,7 @@
 	l = !"l() { git --no-pager log -${1-1}; }; l"
 	ll = log
 
-	ignore = "!gi() { curl -L -s https://www.gitignore.io/api/$@ ;}; gi >> .gitignore"
+	ignore = "!gi() { curl -L -s https://www.gitignore.io/api/$@; }; gi >> .gitignore"
 
 	ri = rebase -i
 	re = rebase
@@ -49,7 +49,7 @@
 
 	ini = init
 
-	newgh = "!ghnew() { \\git init ; \\hub create $@ }; ghnew"
+	newgh = "!ghnew() { \\git init; \\hub create $@; }; ghnew"
 
 [push]
 	followTags = true
