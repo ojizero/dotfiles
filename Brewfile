@@ -5,6 +5,7 @@ tap "homebrew/cask-versions"
 tap "homebrew/core"
 tap "nodenv/nodenv"
 brew "awscli"
+brew "azure-cli"
 brew "bash"
 brew "coreutils"
 brew "docker", link: false
