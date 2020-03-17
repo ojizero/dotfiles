@@ -60,7 +60,7 @@ function docker-build {
 
   if [[ "${args}" != *'--no-progressive-build'* ]]; then
     echo '=== Automatically build multistages in a progressive way' >&2
-    echo '=== Each named target will be build independently and used to cache next targets' >&2
+    echo '=== Each named targets will be built independently and used to cache next targets' >&2
 
     for t in $(echo ${targets}); do
       echo "=== Building target '${t}'" >&2
@@ -87,9 +87,28 @@ function docker-build {
   eval "/usr/bin/env docker ${dopts} build ${caches} ${args}"
 }
 
+function docker-remove-dangling {
+  local input="${@}"
+
+  local dopts="${input% // *}"
+  local args="${input#* // }"
+
+  local dangling_images=$(eval "/usr/bin/env docker ${dopts} images --filter dangling=true --quiet")
+
+  local s=$?
+  if [[ $s -ne 0 ]]; then
+    echo '=== Docker failed to query dangling images' >&2
+    echo "${dangling_images}" >&2
+
+    return $s
+  fi
+
+  eval "/usr/bin/env docker ${dopts} rmi ${args} ${dangling_images}"
+}
+
 function docker {
   if [[ $# -eq 0 ]]; then
-    docker-build "" // "${PWD}"
+    docker-build " // ${PWD}"
 
     return $?
   fi
@@ -145,17 +164,19 @@ function docker {
   case "${cmd}" in
     into)
       local _path="${1}"; shift
-      docker-into "${dopts}" // "${_path}" // "${@}"
+      docker-into "${dopts} // ${_path} // ${@}"
       ;;
-    here) docker-into "${dopts}" // "${PWD}" // "${@}"
+    here) docker-into "${dopts} // ${PWD} // ${@}"
       ;;
-    dive) eval "/usr/bin/env docker ${dopts} run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive // ${@}"
+    dive) eval "/usr/bin/env docker ${dopts} run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive -- ${@}"
       ;;
     nsenter|enter) eval "/usr/bin/env docker ${dopts} run --rm -it --privileged --pid=host justincormack/nsenter1"
       ;;
-    bld|build) docker-build "${dopts}" // "${@}"
+    bld|build) docker-build "${dopts} // ${@}"
       ;;
-    run) docker-run "${dopts}" // "${@}"
+    run) docker-run "${dopts} // ${@}"
+      ;;
+    rmd|rmdangling) docker-remove-dangling "${dopts} // ${@}"
       ;;
     net) eval "/usr/bin/env docker ${dopts} network ${@}"
       ;;
