@@ -63,12 +63,13 @@ function docker-build {
     echo '=== Each named target will be build independently and used to cache next targets' >&2
 
     for t in $(echo ${targets}); do
-      echo "=== Building target ${t}" >&2
+      echo "=== Building target '${t}'" >&2
 
       local target_tag="${default_tag}:${t}"
       local args_changes=" --tag ${target_tag} --target ${t} ${caches}"
 
       eval "/usr/bin/env docker ${dopts} build $(echo ${args} | sed -e 's/'${base_tag}'/'${args_changes}'/')"
+      local s=$?; if [[ $s -ne 0 ]]; then return $s; fi
 
       caches="${caches} --cache-from ${target_tag}"
     done
@@ -99,8 +100,7 @@ function docker {
       |--tlscert\
       |--tlskey\
       )
-        dopts="${dopts} ${1} ${2}"
-        shift 2
+        dopts="${dopts} ${1} ${2}"; shift 2
         ;;
 
       -D|--debug\
@@ -108,13 +108,11 @@ function docker {
       |--tls\
       |--tlsverify\
       )
-        dopts="${dopts} ${1}"
-        shift
+        dopts="${dopts} ${1}"; shift
         ;;
 
       --no-shim)
-        local __no_shim='__true__'
-        shift
+        local __no_shim='__true__'; shift
         echo '=== The command will be run as is without Shim function intervening' >&2
         ;;
 
@@ -136,13 +134,11 @@ function docker {
     return $?
   fi
 
-  local cmd="${1}"
-  shift
+  local cmd="${1}"; shift
 
   case "${cmd}" in
     into)
-      local _path="${1}"
-      shift
+      local _path="${1}"; shift
       docker-into "${dopts}" // "${_path}" // "${@}"
       ;;
     here) docker-into "${dopts}" // "${PWD}" // "${@}"
