@@ -69,7 +69,13 @@ function docker-build {
       local args_changes=" --tag ${target_tag} --target ${t} ${caches}"
 
       eval "/usr/bin/env docker ${dopts} build $(echo ${args} | sed -e 's/'${base_tag}'/'${args_changes}'/')"
-      local s=$?; if [[ $s -ne 0 ]]; then return $s; fi
+
+      local s=$?
+      if [[ $s -ne 0 ]]; then
+        echo "=== Docker failed to build target '${t}'" >&2
+
+        return $s
+      fi
 
       caches="${caches} --cache-from ${target_tag}"
     done
