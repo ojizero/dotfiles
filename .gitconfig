@@ -55,3 +55,6 @@
 
 [push]
 	followTags = true
+
+[rebase]
+	autoStash = true
