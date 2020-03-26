@@ -93,7 +93,7 @@ function docker-remove-dangling {
   local dopts="${input% // *}"
   local args="${input#* // }"
 
-  local dangling_images=$(eval "/usr/bin/env docker ${dopts} images --filter dangling=true --quiet")
+  local dangling_images=$(eval "/usr/bin/env docker ${dopts} images --filter dangling=true --quiet" | tr '\n' ' ')
 
   local s=$?
   if [[ $s -ne 0 ]]; then
