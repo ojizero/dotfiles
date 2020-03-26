@@ -58,3 +58,13 @@
 
 [rebase]
 	autoStash = true
+
+[color]
+	ui = true
+
+[core]
+	pager = diff-so-fancy | less -RFX
+
+[diff-so-fancy]
+	markEmptyLines = false
+	stripLeadingSymbols = false
