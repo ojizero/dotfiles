@@ -1,3 +1,13 @@
+function info {
+  echo "=== ${@}" >&2
+}
+
+function debug {
+  if [[ "${DEBUG}" = *'docker-shim'* ]] || [[ "${DEBUG}" = '*' ]] || [[ "${DEBUG:l}" = 'true' ]]; then
+    echo "=== ${@}" >&2
+  fi
+}
+
 function docker-into {
   local input="${@}"
 
@@ -10,6 +20,7 @@ function docker-into {
   local args="${input#* // }"
   local args="${args#* // }"
 
+  debug "RUNNING: /usr/bin/env docker ${dopts} run -it --rm --volume "${_path}:${_path}" --workdir "${_path}" ${args}"
   eval "/usr/bin/env docker ${dopts} run -it --rm --volume "${_path}:${_path}" --workdir "${_path}" ${args}"
 }
 
@@ -26,6 +37,7 @@ function docker-run {
     args="--rm ${args}"
   fi
 
+  debug "RUNNING: /usr/bin/env docker ${dopts} run ${args}"
   eval "/usr/bin/env docker ${dopts} run ${args}"
 }
 
@@ -38,6 +50,7 @@ function docker-build {
   local default_tag="$(basename ${PWD})"
 
   if [[ "${args}" = *'--help'* ]] || [[ "${args}" = *'-h'* ]]; then
+    debug "RUNNING: /usr/bin/env docker ${dopts} build ${args}"
     eval "/usr/bin/env docker ${dopts} build ${args}"
 
     return $?
@@ -59,8 +72,8 @@ function docker-build {
   local base_tag=$(echo "${args}" | grep -oE ' (--tag|-t)(=| )?([^ ])*')
 
   if [[ "${args}" != *'--no-progressive-build'* ]]; then
-    echo '=== Automatically build multistages in a progressive way' >&2
-    echo '=== Each named targets will be built independently and used to cache next targets' >&2
+    info 'Automatically build multistages in a progressive way'
+    info 'Each named targets will be built independently and used to cache next targets'
 
     for t in $(echo ${targets}); do
       echo "=== Building target '${t}'" >&2
@@ -68,6 +81,7 @@ function docker-build {
       local target_tag="${default_tag}:${t}"
       local args_changes=" --tag ${target_tag} --target ${t} ${caches}"
 
+      debug "RUNNING: /usr/bin/env docker ${dopts} build $(echo ${args} | sed -e 's/'${base_tag}'/'${args_changes}'/')"
       eval "/usr/bin/env docker ${dopts} build $(echo ${args} | sed -e 's/'${base_tag}'/'${args_changes}'/')"
 
       local s=$?
@@ -84,6 +98,7 @@ function docker-build {
     args=$(echo "${args}" | sed -e 's/--no-progressive-build//g')
   fi
 
+  debug "RUNNING: /usr/bin/env docker ${dopts} build ${caches} ${args}"
   eval "/usr/bin/env docker ${dopts} build ${caches} ${args}"
 }
 
@@ -93,16 +108,18 @@ function docker-remove-dangling {
   local dopts="${input% // *}"
   local args="${input#* // }"
 
+  debug "RUNNING: /usr/bin/env docker ${dopts} images --filter dangling=true --quiet"
   local dangling_images=$(eval "/usr/bin/env docker ${dopts} images --filter dangling=true --quiet" | tr '\n' ' ')
 
   local s=$?
   if [[ $s -ne 0 ]]; then
-    echo '=== Docker failed to query dangling images' >&2
+    info 'Docker failed to query dangling images'
     echo "${dangling_images}" >&2
 
     return $s
   fi
 
+  debug "RUNNING: /usr/bin/env docker ${dopts} rmi ${args} ${dangling_images}"
   eval "/usr/bin/env docker ${dopts} rmi ${args} ${dangling_images}"
 }
 
@@ -138,7 +155,7 @@ function docker {
 
       --no-shim)
         local __no_shim='__true__'; shift
-        echo '=== The command will be run as is without Shim function intervening' >&2
+        info 'The command will be run as is without Shim function intervening'
         ;;
 
       *)
@@ -148,12 +165,13 @@ function docker {
   done
 
   if [[ "${__no_shim}" = '__true__' ]]; then
-    echo "=== Evaluating the command [[ /usr/bin/env docker ${dopts} ${@} ]] as is" >&2
+    debug "RUNNING: /usr/bin/env docker ${dopts} ${@}"
     eval "/usr/bin/env docker ${dopts} ${@}"
     return $?
   fi
 
   if [[ $# -eq 0 ]]; then
+    debug "RUNNING: /usr/bin/env docker ${dopts} --help"
     eval "/usr/bin/env docker ${dopts} --help"
 
     return $?
@@ -163,14 +181,23 @@ function docker {
 
   case "${cmd}" in
     into)
+      debug "ALIAS: ${cmd}"
       local _path="${1}"; shift
       docker-into "${dopts} // ${_path} // ${@}"
       ;;
-    here) docker-into "${dopts} // ${PWD} // ${@}"
+    here)
+      debug "ALIAS: ${cmd}"
+      docker-into "${dopts} // ${PWD} // ${@}"
       ;;
-    dive) eval "/usr/bin/env docker ${dopts} run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive -- ${@}"
+    dive)
+      debug "ALIAS: ${cmd}"
+      debug "RUNNING: /usr/bin/env docker ${dopts} run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive -- ${@}"
+      eval "/usr/bin/env docker ${dopts} run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive -- ${@}"
       ;;
-    nsenter|enter) eval "/usr/bin/env docker ${dopts} run --rm -it --privileged --pid=host justincormack/nsenter1"
+    nsenter|enter)
+      debug "ALIAS: ${cmd}"
+      debug "RUNNING: /usr/bin/env docker ${dopts} run --rm -it --privileged --pid=host justincormack/nsenter1"
+      eval "/usr/bin/env docker ${dopts} run --rm -it --privileged --pid=host justincormack/nsenter1"
       ;;
     bld|build) docker-build "${dopts} // ${@}"
       ;;
@@ -178,13 +205,25 @@ function docker {
       ;;
     rmd|rmdangling) docker-remove-dangling "${dopts} // ${@}"
       ;;
-    net) eval "/usr/bin/env docker ${dopts} network ${@}"
+    net)
+      debug "ALIAS: ${cmd}"
+      debug "RUNNING: /usr/bin/env docker ${dopts} network ${@}"
+      eval "/usr/bin/env docker ${dopts} network ${@}"
       ;;
-    ctx) eval "/usr/bin/env docker ${dopts} context ${@}"
+    ctx)
+      debug "ALIAS: ${cmd}"
+      debug "RUNNING: /usr/bin/env docker ${dopts} context ${@}"
+      eval "/usr/bin/env docker ${dopts} context ${@}"
       ;;
-    ls) eval "/usr/bin/env docker ${dopts} images ${@}"
+    ls)
+      debug "ALIAS: ${cmd}"
+      debug "RUNNING: /usr/bin/env docker ${dopts} images ${@}"
+      eval "/usr/bin/env docker ${dopts} images ${@}"
       ;;
-    *) eval "/usr/bin/env docker ${dopts} ${cmd} ${@}"
+    *)
+      debug "PASSTHRU TO DOCKER: ${cmd}"
+      debug "RUNNING: /usr/bin/env docker ${dopts} ${cmd} ${@}"
+      eval "/usr/bin/env docker ${dopts} ${cmd} ${@}"
       ;;
   esac
 
