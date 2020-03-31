@@ -30,6 +30,12 @@ eval "$(thefuck --alias)"
 
 source "$(dirname $(readlink "${ZSH_PROFILE}"))/.docker_shims.zsh"
 
+export PHPENV_ROOT="/Users/oji/.phpenv"
+if [ -d "${PHPENV_ROOT}" ]; then
+  export PATH="${PHPENV_ROOT}/bin:${PATH}"
+  eval "$(phpenv init -)"
+fi
+
 # Aliases and functions
 #
 

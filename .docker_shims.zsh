@@ -20,8 +20,8 @@ function docker-into {
   local args="${input#* // }"
   local args="${args#* // }"
 
-  debug "RUNNING: /usr/bin/env docker ${dopts} run -it --rm --volume "${_path}:${_path}" --workdir "${_path}" ${args}"
-  eval "/usr/bin/env docker ${dopts} run -it --rm --volume "${_path}:${_path}" --workdir "${_path}" ${args}"
+  debug "RUNNING: /usr/bin/env docker ${dopts} run -it --rm --volume \"${_path}:${_path}\" --workdir "${_path}" ${args}"
+  eval "/usr/bin/env docker ${dopts} run -it --rm --volume \"${_path}:${_path}\" --workdir \"${_path}\" ${args}"
 }
 
 function docker-run {
