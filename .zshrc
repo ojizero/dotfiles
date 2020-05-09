@@ -20,6 +20,10 @@ source "${ZSH}/oh-my-zsh.sh"
 export ZSH_PROFILE="${HOME}/.zshrc"
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 
+# Tool related environment variables
+#
+export AWS_PAGER='less -RFX'
+
 # Toolings
 #
 
