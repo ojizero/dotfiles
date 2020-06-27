@@ -27,6 +27,7 @@ export AWS_PAGER='less -RFX'
 # Toolings
 #
 
+if [ -e /Users/oji/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/oji/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 eval "$(nodenv init -)"
 eval "$(goenv init -)"
 eval "$(rbenv init -)"
