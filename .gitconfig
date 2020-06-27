@@ -37,6 +37,7 @@
 
 	d = diff
 	dn = !git --no-pager diff --name-only
+	ds = diff --cached
 
 	l = !"l() { git --no-pager log -${1-1}; }; l"
 	ll = log
