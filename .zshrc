@@ -35,6 +35,8 @@ eval "$(thefuck --alias)"
 
 source "$(dirname $(readlink "${ZSH_PROFILE}"))/.docker_shims.zsh"
 
+# TODO: can be dropped as NIX handles PHP now
+
 export PHPENV_ROOT="/Users/oji/.phpenv"
 if [ -d "${PHPENV_ROOT}" ]; then
   export PATH="${PHPENV_ROOT}/bin:${PATH}"

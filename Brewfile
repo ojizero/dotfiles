@@ -4,16 +4,12 @@ tap "homebrew/bundle"
 tap "homebrew/cask"
 tap "homebrew/cask-versions"
 tap "homebrew/core"
-tap "nektos/tap"
 tap "nodenv/nodenv"
 tap "ojizero/tap"
 
-brew "awscli"                                       #y
 brew "azure-cli"                                    #y
-brew "bash"                                         #y
 brew "cmake"                                        #y
-brew "coreutils"                                    #y
-brew "diff-so-fancy"                                #y
+brew "coreutils"                                    #yy
 brew "docker", link: false                          #y
 brew "gawk"                                         #y
 brew "git-lfs"                                      #y
@@ -48,7 +44,6 @@ brew "watch"                                        #y
 brew "wget"                                         #y
 brew "aws/tap/aws-sam-cli"                          #y
 brew "azure/functions/azure-functions-core-tools@3" #?
-brew "nektos/tap/act"                               #y
 brew "nodenv/nodenv/node-build-update-defs"         #?x
 brew "nodenv/nodenv/nodenv-aliases"                 #?x
 brew "nodenv/nodenv/nodenv-package-rehash"          #?x
@@ -60,11 +55,9 @@ cask "dotnet-sdk"                                   #y
 cask "fanny"                                        #??
 cask "firefox"                                      #y
 cask "flycut"                                       #?
-cask "google-chrome"                                #?x
 cask "gpg-suite"                                    #?x
 cask "imageoptim"                                   #?
 cask "intellij-idea-ce"                             #??
-cask "iterm2"                                       #y
 cask "itsycal"                                      #?
 cask "megasync"                                     #y
 cask "microsoft-teams"                              #y
