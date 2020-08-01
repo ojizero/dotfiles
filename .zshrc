@@ -27,7 +27,6 @@ export AWS_PAGER='less -RFX'
 # Toolings
 #
 
-if [ -e /Users/oji/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/oji/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 eval "$(nodenv init -)"
 eval "$(goenv init -)"
 eval "$(rbenv init -)"
@@ -42,6 +41,9 @@ if [ -d "${PHPENV_ROOT}" ]; then
   export PATH="${PHPENV_ROOT}/bin:${PATH}"
   eval "$(phpenv init -)"
 fi
+
+# Supercedes all previous toolings related to programming languages
+if [ -e /Users/oji/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/oji/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
 # Aliases and functions
 #
