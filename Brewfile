@@ -31,7 +31,6 @@ brew "openjdk@11"                                   #y
 brew "packer"                                       #y
 brew "shellcheck"                                   #y
 brew "terraform"                                    #y
-brew "thefuck"                                      #y
 brew "tree"                                         #y
 brew "unrar"                                        #y
 brew "vagrant-completion"                           #y

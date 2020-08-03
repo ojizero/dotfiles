@@ -1,7 +1,7 @@
 # Initial Oh My Zsh setup
 #
 
-export ZSH="/Users/oji/.oh-my-zsh"
+export ZSH="${HOME}/.oh-my-zsh"
 export ZSH_THEME="avit"
 
 export DISABLE_UPDATE_PROMPT="true"
@@ -17,6 +17,7 @@ source "${ZSH}/oh-my-zsh.sh"
 # Define custom environment variables
 #
 
+export NIX_CONFIG="${HOME}/.nix-profile/etc/profile.d/nix.sh"
 export ZSH_PROFILE="${HOME}/.zshrc"
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 
@@ -27,12 +28,12 @@ export AWS_PAGER='less -RFX'
 # Toolings
 #
 
+# shellcheck source=/dev/null
+if [ -e "${NIX_CONFIG}" ]; then . "${NIX_CONFIG}"; fi
+
 eval "$(thefuck --alias)"
 
 source "$(dirname $(readlink "${ZSH_PROFILE}"))/.docker_shims.zsh"
-
-# Supercedes all previous toolings related to programming languages
-if [ -e /Users/oji/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/oji/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
 # Aliases and functions
 #
