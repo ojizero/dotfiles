@@ -27,8 +27,6 @@ export AWS_PAGER='less -RFX'
 # Toolings
 #
 
-eval "$(goenv init -)"
-eval "$(rbenv init -)"
 eval "$(thefuck --alias)"
 
 source "$(dirname $(readlink "${ZSH_PROFILE}"))/.docker_shims.zsh"

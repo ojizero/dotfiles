@@ -14,8 +14,6 @@ brew "gawk"                                         #y
 brew "git-lfs"                                      #y
 brew "gnu-tar"                                      #y
 brew "gnupg", link: false                           #y
-brew "go"                                           #y
-brew "goenv"                                        #?x
 brew "goreleaser"                                   #??
 brew "grep"                                         #??
 brew "helm"                                         #y
@@ -31,7 +29,6 @@ brew "ncdu"                                         #y
 brew "neovim"                                       #x
 brew "openjdk@11"                                   #y
 brew "packer"                                       #y
-brew "rbenv"                                        #?x
 brew "shellcheck"                                   #y
 brew "terraform"                                    #y
 brew "thefuck"                                      #y
