@@ -4,7 +4,6 @@ tap "homebrew/bundle"
 tap "homebrew/cask"
 tap "homebrew/cask-versions"
 tap "homebrew/core"
-tap "nodenv/nodenv"
 tap "ojizero/tap"
 
 brew "azure-cli"                                    #y
@@ -30,7 +29,6 @@ brew "m-cli"                                        #y
 brew "mas"                                          #?
 brew "ncdu"                                         #y
 brew "neovim"                                       #x
-brew "nodenv"                                       #?x
 brew "openjdk@11"                                   #y
 brew "packer"                                       #y
 brew "rbenv"                                        #?x
@@ -44,9 +42,6 @@ brew "watch"                                        #y
 brew "wget"                                         #y
 brew "aws/tap/aws-sam-cli"                          #y
 brew "azure/functions/azure-functions-core-tools@3" #?
-brew "nodenv/nodenv/node-build-update-defs"         #?x
-brew "nodenv/nodenv/nodenv-aliases"                 #?x
-brew "nodenv/nodenv/nodenv-package-rehash"          #?x
 brew "ojizero/tap/gofindup"                         #h
 cask "adguard"                                      #??
 cask "discord"                                      #y

@@ -27,20 +27,11 @@ export AWS_PAGER='less -RFX'
 # Toolings
 #
 
-eval "$(nodenv init -)"
 eval "$(goenv init -)"
 eval "$(rbenv init -)"
 eval "$(thefuck --alias)"
 
 source "$(dirname $(readlink "${ZSH_PROFILE}"))/.docker_shims.zsh"
-
-# TODO: can be dropped as NIX handles PHP now
-
-export PHPENV_ROOT="/Users/oji/.phpenv"
-if [ -d "${PHPENV_ROOT}" ]; then
-  export PATH="${PHPENV_ROOT}/bin:${PATH}"
-  eval "$(phpenv init -)"
-fi
 
 # Supercedes all previous toolings related to programming languages
 if [ -e /Users/oji/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/oji/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
