@@ -24,6 +24,7 @@ export DOTNET_CLI_TELEMETRY_OPTOUT=1
 # Tool related environment variables
 #
 export AWS_PAGER='less -RFX'
+export ERL_AFLAGS="-kernel shell_history enabled"
 
 # Toolings
 #
@@ -34,6 +35,7 @@ if [ -e "${NIX_CONFIG}" ]; then . "${NIX_CONFIG}"; fi
 eval "$(thefuck --alias)"
 
 source "$(dirname $(readlink "${ZSH_PROFILE}"))/.docker_shims.zsh"
+. <(helm completion zsh)
 
 # Aliases and functions
 #
@@ -95,9 +97,19 @@ function vagrant {
 }
 alias v='vagrant'
 
+function kubetail {
+  selectors="${1}"; shift
+  container="${1}"; shift
+  kubectl logs -l "${selectors}" -c ${container} $@
+}
+alias ktail='kubetail'
+
 # Options
 #
 
 # More sane `pushd` settings
 unsetopt auto_pushd
 setopt pushd_ignore_dups
+
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /usr/local/bin/terraform terraform
