@@ -104,6 +104,20 @@ function kubetail {
 }
 alias ktail='kubetail'
 
+function kubereleasevolumes {
+  released_pvs="$(kubectl get pv -n clickhouse -o json | jq '[.items[]|select(.status.phase=="Released")|.metadata.name]|join(" ")' -r)"
+
+  kubectl delete pv -n clickhouse ${released_pvs[@]}
+}
+alias kreleasevolumes=kubereleasevolumes
+
+function local-forward {
+  local_connection=${1}; shift
+  remote_connection=${1}; shift
+
+  ssh -L "${local_connection}:${remote_connection}" $@
+}
+
 # Options
 #
 
