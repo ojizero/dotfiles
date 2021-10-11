@@ -54,6 +54,9 @@
 
 	newgh = "!ghnew() { \\git init; \\hub create $@; }; ghnew"
 
+	gone = ! "git fetch -p && git for-each-ref --format '%(refname:short) %(upstream:track)' refs/heads | awk '$2 == \"[gone]\" {print $1}' | xargs -r git branch -D"
+
+
 [push]
 	followTags = true
 
@@ -75,3 +78,9 @@
 	process = git-lfs filter-process
 	required = true
 	clean = git-lfs clean -- %f
+
+[pull]
+	rebase = false
+
+[init]
+	defaultBranch = master

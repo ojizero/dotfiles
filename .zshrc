@@ -118,6 +118,17 @@ function local-forward {
   ssh -L "${local_connection}:${remote_connection}" $@
 }
 
+listening() {
+  if [ $# -eq 0 ]; then
+    sudo lsof -iTCP -sTCP:LISTEN -n -P
+  elif [ $# -eq 1 ]; then
+    sudo lsof -iTCP -sTCP:LISTEN -n -P | grep -i --color $1
+  else
+    echo "Usage: listening [pattern]" >&2
+  fi
+}
+
+
 # Options
 #
 
