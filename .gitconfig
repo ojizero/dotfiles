@@ -1,7 +1,7 @@
 [user]
 	# TODO: Move outside this file
 	name = ojizero
-	email = z.acnts.816@pm.me
+	email = hello@ojizero.tech
 
 [alias]
 	s = status --short --branch
@@ -84,3 +84,6 @@
 
 [init]
 	defaultBranch = master
+
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/

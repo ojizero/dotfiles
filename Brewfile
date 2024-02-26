@@ -1,72 +1,108 @@
+# Installed taps
+#
+
 tap "aws/tap"
 tap "azure/functions"
 tap "homebrew/bundle"
 tap "homebrew/cask"
+tap "homebrew/cask-fonts"
 tap "homebrew/cask-versions"
 tap "homebrew/core"
 tap "ojizero/tap"
 
-brew "azure-cli"                                    #y
-brew "cmake"                                        #y
-brew "coreutils"                                    #yy
-brew "docker", link: false                          #y
-brew "gawk"                                         #y
-brew "git-lfs"                                      #y
-brew "gnu-tar"                                      #y
-brew "gnupg", link: false                           #y
-brew "goreleaser"                                   #??
-brew "grep"                                         #??
-brew "helm"                                         #y
-brew "hub"                                          #y
-brew "hugo"                                         #y
-brew "jq"                                           #?
-brew "jsonnet"                                      #x
-brew "just"                                         #?
-brew "kubernetes-cli"                               #y
-brew "m-cli"                                        #y
-brew "mas"                                          #?
-brew "ncdu"                                         #y
-brew "neovim"                                       #x
-brew "openjdk@11"                                   #y
-brew "packer"                                       #y
-brew "shellcheck"                                   #y
-brew "terraform"                                    #y
-brew "tree"                                         #y
-brew "unrar"                                        #y
-brew "vagrant-completion"                           #y
-brew "watch"                                        #y
-brew "wget"                                         #y
-brew "aws/tap/aws-sam-cli"                          #y
-brew "azure/functions/azure-functions-core-tools@3" #?
-brew "ojizero/tap/gofindup"                         #h
-cask "adguard"                                      #??
-cask "discord"                                      #y
-cask "docker"                                       #?
-cask "dotnet-sdk"                                   #y
-cask "fanny"                                        #??
-cask "firefox"                                      #y
-cask "flycut"                                       #?
-cask "gpg-suite"                                    #?x
-cask "imageoptim"                                   #?
-cask "intellij-idea-ce"                             #??
-cask "itsycal"                                      #?
-cask "megasync"                                     #y
-cask "microsoft-teams"                              #y
-cask "mono-mdk"                                     #?x
-cask "parallels"                                    #?
-cask "powershell"                                   #y
-cask "signal"                                       #y
-cask "rider"                                        #?x
-cask "slack"                                        #xx
-cask "steam"                                        #?
-cask "tableplus"                                    #?
-cask "vagrant"                                      #y
-cask "virtualbox"                                   #?x
-cask "virtualbox-extension-pack"                    #?x
-cask "visual-studio"                                #?x
-cask "visual-studio-code"                           #y
-cask "zoomus"                                       #y
-mas "1Password 7", id: 1333542190                   #h
-mas "Jira", id: 1475897096                          #h
-mas "Microsoft Remote Desktop", id: 1295203466      #h
-mas "Wire", id: 931134707                           #h
+# Installed formulae
+#
+
+brew "coreutils"
+brew "asdf"
+brew "aws-iam-authenticator"
+brew "awscli"
+brew "bat"
+brew "diff-so-fancy"
+brew "docker", link: false
+brew "gnutls"
+brew "ffmpeg"
+brew "fzf"
+brew "gawk"
+brew "git-lfs"
+brew "gnu-tar"
+brew "gnupg"
+brew "go"
+brew "goreleaser"
+brew "grep"
+brew "hugo"
+brew "jq"
+brew "k6"
+brew "m-cli"
+brew "mas"
+brew "mkcert"
+brew "ncdu"
+brew "nmap"
+brew "nss"
+brew "shellcheck"
+brew "tree"
+brew "unrar"
+brew "watch"
+brew "wget"
+brew "zoxide"
+
+# Installed casks
+#
+
+cask "1password"
+cask "adguard"
+cask "arc"
+cask "discord"
+cask "docker"
+cask "epic-games"
+cask "fanny"
+cask "firefox"
+cask "font-fira-code"
+cask "imageoptim"
+cask "megasync"
+cask "obsidian"
+cask "paw"
+cask "postman"
+cask "protonvpn"
+cask "rectangle"
+cask "signal"
+cask "steam"
+cask "tableplus"
+cask "visual-studio-code"
+cask "warp"
+cask "zed"
+cask "zoom"
+
+# Installed apps from the Mac App Store
+#
+
+mas "Actions", id: 1586435171
+mas "Apple Configurator", id: 1037126344
+mas "com.kagimacOS.Kagi-Search", id: 1622835804
+mas "Data Jar", id: 1453273600
+mas "DeArrow", id: 6451469297
+mas "Debit & Credit", id: 882637653
+mas "Flow", id: 1423210932
+mas "Flycut", id: 442160987
+mas "GarageBand", id: 682658836
+mas "Hand Mirror", id: 1502839586
+mas "Hyperduck", id: 6444667067
+mas "iMovie", id: 408981434
+mas "Keynote", id: 409183694
+mas "Noir", id: 1592917505
+mas "NordVPN", id: 905953485
+mas "Numbers", id: 409203825
+mas "Pages", id: 409201541
+mas "Pandan", id: 1569600264
+mas "Posture Pal", id: 1590316152
+mas "Privacy Redirect", id: 1578144015
+mas "Pure Paste", id: 1611378436
+mas "Reeder", id: 1529448980
+mas "Refined GitHub", id: 1519867270
+mas "Slack", id: 803453959
+mas "Speediness", id: 1596706466
+mas "SponsorBlock", id: 1573461917
+mas "StopTheMadness", id: 1376402589
+mas "Strongbox", id: 1481853033
+mas "Userscripts-Mac-App", id: 1463298887
+mas "Velja", id: 1607635845

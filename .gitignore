@@ -90,6 +90,7 @@ Temporary Items
 ### AWSCLI ###
 # Credentials
 .aws/credentials
+.aws/sso
 
 # Config
 .aws/config

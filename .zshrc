@@ -10,32 +10,31 @@ export UPDATE_ZSH_DAYS=13
 export COMPLETION_WAITING_DOTS="true"
 export ENABLE_CORRECTION="false"
 
-plugins=(git z)
+plugins=(git asdf)
 
 source "${ZSH}/oh-my-zsh.sh"
 
 # Define custom environment variables
 #
 
-export NIX_CONFIG="${HOME}/.nix-profile/etc/profile.d/nix.sh"
 export ZSH_PROFILE="${HOME}/.zshrc"
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
+export HOMEBREW_NO_ANALYTICS=1
 
 # Tool related environment variables
 #
+
 export AWS_PAGER='less -RFX'
 export ERL_AFLAGS="-kernel shell_history enabled"
 
 # Toolings
 #
 
-# shellcheck source=/dev/null
-if [ -e "${NIX_CONFIG}" ]; then . "${NIX_CONFIG}"; fi
-
-eval "$(thefuck --alias)"
-
 source "$(dirname $(readlink "${ZSH_PROFILE}"))/.docker_shims.zsh"
-. <(helm completion zsh)
+
+# Setup ZOxide in place of CD & Z, provides commands aliased behind
+#  `cd` and `cdi` as for ease of interactivity
+eval "$(zoxide init --cmd=cd zsh)"
 
 # Aliases and functions
 #
@@ -68,16 +67,7 @@ function git {
   fi
 }
 alias g='git'
-
-function hub {
-  if [[ $# -gt 0 ]]; then
-    /usr/bin/env hub $@
-  else
-    /usr/bin/env hub status --short --branch
-  fi
-}
-alias gh='hub'
-alias github='hub'
+alias gg='git gone'
 
 function npm {
   if [[ $# -gt 0 ]]; then
@@ -88,15 +78,6 @@ function npm {
 }
 alias n='npm'
 
-function vagrant {
-  if [[ $# -gt 0 ]]; then
-    /usr/bin/env vagrant $@
-  else
-    /usr/bin/env vagrant up
-  fi
-}
-alias v='vagrant'
-
 function kubetail {
   selectors="${1}"; shift
   container="${1}"; shift
@@ -104,18 +85,11 @@ function kubetail {
 }
 alias ktail='kubetail'
 
-function kubereleasevolumes {
-  released_pvs="$(kubectl get pv -n clickhouse -o json | jq '[.items[]|select(.status.phase=="Released")|.metadata.name]|join(" ")' -r)"
-
-  kubectl delete pv -n clickhouse ${released_pvs[@]}
-}
-alias kreleasevolumes=kubereleasevolumes
-
 function local-forward {
   local_connection=${1}; shift
   remote_connection=${1}; shift
 
-  ssh -L "${local_connection}:${remote_connection}" $@
+  ssh -L "${local_connection}:${remote_connection}" -N $@
 }
 
 listening() {
@@ -128,9 +102,9 @@ listening() {
   fi
 }
 
-
-# Options
-#
+cheat() {
+  curl "https://cht.sh/${1}"
+}
 
 # More sane `pushd` settings
 unsetopt auto_pushd
