@@ -30,8 +30,6 @@ export ERL_AFLAGS="-kernel shell_history enabled"
 # Toolings
 #
 
-source "$(dirname $(readlink "${ZSH_PROFILE}"))/.docker_shims.zsh"
-
 # Setup ZOxide in place of CD & Z, provides commands aliased behind
 #  `cd` and `cdi` as for ease of interactivity
 eval "$(zoxide init --cmd=cd zsh)"
@@ -39,7 +37,6 @@ eval "$(zoxide init --cmd=cd zsh)"
 # Aliases and functions
 #
 
-alias f='\fuck'
 alias k='\kubectl'
 if type gls > /dev/null; then
   alias l='\gls -lhA --color=auto --group-directories-first'
@@ -58,6 +55,7 @@ alias sudo='sudo ' # This allows for using aliases under sudo
 alias nsenter='\docker run -it --rm --privileged --pid=host justincormack/nsenter1'
 alias dockerdive='\docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive'
 alias dockerclean='\docker rmi --force $(docker images -q)'
+alias dockerremovedangles='\docker rmi --force $(docker images -f "dangling=true" -q)'
 
 function git {
   if [[ $# -gt 0 ]]; then
