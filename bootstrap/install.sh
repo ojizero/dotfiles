@@ -3,11 +3,11 @@
 GITHUB_SSH_KEY=${GITHUB_SSH_KEY:-~/.ssh/github.self}
 DOTFILES_CLONE_PATH=${DOTFILES_CLONE_PATH:-${DOTFILES_CLONE_PATH}}
 
-# Install Homebrew https://brew.sh/
+# Install Homebrew - https://brew.sh/
 #
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Install just which is used by the setup scripts
+# Install just which is used by the setup scripts - https://just.systems
 #
 brew install just
 
