@@ -7,7 +7,9 @@ home_gitconfig := "${HOME}/.gitconfig"
 cfg_aws := "${PWD}/.aws"
 home_aws := "${HOME}/.aws"
 
-default: brew config-zsh config-git config-aws
+default: setup
+
+setup: brew config-zsh config-git config-aws
 
 @brew +opts='': _install_homebrew_if_missing
 	brew bundle {{opts}}
