@@ -22,7 +22,7 @@ read -p "Once done press enter to continue..."
 
 # Prepapre SSH configuration
 #
-cat <<EOF > ~/.ssh/config
+cat <<EOF >> ~/.ssh/config
 Host github.com
   HostName github.com
   IdentityFile ${GITHUB_SSH_KEY}
