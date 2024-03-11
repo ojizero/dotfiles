@@ -1,7 +1,7 @@
 #! /bin/bash
 
 GITHUB_SSH_KEY=${GITHUB_SSH_KEY:-~/.ssh/github.self}
-DOTFILES_CLONE_PATH=${DOTFILES_CLONE_PATH:-${DOTFILES_CLONE_PATH}}
+DOTFILES_CLONE_PATH=${DOTFILES_CLONE_PATH:-~/workspace/self}
 
 # Install Homebrew - https://brew.sh/
 #
