@@ -3,6 +3,11 @@
 GITHUB_SSH_KEY=${GITHUB_SSH_KEY:-~/.ssh/github.self}
 DOTFILES_CLONE_PATH=${DOTFILES_CLONE_PATH:-~/workspace/self}
 
+# Simply here as a workaround to allow HomeBrew installation to proceed while not being run as root.
+# Ref: https://github.com/orgs/Homebrew/discussions/4311#discussioncomment-5240151
+#
+sudo echo
+
 # Install Homebrew - https://brew.sh/
 #
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
