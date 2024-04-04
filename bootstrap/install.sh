@@ -10,7 +10,7 @@ sudo echo
 
 # Install Homebrew - https://brew.sh/
 #
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> /Users/oji/.zprofile
 eval "$(/opt/homebrew/bin/brew shellenv)"
 if ! which brew &>/dev/null; then
