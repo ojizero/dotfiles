@@ -11,10 +11,20 @@ sudo echo
 # Install Homebrew - https://brew.sh/
 #
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> /Users/oji/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+if ! which brew &>/dev/null; then
+  echo 'brew was not installed successfully'
+  exit 1
+fi
 
 # Install just which is used by the setup scripts - https://just.systems
 #
 brew install just
+if ! which just &>/dev/null; then
+  echo 'just was not installed successfully'
+  exit 1
+fi
 
 # Generate a new SSH key for authenticating with GitHub
 #
