@@ -17,7 +17,6 @@ brew "awscli"
 brew "bat"
 brew "diff-so-fancy"
 brew "gnutls"
-brew "ffmpeg"
 brew "fzf"
 brew "gawk"
 brew "git-lfs"
@@ -55,6 +54,7 @@ cask "fanny"
 cask "firefox"
 cask "font-fira-code"
 cask "imageoptim"
+cask "iterm2"
 cask "megasync"
 cask "obsidian"
 cask "paw"
@@ -91,7 +91,6 @@ mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 mas "Pandan", id: 1569600264
 mas "Posture Pal", id: 1590316152
-mas "Privacy Redirect", id: 1578144015
 mas "Pure Paste", id: 1611378436
 mas "Reeder", id: 1529448980
 mas "Refined GitHub", id: 1519867270
@@ -100,5 +99,4 @@ mas "Speediness", id: 1596706466
 mas "SponsorBlock", id: 1573461917
 mas "StopTheMadness", id: 1376402589
 mas "Strongbox", id: 1481853033
-mas "Userscripts-Mac-App", id: 1463298887
 mas "Velja", id: 1607635845
