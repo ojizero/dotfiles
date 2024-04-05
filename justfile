@@ -7,6 +7,9 @@ home_gitconfig := "${HOME}/.gitconfig"
 cfg_aws := "${PWD}/.aws"
 home_aws := "${HOME}/.aws"
 
+cfg_asdf := "${PWD}/.asdfrc"
+home_asdf := "${HOME}/.asdfrc"
+
 default: setup
 
 setup: brew config-zsh config-git config-aws
@@ -26,6 +29,10 @@ setup: brew config-zsh config-git config-aws
 	rm -fr {{home_aws}}
 	ln -s {{cfg_aws}} {{home_aws}}
 
+@asdf: _install_asdf_plugins
+	rm -fr {{home_asdf}}
+	ln -s {{cfg_asdf}} {{home_asdf}}
+
 _install_ohmyzsh_if_missing:
 	#!/usr/bin/env bash
 	if [ ! -d "${HOME}/.oh-my-zsh" ]; then
@@ -37,6 +44,12 @@ _install_homebrew_if_missing:
 	if ! type brew >/dev/null 2>&1; then
 		/usr/bin/env bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 	fi
+
+_install_asdf_plugins:
+	asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
+	asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git
+	asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
+	asdf plugin add golang https://github.com/asdf-community/asdf-golang.git
 
 # Local Variables:
 # mode: makefile
