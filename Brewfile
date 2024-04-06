@@ -55,9 +55,9 @@ cask "imageoptim"
 cask "iterm2"
 cask "megasync"
 cask "obsidian"
-cask "paw"
 cask "postman"
 cask "protonvpn"
+cask "rapidapi"
 cask "rectangle"
 cask "signal"
 cask "steam"
@@ -95,6 +95,6 @@ mas "Refined GitHub", id: 1519867270
 mas "Slack", id: 803453959
 mas "Speediness", id: 1596706466
 mas "SponsorBlock", id: 1573461917
-mas "StopTheMadness", id: 1376402589
+mas "StopTheMadness Pro", id: 6471380298
 mas "Strongbox", id: 1481853033
 mas "Velja", id: 1607635845
