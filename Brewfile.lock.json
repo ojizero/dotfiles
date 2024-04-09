@@ -5,13 +5,13 @@
         "revision": "a537114a3ccf20f557c2b9f67973deefd26e1181"
       },
       "homebrew/bundle": {
-        "revision": "40ab9cfe3e5e59b0b690b5afd0dd59288d407551"
+        "revision": "0376dd6111035567c966171332f5099aa7d1632b"
       },
       "homebrew/cask-fonts": {
-        "revision": "b84143d3f249d4e9475ad3a7766f81a64e892724"
+        "revision": "120847cb1d159b7dedc0137897f8702a96dbc134"
       },
       "homebrew/cask-versions": {
-        "revision": "b4c79db5ed04e847d2ea3f07aa9e6ed7a76b3081"
+        "revision": "c107a9cffebdd77619847fb28a5f5640db72adea"
       },
       "ojizero/tap": {
         "revision": "99a88c44f3914ea52d9fc2e215fc025301ff74fe"
@@ -1291,13 +1291,13 @@
         }
       },
       "discord": {
-        "version": "0.0.298",
+        "version": "0.0.299",
         "options": {
           "full_name": "discord"
         }
       },
       "docker": {
-        "version": "4.28.0,139021",
+        "version": "4.29.0,145265",
         "options": {
           "full_name": "docker"
         }
@@ -1415,6 +1415,12 @@
         "options": {
           "full_name": "zoom"
         }
+      },
+      "bartender": {
+        "version": "5.0.49",
+        "options": {
+          "full_name": "bartender"
+        }
       }
     },
     "mas": {
@@ -1529,13 +1535,21 @@
       "Velja": {
         "id": "1607635845",
         "version": "2.0.2"
+      },
+      "Streaks": {
+        "id": "963034692",
+        "version": "9.7.1"
+      },
+      "Telegram": {
+        "id": "747648890",
+        "version": "10.10.2"
       }
     }
   },
   "system": {
     "macos": {
       "sonoma": {
-        "HOMEBREW_VERSION": "4.2.16",
+        "HOMEBREW_VERSION": "4.2.17",
         "HOMEBREW_PREFIX": "/opt/homebrew",
         "Homebrew/homebrew-core": "api",
         "CLT": "15.3.0.0.1.1708646388",

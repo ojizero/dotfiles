@@ -45,6 +45,7 @@ brew "zoxide"
 cask "1password"
 cask "adguard"
 cask "arc"
+cask "bartender"
 cask "discord"
 cask "docker"
 cask "epic-games"
@@ -96,5 +97,7 @@ mas "Slack", id: 803453959
 mas "Speediness", id: 1596706466
 mas "SponsorBlock", id: 1573461917
 mas "StopTheMadness Pro", id: 6471380298
+mas "Streaks", id: 963034692
 mas "Strongbox", id: 1481853033
+mas "Telegram", id: 747648890
 mas "Velja", id: 1607635845
