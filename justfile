@@ -1,6 +1,9 @@
 cfg_zshrc := "${PWD}/.zshrc"
 home_zshrc := "${HOME}/.zshrc"
 
+cfg_zprofile := "${PWD}/.zprofile"
+home_zprofile := "${HOME}/.zprofile"
+
 cfg_gitconfig := "${PWD}/.gitconfig"
 home_gitconfig := "${HOME}/.gitconfig"
 
@@ -10,9 +13,12 @@ home_aws := "${HOME}/.aws"
 cfg_asdf := "${PWD}/.asdfrc"
 home_asdf := "${HOME}/.asdfrc"
 
+cfg_tool_versions := "${PWD}/.tool-versions"
+home_tool_versions := "${HOME}/.tool-versions"
+
 default: setup
 
-setup: brew config-zsh config-git config-aws
+setup: brew config-zsh config-git config-aws asdf
 
 @brew +opts='': _install_homebrew_if_missing
 	brew bundle {{opts}}
@@ -20,6 +26,9 @@ setup: brew config-zsh config-git config-aws
 @config-zsh: _install_ohmyzsh_if_missing
 	rm -fr {{home_zshrc}}
 	ln -s {{cfg_zshrc}} {{home_zshrc}}
+
+	rm -fr {{home_zprofile}}
+	ln -s {{cfg_zprofile}} {{home_zprofile}}
 
 @config-git:
 	rm -fr {{home_gitconfig}}
@@ -32,6 +41,10 @@ setup: brew config-zsh config-git config-aws
 @asdf: _install_asdf_plugins
 	rm -fr {{home_asdf}}
 	ln -s {{cfg_asdf}} {{home_asdf}}
+
+	rm -fr {{home_tool_versions}}
+	ln -s {{cfg_tool_versions}} {{home_tool_versions}}
+	asdf install
 
 _install_ohmyzsh_if_missing:
 	#!/usr/bin/env bash
