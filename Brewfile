@@ -76,7 +76,6 @@ mas "Apple Configurator", id: 1037126344
 mas "com.kagimacOS.Kagi-Search", id: 1622835804
 mas "Data Jar", id: 1453273600
 mas "DeArrow", id: 6451469297
-mas "Debit & Credit", id: 882637653
 mas "Flow", id: 1423210932
 mas "Flycut", id: 442160987
 mas "GarageBand", id: 682658836
