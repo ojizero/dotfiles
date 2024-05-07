@@ -88,9 +88,5 @@ Temporary Items
 # End of https://www.gitignore.io/api/git,zsh,visualstudiocode
 
 ### AWSCLI ###
-# Credentials
-.aws/credentials
-.aws/sso
-
-# Config
-.aws/config
+.aws
+!.aws/cli/alias
