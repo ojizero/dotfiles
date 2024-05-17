@@ -17,6 +17,7 @@ brew "awscli"
 brew "bat"
 brew "diff-so-fancy"
 brew "gnutls"
+brew "ffmpeg"
 brew "fzf"
 brew "gawk"
 brew "git-lfs"
@@ -30,6 +31,7 @@ brew "k6"
 brew "m-cli"
 brew "mas"
 brew "mkcert"
+brew "mysql"
 brew "ncdu"
 brew "nmap"
 brew "nss"
@@ -52,6 +54,7 @@ cask "epic-games"
 cask "fanny"
 cask "firefox"
 cask "font-fira-code"
+cask "google-cloud-sdk"
 cask "imageoptim"
 cask "iterm2"
 cask "megasync"
@@ -77,6 +80,8 @@ mas "Apple Configurator", id: 1037126344
 mas "com.kagimacOS.Kagi-Search", id: 1622835804
 mas "Data Jar", id: 1453273600
 mas "DeArrow", id: 6451469297
+mas "Fantastical", id: 975937182
+mas "Flighty", id: 1358823008
 mas "Flow", id: 1423210932
 mas "Flycut", id: 442160987
 mas "GarageBand", id: 682658836
@@ -84,6 +89,7 @@ mas "Hand Mirror", id: 1502839586
 mas "Hyperduck", id: 6444667067
 mas "iMovie", id: 408981434
 mas "Keynote", id: 409183694
+mas "Microsoft Outlook", id: 985367838
 mas "Noir", id: 1592917505
 mas "NordVPN", id: 905953485
 mas "Numbers", id: 409203825
