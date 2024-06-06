@@ -17,7 +17,6 @@ source "${ZSH}/oh-my-zsh.sh"
 # Define custom environment variables
 #
 
-export ZSH_PROFILE="${HOME}/.zshrc"
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 export HOMEBREW_NO_ANALYTICS=1
 
@@ -90,7 +89,7 @@ function local-forward {
   ssh -L "${local_connection}:${remote_connection}" -N $@
 }
 
-listening() {
+function listening {
   if [ $# -eq 0 ]; then
     sudo lsof -iTCP -sTCP:LISTEN -n -P
   elif [ $# -eq 1 ]; then
@@ -100,7 +99,7 @@ listening() {
   fi
 }
 
-cheat() {
+function cheat {
   curl "https://cht.sh/${1}"
 }
 
