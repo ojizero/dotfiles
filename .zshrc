@@ -1,14 +1,21 @@
-# Initial Oh My Zsh setup
+# Dotfiles root path
+#
+
+export DOTFILES_PATH="$(dirname $(readlink ${HOME}/.zshrc))"
+
+# Initiate Oh My Zsh setup
 #
 
 export ZSH="${HOME}/.oh-my-zsh"
-export ZSH_THEME="avit"
+export ZSH_CUSTOM="${DOTFILES_PATH}/omz"
 
-export DISABLE_UPDATE_PROMPT="true"
+export ZSH_THEME="avit-copy"
+
 export UPDATE_ZSH_DAYS=13
+export DISABLE_UPDATE_PROMPT="true"
 
-export COMPLETION_WAITING_DOTS="true"
 export ENABLE_CORRECTION="false"
+export COMPLETION_WAITING_DOTS="true"
 
 plugins=(git asdf)
 
@@ -102,6 +109,9 @@ function listening {
 function cheat {
   curl "https://cht.sh/${1}"
 }
+
+# Configurations
+#
 
 # More sane `pushd` settings
 unsetopt auto_pushd
