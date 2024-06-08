@@ -3,7 +3,7 @@
 
 export DOTFILES_PATH="$(dirname $(readlink ${HOME}/.zshrc))"
 
-# Initiate Oh My Zsh setup
+# Initialize Oh My Zsh
 #
 
 export ZSH="${HOME}/.oh-my-zsh"
@@ -17,98 +17,16 @@ export DISABLE_UPDATE_PROMPT="true"
 export ENABLE_CORRECTION="false"
 export COMPLETION_WAITING_DOTS="true"
 
-plugins=(git asdf)
-
-source "${ZSH}/oh-my-zsh.sh"
-
-# Define custom environment variables
-#
-
-export DOTNET_CLI_TELEMETRY_OPTOUT=1
-export HOMEBREW_NO_ANALYTICS=1
-
-# Tool related environment variables
-#
-
-export AWS_PAGER='less -RFX'
-export ERL_AFLAGS="-kernel shell_history enabled"
-
-# Toolings
-#
-
 # Setup ZOxide in place of CD & Z, provides commands aliased behind
 #  `cd` and `cdi` as for ease of interactivity
-eval "$(zoxide init --cmd=cd zsh)"
+export ZOXIDE_CMD_OVERRIDE='cd'
 
-# Aliases and functions
-#
+plugins=(
+  asdf
+  zoxide
+)
 
-alias k='\kubectl'
-if type gls > /dev/null; then
-  alias l='\gls -lhA --color=auto --group-directories-first'
-  alias ls='\gls -lhA --color=auto --group-directories-first'
-else
-  alias l='\ls -lhA'
-  alias ls='\ls -lhA'
-fi
-alias d='\dirs -v'
-alias p='\pushd'
-alias pp='\popd'
-alias tf='\terraform'
-alias mkdir='\mkdir -vp'
-alias ipglobal='\dig +short myip.opendns.com @resolver1.opendns.com'
-alias sudo='sudo ' # This allows for using aliases under sudo
-alias nsenter='\docker run -it --rm --privileged --pid=host justincormack/nsenter1'
-alias dockerdive='\docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive'
-alias dockerclean='\docker rmi --force $(docker images -q)'
-alias dockerremovedangles='\docker rmi --force $(docker images -f "dangling=true" -q)'
-
-function git {
-  if [[ $# -gt 0 ]]; then
-    /usr/bin/env git $@
-  else
-    /usr/bin/env git status --short --branch
-  fi
-}
-alias g='git'
-alias gg='git gone'
-
-function npm {
-  if [[ $# -gt 0 ]]; then
-    /usr/bin/env npm $@
-  else
-    /usr/bin/env npm install
-  fi
-}
-alias n='npm'
-
-function kubetail {
-  selectors="${1}"; shift
-  container="${1}"; shift
-  kubectl logs -l "${selectors}" -c ${container} $@
-}
-alias ktail='kubetail'
-
-function local-forward {
-  local_connection=${1}; shift
-  remote_connection=${1}; shift
-
-  ssh -L "${local_connection}:${remote_connection}" -N $@
-}
-
-function listening {
-  if [ $# -eq 0 ]; then
-    sudo lsof -iTCP -sTCP:LISTEN -n -P
-  elif [ $# -eq 1 ]; then
-    sudo lsof -iTCP -sTCP:LISTEN -n -P | grep -i --color $1
-  else
-    echo "Usage: listening [pattern]" >&2
-  fi
-}
-
-function cheat {
-  curl "https://cht.sh/${1}"
-}
+source "${ZSH}/oh-my-zsh.sh"
 
 # Configurations
 #
