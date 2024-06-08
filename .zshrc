@@ -23,6 +23,7 @@ export ZOXIDE_CMD_OVERRIDE='cd'
 
 plugins=(
   asdf
+  devops
   zoxide
 )
 
