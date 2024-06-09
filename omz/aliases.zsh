@@ -15,6 +15,16 @@ alias mkdir='\mkdir -vp'
 alias ipglobal='\dig +short myip.opendns.com @resolver1.opendns.com'
 alias sudo='sudo ' # This allows for using aliases under sudo
 
+function git {
+  if [[ $# -gt 0 ]]; then
+    /usr/bin/env git $@
+  else
+    /usr/bin/env git status --short --branch
+  fi
+}
+alias g='git'
+alias gg='git gone'
+
 function npm {
   if [[ $# -gt 0 ]]; then
     /usr/bin/env npm $@
