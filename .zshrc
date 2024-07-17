@@ -27,6 +27,8 @@ plugins=(
   zoxide
 )
 
+fpath=($HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
+
 source "${ZSH}/oh-my-zsh.sh"
 
 # Configurations
@@ -37,4 +39,3 @@ unsetopt auto_pushd
 setopt pushd_ignore_dups
 
 autoload -U +X bashcompinit && bashcompinit
-complete -o nospace -C /usr/local/bin/terraform terraform
