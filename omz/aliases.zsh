@@ -37,3 +37,5 @@ alias n='npm'
 function cheat {
   curl "https://cht.sh/${1}"
 }
+
+alias j='just'
