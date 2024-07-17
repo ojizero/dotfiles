@@ -6,16 +6,17 @@ alias dockerclean='\docker rmi --force $(docker images -q)'
 alias dockerremovedangles='\docker rmi --force $(docker images -f "dangling=true" -q)'
 
 function kubetail {
-  selectors="${1}"; shift
-  container="${1}"; shift
+  selectors="${1?:selectors is a required input}"
+  container="${2?:container is a required input}"
+  shift 2
   kubectl logs -l "${selectors}" -c ${container} $@
 }
 alias ktail='kubetail'
 
 function local-forward {
-  local_connection=${1}; shift
-  remote_connection=${1}; shift
-
+  local_connection="${1:?local connection is a required input}"
+  remote_connection="${2:?remote connection is a required input}"
+  shift 2
   ssh -L "${local_connection}:${remote_connection}" -N $@
 }
 
