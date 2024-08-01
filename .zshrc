@@ -9,7 +9,7 @@ export DOTFILES_PATH="$(dirname $(readlink ${HOME}/.zshrc))"
 export ZSH="${HOME}/.oh-my-zsh"
 export ZSH_CUSTOM="${DOTFILES_PATH}/omz"
 
-export ZSH_THEME="avit-copy"
+export ZSH_THEME="z"
 
 export UPDATE_ZSH_DAYS=13
 export DISABLE_UPDATE_PROMPT="true"
