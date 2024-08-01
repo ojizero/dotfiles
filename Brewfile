@@ -2,6 +2,7 @@
 #
 
 tap "aws/tap"
+tap "homebrew/aliases"
 tap "homebrew/bundle"
 tap "homebrew/cask-fonts"
 tap "homebrew/cask-versions"

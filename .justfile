@@ -26,11 +26,14 @@ home_justfile := "${HOME}/.justfile"
 cfg_justfile_imports := "${PWD}/just/.imports.justfile"
 home_justfile_imports := "${HOME}/.imports.justfile"
 
+cfg_homebrew_aliases := "${PWD}/.brew-aliases"
+home_homebrew_aliases := "${HOME}/.brew-aliases"
+
 default: setup
 
 setup: brew config-zsh config-git config-aws asdf set-global-justfile
 
-brew +opts='': _install_homebrew_if_missing
+brew +opts='': _install_homebrew_if_missing _setup_homebrew_configs
   brew bundle {{opts}}
 
 config-zsh: _install_ohmyzsh_if_missing
@@ -76,6 +79,10 @@ _install_homebrew_if_missing:
     /usr/bin/env bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
   fi
 
+_setup_homebrew_configs:
+  rm -fr {{home_homebrew_aliases}}
+  ln -s {{cfg_homebrew_aliases}} {{home_homebrew_aliases}}
+
 _install_asdf_plugins:
   asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
   asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git
@@ -88,8 +95,3 @@ _build_justfile_imports:
   cat "${PWD}/just/template.imports.justfile" \
     | sed "s|__DOTFILES_PATH__|${PWD}|g" \
     > "${PWD}/just/.imports.justfile"
-
-# Local Variables:
-# mode: makefile
-# End:
-# vim: set ft=make :
