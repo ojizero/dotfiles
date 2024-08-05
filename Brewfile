@@ -32,7 +32,7 @@ brew "k6"
 brew "m-cli"
 brew "mas"
 brew "mkcert"
-brew "mysql"
+brew "mysql@8.0", link: true
 brew "ncdu"
 brew "nmap"
 brew "nss"
