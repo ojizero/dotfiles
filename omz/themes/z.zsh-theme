@@ -34,12 +34,12 @@ function _git_time_since_commit() {
 
 PROMPT='
 %{$fg[blue]%}%3~%{$reset_color%} $(git_prompt_info)
-%(?:%{$fg_bold[green]%}❯ :%{$fg_bold[red]%}❯ )%{$reset_color%}'
+%(?:%{$fg[green]%}❯ :%{$fg[red]%}❯ )%{$reset_color%}'
 PROMPT2='%{$fg[grey]%}❯   %{$reset_color%}'
 
 RPROMPT='%{$(echotc UP 1)%}$(_git_time_since_commit) $(git_prompt_status) %{$fg_bold[red]%}%(?..⍉)%{$reset_color%}%{$(echotc DO 1)%}'
 
-ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[green]%}"
+ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[green]%}" # \e[1;38;5;239m <- bold grey
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[red]%} *%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_CLEAN=""
