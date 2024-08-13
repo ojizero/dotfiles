@@ -1,0 +1,40 @@
+#!/bin/zsh
+
+export MPATH="$(readlink -f ${0} | xargs dirname)/commands"
+export COMMAND="${1}"
+shift
+
+function usage {
+  cat <<__EOF__
+
+ Miniature Swiss Army Knife for macOS!
+
+
+  usage: m COMMAND [help]
+
+  COMMANDS:
+        help
+__EOF__
+
+  for i in ${MPATH}/*; do
+    [ ! -L "$i" -a -f "$i"  ] && echo "        ${i##*/}"
+  done
+
+  [ "${COMMAND}" = "help" ] && exit 0 || exit 1
+}
+
+function convert-alias {
+  case "${1}" in
+    up|upgrade)
+      echo update
+      ;;
+
+    *)
+      echo "${1}"
+      ;;
+  esac
+}
+
+COMMAND="$(convert-alias ${COMMAND})"
+[ ! -f ${MPATH}/${COMMAND} ] && usage
+${MPATH}/${COMMAND} "$@"

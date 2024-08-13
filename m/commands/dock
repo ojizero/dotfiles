@@ -1,0 +1,198 @@
+#/usr/bin/env zsh
+
+# The MIT License
+#
+# Copyright (c) 2016 Rogelio Cedillo
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+help(){
+    cat<<__EOF__
+    usage: m dock [ showdelay | autohide | magnification | position | addblankspace | additem | addrecentitems | prune | help ]
+
+    Examples:
+      m dock showdelay x.x          # Changes how long the Dock takes to show up when auto-hide is enabled
+      m dock autohide YES           # Enable Dock's auto hide feature
+      m dock autohide NO            # Disable Dock's auto hide feature
+      m dock autohidedelay x.x      # Changes how long it takes to detect you want to show up the dock
+      m dock magnification YES      # Turn magnification on
+      m dock magnification NO       # Turn magnification off
+      m dock position BOTTOM        # Change Dock's position to the bottom of the screen
+      m dock position LEFT          # Change Dock's position to the left of the screen
+      m dock position RIGHT         # Change Dock's position to the right of the screen
+      m dock addblankspace          # Add a blank space (separator) to the Dock
+      m dock additem PATH           # Add an item to the Dock, e.g. /Applications/Safari.app
+      m dock addrecentitems         # Add a stack containg your recent items to the Dock
+                                    #  (You can change the stack's type by right clicking on it)
+      m dock prune                  # remove all items from dock
+__EOF__
+}
+
+show_delay(){
+    case $1 in
+        [0-9][.][0-9])
+            echo "New Auto-Hide time: "$1
+            defaults write com.apple.dock autohide-time-modifier -float $1
+            ;;
+        [0-9])
+            echo "New Auto-Hide time: "$1
+            defaults write com.apple.dock autohide-time-modifier -int $1
+            ;;
+        *)
+            echo "Current Auto-Hide time: $(defaults read com.apple.dock autohide-time-modifier 2>/dev/null)"
+            exit 0
+            ;;
+    esac
+    killall Dock
+}
+
+auto_hide(){
+    case $1 in
+        [yY][eE][sS])
+            echo "Auto Hide: YES"
+            defaults write com.apple.dock autohide -boolean YES
+            ;;
+        [nN][oO])
+            echo "Auto Hide: No"
+            defaults write com.apple.dock autohide -boolean NO
+            ;;
+        *)
+            echo "Auto Hide: $(defaults read com.apple.dock autohide)"
+            exit 0
+            ;;
+    esac
+    killall Dock
+}
+
+autohide_delay(){
+    case $1 in
+    [0-9][.][0-9])
+        echo "New Auto-Hide delay time: "$1
+        defaults write com.apple.dock autohide-delay -float $1
+      ;;
+    [0-9])
+      echo "New Auto-Hide delay time: "$1
+      defaults write com.apple.dock autohide-delay -int $1
+      ;;
+    *)
+      echo "Current Auto-Hide delay time: $(defaults read com.apple.dock autohide-delay 2>/dev/null)"
+      exit 0
+      ;;
+  esac
+  killall Dock
+}
+
+
+magnify(){
+    case $1 in
+        [yY][eE][sS])
+            echo "Magnification: YES"
+            defaults write com.apple.dock magnification -boolean YES
+            ;;
+        [nN][oO])
+            echo "Magnification: NO"
+            defaults write com.apple.dock magnification -boolean NO
+            ;;
+        *)
+            echo "Magnification: $(defaults read com.apple.dock magnification)"
+            exit 0
+            ;;
+    esac
+    killall Dock
+}
+
+dock_position(){
+    case $1 in
+        [bB][oO][tT][tT][oO][mM])
+            echo "Dock Position: BOTTOM"
+            defaults write com.apple.dock orientation bottom
+            ;;
+        [lL][eE][fF][tT])
+            echo "Dock Position: LEFT"
+            defaults write com.apple.dock orientation left
+            ;;
+        [rR][iI][gG][hH][tT])
+            echo "Dock Position: RIGHT"
+            defaults write com.apple.dock orientation right
+            ;;
+        *)
+            echo "Position: $(defaults read com.apple.dock orientation)"
+            exit 0
+            ;;
+    esac
+    killall Dock
+}
+
+add_blank_space(){
+    echo "New blank space added to the Dock"
+    defaults write com.apple.dock persistent-apps -array-add '{"tile-type"="spacer-tile";}'
+    killall Dock
+}
+
+add_item(){
+    [ -z "$1" ] && help && exit 1
+    echo "Item added to the Dock: $1"
+    defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>$1</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
+    killall Dock
+}
+
+add_recent_items(){
+    echo "Add recent items stack"
+    defaults write com.apple.dock persistent-others -array-add '{"tile-data" = {"list-type" = 1;}; "tile-type" = "recents-tile";}';
+    killall Dock
+}
+
+prune(){
+    echo "remove all items from stack"
+    defaults write com.apple.dock persistent-apps '()'
+    killall Dock
+}
+
+case $1 in
+    help)
+        help
+        ;;
+    showdelay)
+        shift
+        show_delay $@
+        ;;
+    autohide)
+        shift
+        auto_hide $@
+        ;;
+    autohidedelay)
+        shift
+        autohide_delay $@
+        ;;
+    magnification)
+        shift
+        magnify $@
+        ;;
+    position)
+        shift
+        dock_position $@
+        ;;
+    addblankspace)
+        shift
+        add_blank_space
+        ;;
+    additem)
+        shift
+        add_item $@
+        ;;
+    addrecentitems)
+        shift
+        add_recent_items
+        ;;
+    prune)
+        shift
+        prune
+        ;;
+    *)
+        help
+        ;;
+esac

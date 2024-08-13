@@ -1,0 +1,51 @@
+#/usr/bin/env zsh
+
+function usage {
+  cat<<__EOF__
+
+    usage: m update [ list | install | all [--with-brew] | brew | help ]
+
+
+    Examples:
+      m help                                                        # prints this help message
+      m update list                                                 # list available updates
+      m update all [--with-brew]                                    # install all the available updates
+                                                                    # includes home brew if --with-brew is passed
+      m update install iTunesX-12.4.1 RAWCameraUpdate6.20-6.20      # install specific updates
+      m update brew                                                 # install all the available updates from Homebrew
+
+__EOF__
+
+}
+
+cmd="${1}"; shift
+
+case "${cmd}" in
+  all)
+    if [ ! -z "$1" ] && [ "$1" = '--with-brew' ]; then
+      brew update && brew upgrade && brew upgrade --casks
+    elif [ ! -z "$1" ]; then
+      echo "Unknown option: ${1}"
+      exit 1
+    fi
+
+    sudo softwareupdate --install --all
+    ;;
+
+  ls|list)
+    sudo softwareupdate --list
+    ;;
+
+  brew)
+    brew update && brew upgrade && brew upgrade --casks
+    ;;
+
+  help)
+    usage
+    ;;
+
+  *)
+    [ -z "$1" ] && usage && exit 1
+    sudo softwareupdate --install "${@}"
+    ;;
+esac
