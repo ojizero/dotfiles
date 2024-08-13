@@ -1,8 +1,3 @@
-[user]
-	# TODO: Move outside this file
-	name = ojizero
-	email = hello@ojizero.tech
-
 [alias]
 	s = status --short --branch
 	ss = status
@@ -85,3 +80,7 @@
 
 [url "ssh://git@github.com/"]
 	insteadOf = https://github.com/
+
+[include]
+	# Allow passing custom configs to Git outside of the dotfiles
+	path = ~/.local.gitconfig

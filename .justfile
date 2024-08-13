@@ -11,6 +11,9 @@ home_zprofile := "${HOME}/.zprofile"
 cfg_gitconfig := "${PWD}/.gitconfig"
 home_gitconfig := "${HOME}/.gitconfig"
 
+cfg_local_gitconfig := "${PWD}/.local/.gitconfig"
+home_local_gitconfig := "${HOME}/.local.gitconfig"
+
 cfg_aws := "${PWD}/.aws"
 home_aws := "${HOME}/.aws"
 
@@ -46,6 +49,9 @@ config-zsh: _install_ohmyzsh_if_missing
 config-git:
   rm -fr {{home_gitconfig}}
   ln -s {{cfg_gitconfig}} {{home_gitconfig}}
+
+  rm -fr {{home_local_gitconfig}}
+  ln -s {{cfg_local_gitconfig}} {{home_local_gitconfig}}
 
 config-aws:
   rm -fr {{home_aws}}
