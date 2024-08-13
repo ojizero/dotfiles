@@ -34,7 +34,7 @@ home_homebrew_aliases := "${HOME}/.brew-aliases"
 
 default: setup
 
-setup: brew config-zsh config-git config-aws asdf set-global-justfile
+setup: brew config-zsh config-git config-aws asdf set-global-justfile config_mac
 
 brew +opts='': _install_homebrew_if_missing _setup_homebrew_configs
   brew bundle {{opts}}
@@ -72,6 +72,17 @@ set-global-justfile: _build_justfile_imports
 
   rm -fr {{home_justfile_imports}}
   ln -s {{cfg_justfile_imports}} {{home_justfile_imports}}
+
+config_mac:
+  #!/usr/bin/env bash
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    # Configure the dock
+    ./m/m dock autohide YES
+    ./m/m dock magnification YES
+
+    # Run any updates on system
+    ./m/m update all
+  fi
 
 _install_ohmyzsh_if_missing:
   #!/usr/bin/env bash
