@@ -77,8 +77,12 @@ config_mac:
   #!/usr/bin/env bash
   if [[ "$OSTYPE" == "darwin"* ]]; then
     # Configure the dock
-    ./m/m dock autohide YES
-    ./m/m dock magnification YES
+    defaults write com.apple.dock autohide -boolean YES
+    defaults write com.apple.dock magnification -boolean YES
+
+    # Configure powermode options -> https://github.com/rgcr/m-cli/blob/master/plugins/powermode possible add to m fork
+    sudo pmset -b powermode 1 # on battery always run low power mode
+    sudo pmset -c powermode 0 # on ac use auto mode and let the OS decide
 
     # Run any updates on system
     ./m/m update all

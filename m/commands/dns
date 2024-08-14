@@ -1,0 +1,55 @@
+#!/usr/bin/env zsh
+
+help(){
+    cat<<__EOF__
+    usage:  m dns [ list | add | flush | help ]
+
+    Examples:
+      m dns list                    # lists DNS servers
+      m dns add [IP/Hostname]       # adds DNS server
+      m dns flush                   # flushes local DNS
+__EOF__
+}
+
+
+flushdns(){
+    VERSION=$(sw_vers -productVersion)
+    echo "Flushing dns..."
+    if echo $VERSION | grep -E '^10\.10(\.[0-3])?$' >/dev/null 2>&1; then
+        sudo discoveryutil mdnsflushcache
+    elif echo $VERSION | grep -E '^10\.6(\.[0-8])?$' >/dev/null 2>&1; then
+        sudo dscacheutil -flushcache
+    else
+        sudo killall -HUP mDNSResponder
+    fi
+}
+
+listdns(){
+    echo "List of the DNS servers:"
+    cat /etc/resolv.conf | grep nameserver | cut -b 11-
+}
+
+adddns(){
+    [ -z "${2}" ] && help && exit 1
+    sudo sh -c "echo nameserver '${2}' >> /etc/resolv.conf"
+    echo "${2} added"
+}
+
+
+case $1 in
+    help)
+        help
+        ;;
+    list)
+        listdns
+        ;;
+    add)
+        adddns
+        ;;
+    flush)
+        flushdns
+        ;;
+    *)
+        help
+        ;;
+esac

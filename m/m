@@ -2,7 +2,7 @@
 
 export MPATH="$(readlink -f ${0} | xargs dirname)/commands"
 export COMMAND="${1}"
-shift
+[ -z "${COMMAND}" ] || shift
 
 function usage {
   cat <<__EOF__

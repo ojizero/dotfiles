@@ -30,7 +30,6 @@ brew "hugo"
 brew "jq"
 brew "just"
 brew "k6"
-brew "m-cli"
 brew "mas"
 brew "mkcert"
 brew "mysql@8.0", link: true

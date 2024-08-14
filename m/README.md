@@ -20,7 +20,7 @@ Simply not enough time, and my needs a much more narrow than even what m-cli off
 
 > Aliases: `up` and `upgrade`.
 
-Manages updating system from the CLI, with support for Homebrew packages.
+Manages updating system, with support for Homebrew packages.
 
 ```
 
@@ -37,6 +37,31 @@ Manages updating system from the CLI, with support for Homebrew packages.
 
 ```
 
-### `dock`
+### `dns`
 
-Manage the system dock from the CLI.
+Manage the system DNS.
+
+```
+
+    usage:  m dns [ list | add | flush | help ]
+
+    Examples:
+      m dns list                    # lists DNS servers
+      m dns add [IP/Hostname]       # adds DNS server
+      m dns flush                   # flushes local DNS
+
+```
+
+### `localhost`
+
+Manage the system `/etc/hosts` file.
+
+```
+    usage: m localhost [ help ]
+
+    Examples:
+      m localhost ls                              # list current records in localhost
+      m localhost add 127.0.0.1 webpage.local     # add a new host to the localhost file
+      m localhost remove webpage.local            # remove a host from the localhost file
+
+```
