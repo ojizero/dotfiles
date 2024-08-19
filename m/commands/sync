@@ -1,0 +1,42 @@
+#/usr/bin/env zsh
+
+function usage {
+  cat<<__EOF__
+
+    usage: m sync [help | dotfiles]
+
+
+    Examples:
+      m sync help                 # prints this help message
+      m sync dotfiles             # syncs the dotfiles repo by running "git pull"
+                                  # this includes this command itself and will implicitly update it
+
+__EOF__
+
+}
+
+function find_dotfiles {
+  readlink -f "${0}" \
+    | xargs dirname \
+    | xargs dirname \
+    | xargs dirname
+}
+
+cmd="${1}"; shift
+
+case "${cmd}" in
+  dotfiles)
+    dotfiles="${DOTFILES_PATH-$(find_dotfiles)}"
+    pushd "${dotfiles}"
+    git pull -p "${dotfiles}"
+    popd
+    ;;
+
+  help)
+    usage
+    ;;
+
+  *)
+    [ -z "$1" ] && usage && exit 1
+    ;;
+esac

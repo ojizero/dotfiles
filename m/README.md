@@ -65,3 +65,19 @@ Manage the system `/etc/hosts` file.
       m localhost remove webpage.local            # remove a host from the localhost file
 
 ```
+
+### `sync`
+
+Sync the dotfiles repo from anywhere.
+
+```
+
+    usage: m sync [help | dotfiles]
+
+
+    Examples:
+      m sync help                 # prints this help message
+      m sync dotfiles             # syncs the dotfiles repo by running "git pull"
+                                  # this includes this command itself and will implicitly update it
+
+```
