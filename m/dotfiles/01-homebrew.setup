@@ -1,0 +1,30 @@
+#!/usr/bin/env zsh
+
+# Instruct Homebrew setup to be as automated as possible.
+export NONINTERACTIVE=1
+
+cfg_homebrew_aliases="${DOTFILES_PATH}/.brew-aliases"
+home_homebrew_aliases="${HOME}/.brew-aliases"
+
+cfg_homebrew_bundle="${DOTFILES_PATH}/Brewfile"
+home_homebrew_bundle="${HOME}/.Brewfile"
+
+cfg_homebrew_lock="${DOTFILES_PATH}/Brewfile.lock.json"
+home_homebrew_lock="${HOME}/.Brewfile.lock.json"
+
+if ! type brew >/dev/null 2>&1; then
+  /usr/bin/env bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+rm -fr "${home_homebrew_aliases}"
+ln -s "${cfg_homebrew_aliases}" "${home_homebrew_aliases}"
+
+rm -fr "${home_homebrew_bundle}"
+ln -s "${cfg_homebrew_bundle}" "${home_homebrew_bundle}"
+
+rm -fr "${home_homebrew_lock}"
+ln -s "${cfg_homebrew_lock}" "${home_homebrew_lock}"
+
+brew bundle --file "${cfg_homebrew_bundle}"

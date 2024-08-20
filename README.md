@@ -16,9 +16,7 @@ that should, if run, pull this repo and set everything up.
 ### Manually
 
 1. Pull the repo somewhere.
-1. Install [Homebrew](https://brew.sh).
-1. Install [just](https://just.systems) `brew install just`.
-1. Run `just setup`.
+1. Run `./m/m setup`.
 
 ## Usage
 

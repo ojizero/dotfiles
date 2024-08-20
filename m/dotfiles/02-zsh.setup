@@ -1,0 +1,18 @@
+#!/usr/bin/env zsh
+
+cfg_zshrc="${DOTFILES_PATH}/.zshrc"
+home_zshrc="${HOME}/.zshrc"
+
+cfg_zprofile="${DOTFILES_PATH}/.zprofile"
+home_zprofile="${HOME}/.zprofile"
+
+
+if [ ! -d "${HOME}/.oh-my-zsh" ]; then
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
+
+rm -fr "${home_zshrc}"
+ln -s "${cfg_zshrc}" "${home_zshrc}"
+
+rm -fr "${home_zprofile}"
+ln -s "${cfg_zprofile}" "${home_zprofile}"

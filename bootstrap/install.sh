@@ -8,23 +8,6 @@ DOTFILES_CLONE_PATH=${DOTFILES_CLONE_PATH:-~/workspace/self}
 #
 sudo echo
 
-# Install Homebrew - https://brew.sh/
-#
-NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-eval "$(/opt/homebrew/bin/brew shellenv)"
-if ! which brew &>/dev/null; then
-  echo 'brew was not installed successfully'
-  exit 1
-fi
-
-# Install just which is used by the setup scripts - https://just.systems
-#
-brew install just
-if ! which just &>/dev/null; then
-  echo 'just was not installed successfully'
-  exit 1
-fi
-
 # Generate a new SSH key for authenticating with GitHub
 #
 read -p "Enter your email: " email
@@ -50,5 +33,5 @@ git clone git@github.com:ojizero/dotfiles.git
 
 # Run the setup script
 #
-cd "${DOTFILES_CLONE_PATH}/dotfiles"
-just setup
+cd "${DOTFILES_CLONE_PATH}/dotfiles/"
+./m dotfiles setup

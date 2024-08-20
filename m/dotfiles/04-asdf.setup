@@ -1,0 +1,25 @@
+#!/usr/bin/env zsh
+
+cfg_asdf="${DOTFILES_PATH}/.asdfrc"
+home_asdf="${HOME}/.asdfrc"
+
+cfg_tool_versions="${DOTFILES_PATH}/.tool-versions"
+home_tool_versions="${HOME}/.tool-versions"
+
+asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
+asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git
+asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
+asdf plugin add golang https://github.com/asdf-community/asdf-golang.git
+
+asdf plugin-add terraform https://github.com/asdf-community/asdf-hashicorp.git
+asdf plugin-add terraform-ls https://github.com/asdf-community/asdf-hashicorp.git
+
+rm -fr "${home_asdf}"
+ln -s "${cfg_asdf}" "${home_asdf}"
+
+rm -fr "${home_tool_versions}"
+ln -s "${cfg_tool_versions}" "${home_tool_versions}"
+
+pushd "${DOTFILES_PATH}"
+asdf install
+popd

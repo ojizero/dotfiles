@@ -1,16 +1,16 @@
-#/usr/bin/env zsh
+#!/usr/bin/env zsh
 
 function usage {
   cat<<__EOF__
 
-    usage: m dotfiles [help | sync]
+    usage: m dotfiles [help | sync | setup]
 
 
     Examples:
       m dotfiles help             # prints this help message
-      m dotfiles sync             # syncs the dotfiles repo by running "git pull"
+      m dotfiles pull             # pull the latest changes to the dotfiles repo by running
                                   # this includes this command itself and will implicitly update it
-      m dotfiles pull             # alias for sync
+      m dotfiles setup            # sets up the dotfiles repo for the first time in a system
 
 __EOF__
 
@@ -23,13 +23,24 @@ function find_dotfiles {
     | xargs dirname
 }
 
+export DOTFILES_PATH="${DOTFILES_PATH-$(find_dotfiles)}"
+
 cmd="${1}"; shift
 
 case "${cmd}" in
-  sync|pull)
-    dotfiles="${DOTFILES_PATH-$(find_dotfiles)}"
-    pushd "${dotfiles}"
-    git pull -p "${dotfiles}"
+  pull)
+    pushd "${DOTFILES_PATH}"
+    git pull -p
+    popd
+    ;;
+
+  setup)
+    pushd "${DOTFILES_PATH}"
+
+    for setup in ${DOTFILES_PATH}/m/dotfiles/*.setup; do
+      source $setup
+    done
+
     popd
     ;;
 
