@@ -48,6 +48,8 @@ case "${cmd}" in
         for setup in ${DOTFILES_PATH}/bootstrap/macos/*.setup; do
           source $setup
         done
+
+        ;;
     esac
 
     popd
