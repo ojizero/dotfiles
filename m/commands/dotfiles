@@ -39,9 +39,16 @@ case "${cmd}" in
   setup)
     pushd "${DOTFILES_PATH}"
 
-    for setup in ${DOTFILES_PATH}/m/dotfiles/*.setup; do
+    for setup in ${DOTFILES_PATH}/bootstrap/common/*.setup; do
       source $setup
     done
+
+    case "${OSTYPE}" do
+      darwin*)
+        for setup in ${DOTFILES_PATH}/bootstrap/macos/*.setup; do
+          source $setup
+        done
+    esac
 
     popd
     ;;

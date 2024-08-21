@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+
+# Run any updates on system
+${DOTFILES_PATH}/m/m update all

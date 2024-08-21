@@ -1,0 +1,22 @@
+#!/usr/bin/env zsh
+
+# Configure the dock
+defaults write com.apple.dock autohide -boolean YES
+defaults write com.apple.dock magnification -boolean YES
+killall Dock
+
+# Enable Safari developer menu
+defaults write com.apple.Safari IncludeDevelopMenu -boolean YES
+
+# Configure Finder
+defaults write com.apple.finder ShowPathbar -boolean YES
+defaults write com.apple.finder ShowStatusBar -boolean YES
+
+# USe auto dark/light modes
+defaults write NSGlobalDomain AppleInterfaceStyleSwitchesAutomatically -boolean YES
+
+# Auto scroll bars
+defaults write NSGlobalDomain AppleShowScrollBars -string "Automatic"
+
+# Speed up the trackpad, this is the max allowed by UI (can be set to more)
+defaults write -g com.apple.trackpad.scaling -float 3.0
