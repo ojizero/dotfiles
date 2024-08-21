@@ -72,13 +72,15 @@ Manage the dotfiles repo from anywhere.
 
 ```
 
-    usage: m dotfiles [help | sync | setup]
+    usage: m dotfiles [help | sync | setup | edit]
 
 
     Examples:
-      m dotfiles help             # prints this help message
-      m dotfiles pull             # pull the latest changes to the dotfiles repo by running
-                                  # this includes this command itself and will implicitly update it
-      m dotfiles setup            # sets up the dotfiles repo for the first time in a system
+      m dotfiles help                              # prints this help message
+      m dotfiles pull                              # pull the latest changes to the dotfiles repo by running
+                                                   # this includes this command itself and will implicitly update it
+      m dotfiles setup                             # sets up the dotfiles repo for the first time in a system
+      m dotfiles edit [--with <editor>]            # opens the dotfiles repo in an editor, defaults to EDITOR env var or vim
+                                                   # if "--with" is passed with an editor it is used instead
 
 ```
