@@ -43,7 +43,7 @@ case "${cmd}" in
       source $setup
     done
 
-    case "${OSTYPE}" do
+    case "${OSTYPE}" in
       darwin*)
         for setup in ${DOTFILES_PATH}/bootstrap/macos/*.setup; do
           source $setup
