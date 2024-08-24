@@ -18,6 +18,6 @@ esac
 mpath="$(readlink -f ~/.zprofile | xargs dirname)/m"
 export PATH="${mpath}:${PATH}"
 
-if [[ -f "~/.local/.zprofile" ]]; then
-  source "~/.local/.zprofile"
+if [[ -f "${HOME}/.local/.zprofile" ]]; then
+  source "${HOME}/.local/.zprofile"
 fi

@@ -6,8 +6,8 @@ export DOTFILES_PATH="$(dirname $(readlink ${HOME}/.zshrc))"
 # Prepare any local specific configurations
 #
 
-if [[ -f "~/.local/.zshrc" ]]; then
-  source "~/.local/.zshrc"
+if [[ -f "${HOME}/.local/.zshrc" ]]; then
+  source "${HOME}/.local/.zshrc"
 fi
 
 # Initialize Oh My Zsh
