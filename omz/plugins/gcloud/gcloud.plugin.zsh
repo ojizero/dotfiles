@@ -11,10 +11,15 @@ source "${gcloud_sdk_path}/${comp_file_name}"
 unset comp_file_name gcloud_sdk_path
 
 gssh() {
-  host_at_project="${1:?requires providing a host machine name and project name in format of host@project}"
+  host_at_project="${1}"
+  : "${host_at_project:?requires providing a host machine name and project name in format of host@project[@zone]}"
+
   host="$(echo ${host_at_project} | cut -d@ -f1)"
   project="$(echo ${host_at_project} | cut -d@ -f2)"
-  zone="${2:?requires providing a GCP zone}"
+
+  zone="$(echo ${host_at_project} | cut -d@ -f3)"
+  zone="${zone:-${2}}"
+  : "${zone:?requires providing a GCP zone, either as third segment of first argument or a second argument}"
 
   gcloud compute ssh --zone "${zone}" "${host}" --project "${project}"
 }
