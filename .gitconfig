@@ -83,4 +83,4 @@
 
 [include]
 	# Allow passing custom configs to Git outside of the dotfiles
-	path = ~/.local.gitconfig
+	path = ~/.local/.gitconfig

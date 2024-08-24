@@ -55,6 +55,17 @@ case "${cmd}" in
     popd
     ;;
 
+  bundle)
+    pushd "${DOTFILES_PATH}"
+    brew bundle install --file "${DOTFILES_PATH}/Brewfile"
+    popd
+
+    if [[ -f "${DOTFILES_PATH}/.local/Brewfile" ]]; then
+      pushd "${DOTFILES_PATH}/.local"
+      brew bundle install --file "${DOTFILES_PATH}/.local/Brewfile"
+      popd
+    fi
+
   edit)
     editor="${EDITOR-vim}"
     if [ ! -z "$1" ] && [ "$1" = '--with' ] && [ ! -z "$2" ]; then

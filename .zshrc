@@ -3,6 +3,13 @@
 
 export DOTFILES_PATH="$(dirname $(readlink ${HOME}/.zshrc))"
 
+# Prepare any local specific configurations
+#
+
+if [[ -f "~/.local/.zshrc" ]]; then
+  source "~/.local/.zshrc"
+fi
+
 # Initialize Oh My Zsh
 #
 
@@ -21,9 +28,10 @@ export COMPLETION_WAITING_DOTS="true"
 #  `cd` and `cdi` as for ease of interactivity
 export ZOXIDE_CMD_OVERRIDE='cd'
 
-plugins=(
+# We append here to whatever plugins have, you can customize
+# stuff by adding this in a .local/.zshrc
+plugins+=(
   asdf
-  devops
   zoxide
 )
 

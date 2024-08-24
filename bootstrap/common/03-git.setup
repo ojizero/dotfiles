@@ -3,11 +3,5 @@
 cfg_gitconfig="${DOTFILES_PATH}/.gitconfig"
 home_gitconfig="${HOME}/.gitconfig"
 
-cfg_local_gitconfig="${DOTFILES_PATH}/.local/.gitconfig"
-home_local_gitconfig="${HOME}/.local.gitconfig"
-
 rm -fr "${home_gitconfig}"
 ln -s "${cfg_gitconfig}" "${home_gitconfig}"
-
-rm -fr "${home_local_gitconfig}"
-ln -s "${cfg_local_gitconfig}" "${home_local_gitconfig}"
