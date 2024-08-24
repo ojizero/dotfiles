@@ -1,5 +1,18 @@
 # Load Homebrew packages and binaries
-eval "$(/opt/homebrew/bin/brew shellenv)"
+#
+# This differs between Apple Silicon and Intel based
+# Macs so we check the machine architecture before
+case "$(machine)" into
+  arm*)
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+
+    ;;
+
+  x86_64*)
+    eval "$(/usr/local/bin/brew shellenv)"
+
+    ;;
+esac
 
 # Load `m` into the env
 mpath="$(readlink -f ~/.zprofile | xargs dirname)/m"
