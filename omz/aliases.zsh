@@ -38,4 +38,16 @@ function cheat {
   curl "https://cht.sh/${1}"
 }
 
-alias j='just'
+# Find up in zsh because why not...
+# Consider replacing with gofindup?
+find-up() {
+  f="${1:?required input of file name to look for}"
+  cur="${2:-${PWD}}"
+  testing="$(echo "${cur}/${f}" | tr -s /)"
+  while [[ ! -f "${testing}" ]]; do
+    cur="$(dirname ${cur})"
+    testing="$(echo "${cur}/${f}" | tr -s /)"
+    [[ "${cur}" = "/" ]] && [[ ! -f "${testing}" ]] && return 0
+  done
+  echo "${testing}"
+}
