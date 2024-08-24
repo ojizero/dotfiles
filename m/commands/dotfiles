@@ -56,21 +56,20 @@ case "${cmd}" in
     ;;
 
   bundle)
-    if [ ! -z "$1" ] && [ "$1" = '--clean' ]; then
-      opts="--cleanup --zap"
+    if [ ! -z "$1" ] && [ "$1" = '--reset' ]; then
+      opts=(--cleanup --zap --force)
     elif [ ! -z "$1" ]; then
       echo "Unknown option: ${1}"
       exit 1
     fi
 
-    pushd "${DOTFILES_PATH}"
-    brew bundle install --file "${DOTFILES_PATH}/Brewfile" $opts
-    popd
 
     if [[ -f "${DOTFILES_PATH}/.local/Brewfile" ]]; then
-      pushd "${DOTFILES_PATH}/.local"
-      brew bundle install --file "${DOTFILES_PATH}/.local/Brewfile" $opts
-      popd
+      # If we have a locally defined Brewfile combine it with the main and run them together.
+      # We disable lock here as it could leak what's in the .local/Brewfile.
+      cat "${DOTFILES_PATH}/Brewfile" "${DOTFILES_PATH}/.local/Brewfile" | brew bundle install $opts --file - --no-lock
+    else
+      brew bundle install $opts --file "${DOTFILES_PATH}/Brewfile"
     fi
 
     ;;
