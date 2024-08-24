@@ -2,7 +2,7 @@
 #
 # This differs between Apple Silicon and Intel based
 # Macs so we check the machine architecture before
-case "$(machine)" into
+case "$(machine)" in
   arm*)
     eval "$(/opt/homebrew/bin/brew shellenv)"
 
