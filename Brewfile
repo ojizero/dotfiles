@@ -1,11 +1,9 @@
 # Installed taps
 #
 
-tap "aws/tap"
 tap "homebrew/aliases"
 tap "homebrew/bundle"
 tap "homebrew/cask-fonts"
-tap "homebrew/cask-versions"
 tap "homebrew/services"
 tap "ojizero/tap"
 
@@ -14,8 +12,6 @@ tap "ojizero/tap"
 
 brew "coreutils"
 brew "asdf"
-brew "aws-iam-authenticator"
-brew "awscli"
 brew "bat"
 brew "diff-so-fancy"
 brew "gnutls"
@@ -29,10 +25,8 @@ brew "grep"
 brew "hugo"
 brew "jq"
 brew "just"
-brew "k6"
 brew "mas"
 brew "mkcert"
-brew "mysql@8.0", link: true
 brew "ncdu"
 brew "nmap"
 brew "nss"
@@ -45,7 +39,6 @@ brew "zoxide"
 # Installed casks
 #
 
-cask "1password"
 cask "adguard"
 cask "arc"
 cask "bartender"
@@ -55,20 +48,16 @@ cask "epic-games"
 cask "fanny"
 cask "firefox"
 cask "font-fira-code"
-cask "google-cloud-sdk"
 cask "imageoptim"
 cask "iterm2"
 cask "megasync"
-cask "microsoft-teams"
 cask "obsidian"
-cask "postman"
 cask "protonvpn"
 cask "rapidapi"
 cask "rectangle"
 cask "signal"
 cask "steam"
 cask "tableplus"
-cask "tailscale"
 cask "visual-studio-code"
 cask "warp"
 cask "zed"
@@ -91,7 +80,6 @@ mas "Hand Mirror", id: 1502839586
 mas "Hyperduck", id: 6444667067
 mas "iMovie", id: 408981434
 mas "Keynote", id: 409183694
-mas "Microsoft Outlook", id: 985367838
 mas "Noir", id: 1592917505
 mas "NordVPN", id: 905953485
 mas "Numbers", id: 409203825

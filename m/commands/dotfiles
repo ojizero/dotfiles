@@ -56,13 +56,20 @@ case "${cmd}" in
     ;;
 
   bundle)
+    if [ ! -z "$1" ] && [ "$1" = '--clean' ]; then
+      opts="--cleanup --zap"
+    elif [ ! -z "$1" ]; then
+      echo "Unknown option: ${1}"
+      exit 1
+    fi
+
     pushd "${DOTFILES_PATH}"
-    brew bundle install --file "${DOTFILES_PATH}/Brewfile"
+    brew bundle install --file "${DOTFILES_PATH}/Brewfile" $opts
     popd
 
     if [[ -f "${DOTFILES_PATH}/.local/Brewfile" ]]; then
       pushd "${DOTFILES_PATH}/.local"
-      brew bundle install --file "${DOTFILES_PATH}/.local/Brewfile"
+      brew bundle install --file "${DOTFILES_PATH}/.local/Brewfile" $opts
       popd
     fi
 
