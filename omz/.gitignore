@@ -1,0 +1,5 @@
+# While we use `.local` for most of the local configurations,
+# OhMyZsh automatically loads any Zsh file in this folder
+# so it's less of a hassle to just add an ignore here.
+
+local.zsh
