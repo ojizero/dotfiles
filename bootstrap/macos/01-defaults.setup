@@ -1,8 +1,15 @@
 #!/usr/bin/env zsh
 
-# Configure the dock
+# Configure the dock to autohide and do magnification
 defaults write com.apple.dock autohide -boolean YES
 defaults write com.apple.dock magnification -boolean YES
+# Don’t automatically rearrange Spaces based on most recent use
+defaults write com.apple.dock mru-spaces -boolean false
+# Disable dock's recents
+defaults write com.apple.dock show-recents -boolean false
+# Use scale animation for the dock
+defaults write com.apple.dock mineffect -string "scale"
+
 killall Dock
 
 # Enable Safari developer menu
@@ -12,7 +19,7 @@ defaults write com.apple.Safari IncludeDevelopMenu -boolean YES
 defaults write com.apple.finder ShowPathbar -boolean YES
 defaults write com.apple.finder ShowStatusBar -boolean YES
 
-# USe auto dark/light modes
+# Use auto dark/light modes
 defaults write NSGlobalDomain AppleInterfaceStyleSwitchesAutomatically -boolean YES
 
 # Auto scroll bars
@@ -20,3 +27,8 @@ defaults write NSGlobalDomain AppleShowScrollBars -string "Automatic"
 
 # Speed up the trackpad, this is the max allowed by UI (can be set to more)
 defaults write -g com.apple.trackpad.scaling -float 3.0
+# Enable tap to click
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -boolean true
+
+# Show battery percent
+defaults -currentHost write com.apple.controlcenter.plist BatteryShowPercentage -boolean true
