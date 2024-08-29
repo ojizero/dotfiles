@@ -23,3 +23,17 @@ gssh() {
 
   gcloud compute ssh --zone "${zone}" "${host}" --project "${project}"
 }
+
+gsshi() {
+  host_at_project="${1}"
+  : "${host_at_project:?requires providing a host machine name and project name in format of host@project[@zone]}"
+
+  host="$(echo ${host_at_project} | cut -d@ -f1)"
+  project="$(echo ${host_at_project} | cut -d@ -f2)"
+
+  zone="$(echo ${host_at_project} | cut -d@ -f3)"
+  zone="${zone:-${2}}"
+  : "${zone:?requires providing a GCP zone, either as third segment of first argument or a second argument}"
+
+  gcloud compute ssh --zone "${zone}" "${host}" --project "${project}" --internal-ip
+}
