@@ -22,13 +22,13 @@ console_title_template = '{{ .Shell }} in {{ .Folder }}'
   [[blocks.segments]]
     type = 'git'
     style = 'plain'
-    foreground = 'p:grey'
+    foreground = 'green'
     background = 'transparent'
-    template = ' {{ .HEAD }}{{ if or (.Working.Changed) (.Staging.Changed) }}*{{ end }} <cyan>{{ if gt .Behind 0 }}⇣{{ end }}{{ if gt .Ahead 0 }}⇡{{ end }}</>'
+    template = ' {{ .HEAD }}{{ if or (.Working.Changed) (.Staging.Changed) }} <red>*{{ end }} <cyan>{{ if gt .Behind 0 }}⇣{{ end }}{{ if gt .Ahead 0 }}⇡{{ end }}</>'
 
     [blocks.segments.properties]
       branch_icon = ''
-      commit_icon = '@'
+      commit_icon = ''
       fetch_status = true
 
 [[blocks]]
@@ -55,7 +55,7 @@ console_title_template = '{{ .Shell }} in {{ .Folder }}'
     style = 'plain'
     foreground_templates = [
       "{{if gt .Code 0}}red{{end}}",
-      "{{if eq .Code 0}}magenta{{end}}",
+      "{{if eq .Code 0}}green{{end}}",
     ]
     background = 'transparent'
     template = '❯'
@@ -63,12 +63,12 @@ console_title_template = '{{ .Shell }} in {{ .Folder }}'
 [transient_prompt]
   foreground_templates = [
     "{{if gt .Code 0}}red{{end}}",
-    "{{if eq .Code 0}}magenta{{end}}",
+    "{{if eq .Code 0}}green{{end}}",
   ]
   background = 'transparent'
   template = '❯ '
 
 [secondary_prompt]
-  foreground = 'magenta'
+  foreground = 'darkGray'
   background = 'transparent'
-  template = '❯❯ '
+  template = '❯   '
