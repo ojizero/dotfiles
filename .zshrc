@@ -1,17 +1,13 @@
 export DOTFILES_PATH="$(dirname $(readlink ${HOME}/.zshrc))"
 
-# Set the shell theme
-source "${DOTFILES_PATH}/omz/themes/z.zsh"
-# Set `cd` to use zoxide
-eval "$(zoxide init --cmd ${ZOXIDE_CMD_OVERRIDE:-cd} zsh)"
+source <(oh-my-posh init zsh --config "${DOTFILES_PATH}/omp.toml")
+source <(zoxide init --cmd "${ZOXIDE_CMD_OVERRIDE:-cd}" zsh)
+source "$(brew --prefix asdf)/libexec/asdf.sh"
+source <(tailscale completion zsh)
 
-for conf in ${DOTFILES_PATH}/omz/*.zsh; do
-  source "${conf}"
+for auto in "${DOTFILES_PATH}/omz/auto/"*; do
+  source "${auto}"
 done
-
-## p
-## TODO: is this needed?
-##
 
 fpath=($HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
 
