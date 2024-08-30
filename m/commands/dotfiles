@@ -24,8 +24,66 @@ function find_dotfiles {
     | xargs dirname \
     | xargs dirname
 }
-
 export DOTFILES_PATH="${DOTFILES_PATH-$(find_dotfiles)}"
+
+function do_setup {
+  for setup in ${DOTFILES_PATH}/bootstrap/common/*.setup; do
+    source $setup
+  done
+
+  case "${OSTYPE}" in
+    darwin*)
+      for setup in ${DOTFILES_PATH}/bootstrap/macos/*.setup; do
+        source $setup
+      done
+
+      ;;
+  esac
+}
+
+function did_run {
+  CACHE_DIR="${DOTFILES_PATH}/bootstrap/.cache"
+  mkdir -p "${CACHE_DIR}"
+  system_setup="${1:t2}"
+  system="${system_setup:h}"
+  setup="${system_setup:t}"
+  : ${system:?failed to know which system this setup is for}
+  : ${setup:?failed to know which setup this setup is}
+  [[ -f "${CACHE_DIR}/${system}/${setup}" ]]
+}
+
+function save_run {
+  CACHE_DIR="${DOTFILES_PATH}/bootstrap/.cache"
+  mkdir -p "${CACHE_DIR}"
+  system_setup="${1:t2}"
+  system="${system_setup:h}"
+  setup="${system_setup:t}"
+  : ${system:?failed to know which system this setup is for}
+  : ${setup:?failed to know which setup this setup is}
+  touch "${CACHE_DIR}/${system}/${setup}"
+}
+
+function source_once {
+  if ! did_run "${1}"; then
+    source "${1}"
+    save_run "${1}"
+  fi
+}
+
+function do_setup_once {
+  for setup in ${DOTFILES_PATH}/bootstrap/common/*.setup.once; do
+    source_once "${setup}"
+  done
+
+  case "${OSTYPE}" in
+    darwin*)
+      for setup in ${DOTFILES_PATH}/bootstrap/macos/*.setup.once; do
+        source_once "${setup}"
+      done
+
+      ;;
+  esac
+}
 
 cmd="${1}"; shift
 
@@ -39,18 +97,7 @@ case "${cmd}" in
   setup)
     pushd "${DOTFILES_PATH}"
 
-    for setup in ${DOTFILES_PATH}/bootstrap/common/*.setup; do
-      source $setup
-    done
-
-    case "${OSTYPE}" in
-      darwin*)
-        for setup in ${DOTFILES_PATH}/bootstrap/macos/*.setup; do
-          source $setup
-        done
-
-        ;;
-    esac
+    do_setup
 
     popd
     ;;
