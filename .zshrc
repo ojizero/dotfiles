@@ -12,7 +12,7 @@ fpath+=("$(brew --prefix asdf)/share/zsh/site-functions")
 autoload -Uz _asdf
 compdef _asdf asdf
 
-for auto in "${DOTFILES_PATH}/omz/auto/"*; do
+for auto in "${DOTFILES_PATH}/omz/auto/"*.zsh; do
   source "${auto}"
 done
 
