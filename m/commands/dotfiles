@@ -98,6 +98,7 @@ case "${cmd}" in
     pushd "${DOTFILES_PATH}"
 
     do_setup
+    do_setup_once
 
     popd
     ;;
