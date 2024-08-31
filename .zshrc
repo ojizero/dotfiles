@@ -15,7 +15,3 @@ compdef _asdf asdf
 for auto in "${DOTFILES_PATH}/omz/auto/"*.zsh; do
   source "${auto}"
 done
-
-# More sane `pushd` settings
-unsetopt auto_pushd
-setopt pushd_ignore_dups
