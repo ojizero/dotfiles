@@ -1,4 +1,5 @@
-export DOTFILES_PATH="$(dirname $(readlink ${HOME}/.zshrc))"
+# export DOTFILES_PATH="$(dirname $(readlink ${HOME}/.zshrc))"
+export DOTFILES_PATH="${0:A:h}"
 
 autoload -U compinit && compinit
 autoload -U +X bashcompinit && bashcompinit
