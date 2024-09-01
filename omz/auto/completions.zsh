@@ -1,3 +1,12 @@
+autoload -U compinit && compinit
+autoload -U +X bashcompinit && bashcompinit
+
+source <(tailscale completion zsh)
+# Append additional custom completions paths
+fpath+=("$(brew --prefix asdf)/share/zsh/site-functions")
+fpath+=("${DOTFILES_PATH}/omz/completions")
+compinit # Load any completions in updated fpath
+
 # Code taken from OhMyZsh
 # https://github.com/ohmyzsh/ohmyzsh/blob/2056aeeeaddd977eb205619c6f236b94dac896be/lib/completion.zsh
 
@@ -23,12 +32,3 @@ zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-
 
 # # disable named-directories autocompletion
 # zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
-
-fpath+=("${DOTFILES_PATH}/omz/completions")
-
-for comp_file in "${DOTFILES_PATH}/omz/completions/"*; do
-  comp="${comp_file:t}"
-  cli="${comp#_}"
-  autoload -Uz "${comp}"
-  compdef "${comp}" "${cli}"
-done
