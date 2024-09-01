@@ -54,12 +54,12 @@ function did_run {
 
 function save_run {
   CACHE_DIR="${DOTFILES_PATH}/bootstrap/.cache"
-  mkdir -p "${CACHE_DIR}"
   system_setup="${1:t2}"
   system="${system_setup:h}"
   setup="${system_setup:t}"
   : ${system:?failed to know which system this setup is for}
   : ${setup:?failed to know which setup this setup is}
+  mkdir -p "${CACHE_DIR}/${system}"
   touch "${CACHE_DIR}/${system}/${setup}"
 }
 
