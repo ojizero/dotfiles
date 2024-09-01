@@ -24,5 +24,11 @@ zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-
 # # disable named-directories autocompletion
 # zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
 
-# Add completions folder to top of the fpath array
-fpath="${DOTFILES}/omz/completions ${fpath}"
+fpath+=("${DOTFILES_PATH}/omz/completions")
+
+for comp_file in "${DOTFILES_PATH}/omz/completions/"*; do
+  comp="${comp_file:t}"
+  cli="${comp#_}"
+  autoload -Uz "${comp}"
+  compdef "${comp}" "${cli}"
+done
