@@ -3,7 +3,7 @@ autoload -U +X bashcompinit && bashcompinit
 
 source <(tailscale completion zsh)
 # Append additional custom completions paths
-fpath+=("$(brew --prefix asdf)/share/zsh/site-functions")
+fpath+=("$(brew --prefix)/share/zsh/site-functions")
 fpath+=("${DOTFILES_PATH}/omz/completions")
 compinit # Load any completions in updated fpath
 
