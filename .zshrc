@@ -1,49 +1,9 @@
-# Dotfiles root path
-#
-
 export DOTFILES_PATH="$(dirname $(readlink ${HOME}/.zshrc))"
 
-# Prepare any local specific configurations
-#
+source <(zoxide init --cmd "${ZOXIDE_CMD_OVERRIDE:-cd}" zsh)
+source "$(brew --prefix asdf)/libexec/asdf.sh"
+source <(cat "${DOTFILES_PATH}/omz/auto/"*.zsh)
 
-if [[ -f "${HOME}/.local/.zshrc" ]]; then
-  source "${HOME}/.local/.zshrc"
-fi
-
-# Initialize Oh My Zsh
-#
-
-export ZSH="${HOME}/.oh-my-zsh"
-export ZSH_CUSTOM="${DOTFILES_PATH}/omz"
-
-export ZSH_THEME="z"
-
-export UPDATE_ZSH_DAYS=13
-export DISABLE_UPDATE_PROMPT="true"
-
-export ENABLE_CORRECTION="false"
-export COMPLETION_WAITING_DOTS="true"
-
-# Setup ZOxide in place of CD & Z, provides commands aliased behind
-#  `cd` and `cdi` as for ease of interactivity
-export ZOXIDE_CMD_OVERRIDE='cd'
-
-# We append here to whatever plugins have, you can customize
-# stuff by adding this in a .local/.zshrc
-plugins+=(
-  asdf
-  zoxide
-)
-
-fpath=($HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
-
-source "${ZSH}/oh-my-zsh.sh"
-
-# Configurations
-#
-
-# More sane `pushd` settings
-unsetopt auto_pushd
-setopt pushd_ignore_dups
-
-autoload -U +X bashcompinit && bashcompinit
+# This ideally is run earlier on, but for some reason the keybindings bit
+# breaks the transient mode, no idea why but moving this here fixes it.
+source <(oh-my-posh init zsh --config "${DOTFILES_PATH}/omp.toml")

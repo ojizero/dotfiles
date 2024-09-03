@@ -1,4 +1,5 @@
 #!/usr/bin/env zsh
 
 # Make a symlink to home with local configs
+rm "${HOME}/.local"
 ln -s "${DOTFILES_PATH}/.local" "${HOME}/.local"

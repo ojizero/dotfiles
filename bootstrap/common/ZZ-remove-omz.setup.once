@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+
+# Uninstall OhMyZsh, they have an uninstall script but nuking their
+# folder is safer given that I want my .zshrc untouched.
+[ -d "${HOME}/.oh-my-zsh" ] && rm -fr "${HOME}/.oh-my-zsh"

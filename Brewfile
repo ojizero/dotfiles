@@ -5,6 +5,7 @@ tap "homebrew/aliases"
 tap "homebrew/bundle"
 tap "homebrew/cask-fonts"
 tap "homebrew/services"
+tap "jandedobbeleer/oh-my-posh"
 tap "ojizero/tap"
 
 # Installed formulae
@@ -52,12 +53,14 @@ cask "imageoptim"
 cask "iterm2"
 cask "megasync"
 cask "obsidian"
+cask "oh-my-posh"
 cask "protonvpn"
 cask "rapidapi"
 cask "rectangle"
 cask "signal"
 cask "steam"
 cask "tableplus"
+cask "tailscale"
 cask "visual-studio-code"
 cask "warp"
 cask "zed"
@@ -97,3 +100,4 @@ mas "Streaks", id: 963034692
 mas "Strongbox", id: 1481853033
 mas "Telegram", id: 747648890
 mas "Velja", id: 1607635845
+mas "Xcode", id: 497799835
