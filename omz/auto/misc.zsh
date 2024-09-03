@@ -2,6 +2,15 @@
 setopt pushd_ignore_dups
 alias -- -='cd -'
 
+# Tool related environment variables
+#
+
+export HOMEBREW_NO_ANALYTICS=1
+export PAGER='less -RFX'
+export AWS_PAGER='less -RFX'
+export ERL_AFLAGS="-kernel shell_history enabled"
+export ASDF_GOLANG_MOD_VERSION_ENABLED=true
+
 # Misc configs, taken from OhMyZsh
 # https://github.com/ohmyzsh/ohmyzsh/blob/2056aeeeaddd977eb205619c6f236b94dac896be/lib/misc.zsh
 setopt multios              # enable redirect to multiple streams: echo >file1 >file2
