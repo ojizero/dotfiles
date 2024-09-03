@@ -1,10 +1,9 @@
-autoload -U compinit && compinit
-source <(tailscale completion zsh)
 # Append additional custom completions paths
 fpath+=("$(brew --prefix)/share/zsh/site-functions")
 fpath+=("${DOTFILES_PATH}/omz/completions")
-compinit # Load any completions in updated fpath
+autoload -U compinit && compinit
 autoload -U +X bashcompinit && bashcompinit
+source <(tailscale completion zsh)
 
 # Code taken from OhMyZsh
 # https://github.com/ohmyzsh/ohmyzsh/blob/2056aeeeaddd977eb205619c6f236b94dac896be/lib/completion.zsh
