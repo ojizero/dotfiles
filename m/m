@@ -29,6 +29,10 @@ function convert-alias {
       echo update
       ;;
 
+    gate|sec|notary)
+      echo gatekeeper
+      ;;
+
     *)
       echo "${1}"
       ;;

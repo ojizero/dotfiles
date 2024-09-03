@@ -1,0 +1,6 @@
+#!/usr/bin/env zsh
+
+# Allow Oh My Posh to run on system
+omp="$(which oh-my-posh)"
+omp="${omp:A}" # follow it if it's a symlink
+${DOTFILES_PATH}/m/m notary approve "${omp}"
