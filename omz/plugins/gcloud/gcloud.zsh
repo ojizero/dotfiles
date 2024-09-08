@@ -2,12 +2,14 @@
 # is defined within the `/bin` folder of the Google Cloud
 # SDK structure. And a sibling to that `/bin` folder
 # is the completion files.
-
+#
+# This is required due to the fact that the completion files in the Google Cloud SDK
+# are not real completion files that can be autoloaded by zsh, they instead
+# require being sourced else they don't work.
+#
 comp_file_name="completion.zsh.inc"
 gcloud_sdk_path="$(which gcloud | xargs readlink -f | xargs dirname | xargs dirname)"
-
 source "${gcloud_sdk_path}/${comp_file_name}"
-
 unset comp_file_name gcloud_sdk_path
 
 gssh() {
