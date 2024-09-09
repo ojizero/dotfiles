@@ -1,0 +1,12 @@
+---
+services:
+  adguard-home:
+    container_name: adguard
+    image: adguard/adguardhome # TODO: lock to latest?
+    restart: unless-stopped
+    volumes:
+      - ./.home/conf:/opt/adguardhome/conf
+      - ./.home/work:/opt/adguardhome/work
+    ports:
+      - 53:53
+      - 3000:3000/tcp
