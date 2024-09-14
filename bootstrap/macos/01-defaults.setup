@@ -13,6 +13,7 @@ defaults write com.apple.dock mineffect -string "scale"
 killall Dock
 
 # Enable Safari developer menu
+defaults write com.apple.Safari.SandboxBroker ShowDevelopMenu -bool true
 defaults write com.apple.Safari IncludeDevelopMenu -boolean YES
 
 # Configure Finder
