@@ -1,0 +1,35 @@
+---
+services:
+  jellyfin:
+    container_name: jellyfin
+    image: linuxserver/jellyfin:10.9.11
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    # volumes:
+    #   - /path/to/config:/config
+    #   - /path/to/cache:/cache
+    #   - type: bind
+    #     source: /path/to/media
+    #     target: /media
+    #   - type: bind
+    #     source: /path/to/media2
+    #     target: /media2
+    #     read_only: true
+    # volumes:
+    #   - /path/to/jellyfin/library:/config
+    #   - /path/to/tvseries:/data/tvshows
+    #   - /path/to/movies:/data/movies
+    ports:
+      - 8096:8096
+      # - 8920:8920     # HTTPS
+      # - 7359:7359/udp # Service auto discover
+      # - 1900:1900/udp # Service auto discover
+    # Using host mode in order to enable DLNA by allow Jellyfin
+    # access to the host's network interfaces.
+    network_mode: host
+    # # Optional - may be necessary for docker healthcheck to pass if running in host network mode
+    # extra_hosts:
+    #   - 'host.docker.internal:host-gateway'
