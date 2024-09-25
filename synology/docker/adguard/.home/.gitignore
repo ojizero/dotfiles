@@ -1,3 +1,0 @@
-# TODO: is it okay to just store the whole config file here? What about the bcrypt stored pass?
-*
-!.gitignore
