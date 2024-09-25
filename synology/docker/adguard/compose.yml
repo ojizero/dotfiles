@@ -2,7 +2,7 @@
 services:
   adguard-home:
     container_name: adguard
-    image: adguard/adguardhome # TODO: lock to latest?
+    image: adguard/adguardhomeL:v0.107.52
     restart: unless-stopped
     volumes:
       - ./.home/conf:/opt/adguardhome/conf
