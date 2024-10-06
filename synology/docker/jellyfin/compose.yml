@@ -10,7 +10,6 @@ services:
       - TZ=Etc/UTC
     volumes:
       - ./config:/config
-      - ./cache:/cache
       - type: bind
         source: /media
         target: /media
