@@ -14,10 +14,9 @@ services:
         source: /media
         target: /media
     ports:
-      - 8096:8096
-      # - 8920:8920     # HTTPS
-      # - 7359:7359/udp # Service auto discover
-      # - 1900:1900/udp # Service auto discover
+      - 8096:8096     # Web portal
+      - 7359:7359/udp # Service auto discover
+      - 1900:1900/udp # Service auto discover
     # Using host mode in order to enable DLNA by allow Jellyfin
     # access to the host's network interfaces.
     network_mode: host
