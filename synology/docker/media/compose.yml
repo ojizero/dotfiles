@@ -1,4 +1,6 @@
 ---
+x-media-vault: &media-vault ${MEDIA_VAULT_PATH:-/media}
+
 services:
   jellyfin:
     container_name: jellyfin
@@ -11,15 +13,13 @@ services:
     volumes:
       - ./config:/config
       - type: bind
-        source: /media
+        source: *media-vault
         target: /media
     ports:
-      - 8096:8096     # Web portal
-      - 7359:7359/udp # Service auto discover
-      - 1900:1900/udp # Service auto discover
-    # Using host mode in order to enable DLNA by allow Jellyfin
-    # access to the host's network interfaces.
-    network_mode: host
+      - 8096:8096      # Web portal
+      - 7359:7359/udp  # Service auto discover
+      - 1900:1900/udp  # Service auto discover
+    network_mode: host # Host mode to enable DLNA support
     # Optional; necessary for docker healthcheck to pass if running in host network mode
     extra_hosts:
       - 'host.docker.internal:host-gateway'
