@@ -1,20 +1,23 @@
 ---
-x-media-vault: &media-vault ${MEDIA_VAULT_PATH:-/media}
+x-media-vault: &media-vault
+  type: bind
+  source: ${MEDIA_VAULT_PATH:-/media}
+  target: /media
+
+x-environment: &environment
+  - PUID=1000
+  - PGID=1000
+  - TZ=Etc/UTC
 
 services:
   jellyfin:
     container_name: jellyfin
     image: linuxserver/jellyfin:10.9.11
     restart: unless-stopped
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
+    environment: *environment
     volumes:
-      - ./config:/config
-      - type: bind
-        source: *media-vault
-        target: /media
+      - ./configs/jellyfin:/config
+      - <<: *media-vault
     ports:
       - 8096:8096      # Web portal
       - 7359:7359/udp  # Service auto discover
@@ -23,3 +26,14 @@ services:
     # Optional; necessary for docker healthcheck to pass if running in host network mode
     extra_hosts:
       - 'host.docker.internal:host-gateway'
+
+  sonarr:
+    container_name: sonarr
+    image: linuxserver/sonarr:4.0.9
+    restart: unless-stopped
+    environment: *environment
+    volumes:
+      - ./configs/sonarr:/config
+      - <<: *media-vault
+    ports:
+      - 8989:8989 # Web portal
