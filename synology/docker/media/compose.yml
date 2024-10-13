@@ -7,7 +7,7 @@ x-media-vault: &media-vault
 x-environment: &environment
   - PUID=1000
   - PGID=1000
-  - TZ=Etc/UTC
+  - TZ=Asia/Jerusalem
 
 services:
   jellyfin:
@@ -37,3 +37,5 @@ services:
       - <<: *media-vault
     ports:
       - 8989:8989 # Web portal
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
