@@ -1,0 +1,47 @@
+---
+# Hardened: https://github.com/wollomatic/traefik-hardened/blob/master/docker-compose.yaml
+#        &| https://github.com/Tecnativa/docker-socket-proxy
+services:
+  docker-socket:
+    container_name: docker-socket-proxy
+    # TODO: decide on wollomatic vs Tecnativa (tecnative seems more common?)
+    image: ''
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    expose:
+      - '2375'
+    networks:
+      - dockernet
+
+  proxy:
+    container_name: traefik
+    image: traefik:v3.1.1
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro        # It's not recommended mounting the docker socket into a container -> see https://github.com/wollomatic/traefik2-hardened
+      - ./config/traefik.yaml:/etc/traefik/traefik.yaml:ro  # static traefik configuration
+      - ./config/dynamic.yaml:/etc/traefik/dynamic.yaml:ro  # dynamic traefik configuration
+      - ./config/acme.json:/etc/traefik/acme.json           # TLS certificate storage
+    ports:
+      - 80:80/udp
+      - 80:80/tcp
+      - 443:443/udp
+      - 443:443/tcp
+    networks:
+      - dockernet
+      - servicenet
+    # TODO: configure traefik to proxy things to host.docker.internal
+    #       and see if it maps, if so we can proceed and proxy DSM
+    #       behind it *.wn.ojizero.dev & *.tn.ojizero.dev & *.ln.ojizero.dev
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
+networks:
+  dockernet:
+    driver: bridge
+    internal: true
+
+  # NOTE: requires things behind Traefik to use this network as external
+  servicenet:
+    name: servicenet
