@@ -1,0 +1,23 @@
+---
+services:
+  docker-proxy:
+    container_name: docker-socket-proxy
+    image: linuxserver/socket-proxy:1.26.2
+    restart: unless-stopped
+    environment:
+      - CONTAINERS=1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    tmpfs:
+      - /run
+    read_only: true
+    expose:
+      - '2375'
+    networks:
+      - dockernet
+
+networks:
+  dockernet:
+    name: admin-dockernet
+    driver: bridge
+    internal: true
