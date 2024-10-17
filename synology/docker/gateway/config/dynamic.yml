@@ -1,0 +1,50 @@
+# Static set of routers and services for Traefik to proxy
+# - Wildcard router, primarily to define all domains to have a wildcard certificate generated.
+# - DSM's own interface.
+# - AdGuard's DNS-over-HTTPS/TLS/QUIC.
+http:
+  routers:
+    dsm:
+      entryPoints:
+        - web-secure
+      rule: >-
+        Host("atlas.ojizero.dev")
+        || Host("atlas.tn.ojizero.dev")
+        || Host("atlas.ln.ojizero.dev")
+      service: dsm
+
+    dns:
+      entryPoints:
+        - web-secure
+      rule: >-
+        Host("d.ojizero.dev")
+        || Host("d.tn.ojizero.dev")
+        || Host("d.ln.ojizero.dev")
+      service: dns
+
+    dns-tls:
+      entryPoints:
+        - dot
+      rule: >-
+        Host("d.ojizero.dev")
+        || Host("d.tn.ojizero.dev")
+        || Host("d.ln.ojizero.dev")
+      service: dns-tls
+      tls:
+        certResolver: letsencrypt
+
+  services:
+    dsm:
+      loadbalancer:
+        servers:
+          - url: http://host.docker.internal:5000
+
+    dns:
+      loadbalancer:
+        servers:
+          - url: http://host.docker.internal:3000
+
+    dns-tls:
+      loadbalancer:
+        servers:
+          - url: http://host.docker.internal:853
