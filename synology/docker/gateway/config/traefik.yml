@@ -5,11 +5,11 @@ global:
 entryPoints:
   web:
     address: ":80"
-    # http:
-    #   redirections:
-    #     entryPoint:
-    #       to: ":443"
-    #       scheme: https
+    http:
+      redirections:
+        entryPoint:
+          to: ":443"
+          scheme: https
   web-secure:
     address: ":443"
     http:
@@ -23,9 +23,6 @@ entryPoints:
               - "*.ln.ojizero.dev"
               - "*.wn.ojizero.dev"
 
-  dot:
-    address: ":853"
-
 providers:
   docker:
     exposedByDefault: false
@@ -35,13 +32,8 @@ providers:
     filename: /etc/traefik/dynamic.yml
     watch: true
 
-api:
-  # insecure: false
-  dashboard: true
-  disableDashboardAd: true
-
 log:
-  level: debug
+  level: warn
 
 certificatesResolvers:
   letsencrypt:

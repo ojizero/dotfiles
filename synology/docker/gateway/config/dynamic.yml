@@ -22,17 +22,6 @@ http:
         || Host("d.ln.ojizero.dev")
       service: dns
 
-    dns-tls:
-      entryPoints:
-        - dot
-      rule: >-
-        Host("d.ojizero.dev")
-        || Host("d.tn.ojizero.dev")
-        || Host("d.ln.ojizero.dev")
-      service: dns-tls
-      tls:
-        certResolver: letsencrypt
-
   services:
     dsm:
       loadbalancer:
@@ -43,8 +32,3 @@ http:
       loadbalancer:
         servers:
           - url: http://host.docker.internal:3000
-
-    dns-tls:
-      loadbalancer:
-        servers:
-          - url: http://host.docker.internal:853
