@@ -1,0 +1,40 @@
+# Discussion around autoconnecting to networks instead of sharing a
+# network: https://github.com/traefik/traefik/issues/8010
+#
+# Alternatively we could do host networking mode, but this will enforce setting
+# the Docker socket proxy on the host machine and would require firewall rules
+# to protect, not a thing I want (could be viable if moving to normal
+# non-proxied socket)
+---
+services:
+  proxy:
+    container_name: traefik
+    image: traefik:v3.1.1
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./config/traefik.yml:/etc/traefik/traefik.yml:ro # static traefik configuration
+      - ./config/dynamic.yml:/etc/traefik/dynamic.yml:ro # dynamic traefik configuration
+      - ./config/acme.json:/etc/traefik/acme.json        # TLS certificate storage
+    ports:
+      - 80:80/udp
+      - 80:80/tcp
+      - 443:443/udp
+      - 443:443/tcp
+    networks:
+      - dockernet
+      - servicenet
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  # Grant Traefik access to the administrive docker net
+  # to be given access to the Docker socket proxy.
+  dockernet:
+    name: admin-dockernet
+    external: true
+
+  # Services managed behind Traefik must use this network
+  # as an externally defined one in their configs.
+  servicenet:
+    name: servicenet

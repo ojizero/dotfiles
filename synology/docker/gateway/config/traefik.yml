@@ -1,0 +1,44 @@
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: ":443"
+          scheme: https
+  web-secure:
+    address: ":443"
+    http:
+      tls:
+        certResolver: letsencrypt
+        domains:
+          - main: ojizero.dev
+            sans:
+              - "*.ojizero.dev"
+              - "*.tn.ojizero.dev"
+              - "*.ln.ojizero.dev"
+              - "*.wn.ojizero.dev"
+
+providers:
+  docker:
+    exposedByDefault: false
+    endpoint: "tcp://docker-proxy:2375"
+    network: servicenet
+  file:
+    filename: /etc/traefik/dynamic.yml
+    watch: true
+
+log:
+  level: warn
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: accounts@ojizero.tech
+      storage: /etc/traefik/acme.json
+      dnsChallenge:
+        provider: cloudflare
