@@ -18,14 +18,16 @@ services:
     volumes:
       - ./configs/jellyfin:/config
       - <<: *media-vault
-    ports:
-      - 8096:8096      # Web portal
-      - 7359:7359/udp  # Service auto discover
-      - 1900:1900/udp  # Service auto discover
-    network_mode: host # Host mode to enable DLNA support
-    # Optional; necessary for docker healthcheck to pass if running in host network mode
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
+    expose:
+      - 8096:8096 # Web portal
+    networks:
+      - servicenet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jellyfin.entrypoints=web-secure
+      - traefik.http.routers.jellyfin.rule=Host(`m.tn.ojizero.dev`) || Host(`m.ln.ojizero.dev`)
+      - traefik.http.routers.jellyfin.service=jellyfin
+      - traefik.http.services.jellyfin.loadbalancer.server.port=8096
 
   sonarr:
     container_name: sonarr
@@ -35,7 +37,18 @@ services:
     volumes:
       - ./configs/sonarr:/config
       - <<: *media-vault
-    ports:
+    expose:
       - 8989:8989 # Web portal
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
+    networks:
+      - servicenet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.sonarr.entrypoints=web-secure
+      - traefik.http.routers.sonarr.rule=Host(`srr.tn.ojizero.dev`) || Host(`srr.ln.ojizero.dev`)
+      - traefik.http.routers.sonarr.service=sonarr
+      - traefik.http.services.sonarr.loadbalancer.server.port=8989
+
+networks:
+  servicenet:
+    name: servicenet
+    external: true
