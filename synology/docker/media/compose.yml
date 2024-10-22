@@ -4,6 +4,11 @@ x-media-vault: &media-vault
   source: ${MEDIA_VAULT_PATH:-/media}
   target: /data/media
 
+x-downloads-vault: &downloads-vault
+  type: bind
+  source: ${DOWNLOADS_VAULT_PATH:-/downloads}
+  target: /data/downloads
+
 x-environment: &environment
   - PUID=${PUID:-1000}
   - PGID=${PGID:-1000}
@@ -37,6 +42,7 @@ services:
     volumes:
       - ./configs/sonarr:/config
       - <<: *media-vault
+      - <<: *downloads-vault
     expose:
       - "8989"
     networks:
@@ -47,6 +53,9 @@ services:
       - traefik.http.routers.sonarr.rule=Host(`srr.tn.ojizero.dev`) || Host(`srr.ln.ojizero.dev`)
       - traefik.http.routers.sonarr.service=sonarr
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
+    # Given to Sonarr to allow access to DSM's DownloadStation
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 networks:
   servicenet:
