@@ -2,11 +2,11 @@
 x-media-vault: &media-vault
   type: bind
   source: ${MEDIA_VAULT_PATH:-/media}
-  target: /media
+  target: /data/media
 
 x-environment: &environment
-  - PUID=1000
-  - PGID=1000
+  - PUID=${PUID:-1000}
+  - PGID=${PGID:-1000}
   - TZ=Asia/Jerusalem
 
 services:
@@ -19,7 +19,7 @@ services:
       - ./configs/jellyfin:/config
       - <<: *media-vault
     expose:
-      - 8096:8096 # Web portal
+      - "8096"
     networks:
       - servicenet
     labels:
@@ -38,7 +38,7 @@ services:
       - ./configs/sonarr:/config
       - <<: *media-vault
     expose:
-      - 8989:8989 # Web portal
+      - "8989"
     networks:
       - servicenet
     labels:
