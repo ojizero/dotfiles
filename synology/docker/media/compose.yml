@@ -1,13 +1,8 @@
 ---
-x-media-vault: &media-vault
+x-data-vault: &data-vault
   type: bind
-  source: ${MEDIA_VAULT_PATH:-/media}
-  target: /data/media
-
-x-downloads-vault: &downloads-vault
-  type: bind
-  source: ${DOWNLOADS_VAULT_PATH:-/downloads}
-  target: /downloads
+  source: ${DATA_VAULT_PATH:-/media}
+  target: /data
 
 x-environment: &environment
   PUID: ${PUID:-1000}
@@ -22,7 +17,7 @@ services:
     environment: *environment
     volumes:
       - ./configs/jellyfin:/config
-      - <<: *media-vault
+      - <<: *data-vault
     expose:
       - "8096"
     networks:
@@ -41,8 +36,7 @@ services:
     environment: *environment
     volumes:
       - ./configs/sonarr:/config
-      - <<: *media-vault
-      - <<: *downloads-vault
+      - <<: *data-vault
     expose:
       - "8989"
     networks:
@@ -88,7 +82,7 @@ services:
       PASS: ${TRANSMISSION_PASS}
     volumes:
       - ./configs/transmission:/config
-      - <<: *downloads-vault
+      - <<: *data-vault
     expose:
       - "9091"
     ports:
