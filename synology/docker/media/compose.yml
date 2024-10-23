@@ -7,7 +7,7 @@ x-media-vault: &media-vault
 x-downloads-vault: &downloads-vault
   type: bind
   source: ${DOWNLOADS_VAULT_PATH:-/downloads}
-  target: /data/downloads
+  target: /downloads
 
 x-environment: &environment
   PUID: ${PUID:-1000}
@@ -89,7 +89,6 @@ services:
     volumes:
       - ./configs/transmission:/config
       - <<: *downloads-vault
-        target: /downloads
     expose:
       - "9091"
     ports:
