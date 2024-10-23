@@ -57,6 +57,24 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  prowlarr:
+    container_name: prowlarr
+    image: linuxserver/prowlarr:1.25.4
+    restart: unless-stopped
+    environment: *environment
+    volumes:
+      - ./configs/prowlarr:/config
+    expose:
+      - "9696"
+    networks:
+      - servicenet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.prowlarr.entrypoints=web-secure
+      - traefik.http.routers.prowlarr.rule=Host(`prr.tn.ojizero.dev`) || Host(`prr.ln.ojizero.dev`)
+      - traefik.http.routers.prowlarr.service=prowlarr
+      - traefik.http.services.prowlarr.loadbalancer.server.port=9696
+
 networks:
   servicenet:
     name: servicenet
