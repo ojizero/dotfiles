@@ -29,6 +29,24 @@ services:
       - traefik.http.routers.jellyfin.service=jellyfin
       - traefik.http.services.jellyfin.loadbalancer.server.port=8096
 
+  watcharr:
+    container_name: watcharr
+    image: ghcr.io/sbondco/watcharr:v1.44.2
+    restart: unless-stopped
+    environment: *environment
+    volumes:
+      - ./configs/watcharr:/data
+    expose:
+      - "3080"
+    networks:
+      - servicenet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.watcharr.entrypoints=web-secure
+      - traefik.http.routers.watcharr.rule=Host(`wrr.tn.ojizero.dev`) || Host(`wrr.ln.ojizero.dev`)
+      - traefik.http.routers.watcharr.service=watcharr
+      - traefik.http.services.watcharr.loadbalancer.server.port=3080
+
   sonarr:
     container_name: sonarr
     image: linuxserver/sonarr:4.0.9
