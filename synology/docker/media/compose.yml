@@ -80,6 +80,7 @@ services:
       - "9696"
     networks:
       - servicenet
+      - mediasphere
     labels:
       - traefik.enable=true
       - traefik.http.routers.prowlarr.entrypoints=web-secure
@@ -115,7 +116,20 @@ services:
       - traefik.http.routers.transmission.service=transmission
       - traefik.http.services.transmission.loadbalancer.server.port=9091
 
+  # Proxy between us an Indexers to solve Cloudflare challenges
+  flaresolverr:
+    container_name: flaresolverr
+    image: flaresolverr/flaresolverr:v3.3.21
+    restart: unless-stopped
+    environment: *environment
+    expose:
+      - "8191"
+    networks:
+      - mediasphere
+
 networks:
   servicenet:
     name: servicenet
     external: true
+
+  mediasphere:
