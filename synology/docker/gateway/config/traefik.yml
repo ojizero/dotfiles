@@ -32,6 +32,11 @@ providers:
     filename: /etc/traefik/dynamic.yml
     watch: true
 
+api:
+  insecure: false
+  dashboard: true
+  disableDashboardAd: true
+
 log:
   level: warn
   noColor: true

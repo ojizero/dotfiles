@@ -24,6 +24,13 @@ services:
     networks:
       - dockernet
       - servicenet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.entrypoints=web-secure
+      - traefik.http.routers.traefik.rule=Host(`traefik.tn.ojizero.dev`) || Host(`traefik.ln.ojizero.dev`)
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.middlewares.traefik-basic-auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASS_HASH}
+      - traefik.http.routers.traefik.middlewares=traefik-basic-auth
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
