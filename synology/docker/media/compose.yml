@@ -81,7 +81,7 @@ services:
       - ./configs/radarr:/config
       - <<: *data-vault
     expose:
-      - "8989"
+      - "7878"
     networks:
       - servicenet
     labels:
@@ -89,7 +89,7 @@ services:
       - traefik.http.routers.radarr.entrypoints=web-secure
       - traefik.http.routers.radarr.rule=Host(`rrr.tn.ojizero.dev`) || Host(`rrr.ln.ojizero.dev`)
       - traefik.http.routers.radarr.service=radarr
-      - traefik.http.services.radarr.loadbalancer.server.port=8989
+      - traefik.http.services.radarr.loadbalancer.server.port=7878
     # Given to Radarr to allow access to DSM's DownloadStation
     extra_hosts:
       - "host.docker.internal:host-gateway"
