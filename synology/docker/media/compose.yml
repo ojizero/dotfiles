@@ -34,6 +34,9 @@ services:
     image: ghcr.io/sbondco/watcharr:v1.44.2
     restart: unless-stopped
     environment: *environment
+    # Watcharr image doesn't support the PUID and PGID environment variables
+    # so we explcitly define those in the `user` directive for Docker.
+    user: ${PUID:-1000}:${PGID:-1000}
     volumes:
       - ./configs/watcharr:/data
     expose:
@@ -66,6 +69,28 @@ services:
       - traefik.http.routers.sonarr.service=sonarr
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
     # Given to Sonarr to allow access to DSM's DownloadStation
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  radarr:
+    container_name: radarr
+    image: linuxserver/radarr:5.14.0
+    restart: unless-stopped
+    environment: *environment
+    volumes:
+      - ./configs/radarr:/config
+      - <<: *data-vault
+    expose:
+      - "8989"
+    networks:
+      - servicenet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.radarr.entrypoints=web-secure
+      - traefik.http.routers.radarr.rule=Host(`rrr.tn.ojizero.dev`) || Host(`rrr.ln.ojizero.dev`)
+      - traefik.http.routers.radarr.service=radarr
+      - traefik.http.services.radarr.loadbalancer.server.port=8989
+    # Given to Radarr to allow access to DSM's DownloadStation
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
