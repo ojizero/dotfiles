@@ -7,6 +7,8 @@ services:
     volumes:
       - ./.home/conf:/opt/adguardhome/conf
       - ./.home/work:/opt/adguardhome/work
+    tmpfs:
+      - /opt/adguardhome/logs
     ports:
       - 53:53/tcp
       - 53:53/udp
