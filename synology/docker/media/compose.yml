@@ -94,6 +94,28 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  bazarr:
+    container_name: bazarr
+    image: linuxserver/bazarr:1.4.5
+    restart: unless-stopped
+    environment: *environment
+    volumes:
+      - ./configs/bazarr:/config
+      - <<: *data-vault
+    expose:
+      - "6767:6767"
+    networks:
+      - servicenet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.bazarr.entrypoints=web-secure
+      - traefik.http.routers.bazarr.rule=Host(`brr.tn.ojizero.dev`) || Host(`brr.ln.ojizero.dev`)
+      - traefik.http.routers.bazarr.service=bazarr
+      - traefik.http.services.bazarr.loadbalancer.server.port=6767
+    # Given to Radarr to allow access to DSM's DownloadStation
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   prowlarr:
     container_name: prowlarr
     image: linuxserver/prowlarr:1.25.4
@@ -130,7 +152,7 @@ services:
     expose:
       - "9091"
     ports:
-      - 51413:51413
+      - 51413:51413/tcp
       - 51413:51413/udp
     networks:
       - servicenet
