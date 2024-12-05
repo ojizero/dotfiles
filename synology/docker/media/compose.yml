@@ -12,7 +12,7 @@ x-environment: &environment
 services:
   jellyfin:
     container_name: jellyfin
-    image: linuxserver/jellyfin:10.10.1
+    image: linuxserver/jellyfin:10.10.3
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -52,7 +52,7 @@ services:
 
   sonarr:
     container_name: sonarr
-    image: linuxserver/sonarr:4.0.10
+    image: linuxserver/sonarr:4.0.11
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -74,7 +74,7 @@ services:
 
   radarr:
     container_name: radarr
-    image: linuxserver/radarr:5.14.0
+    image: linuxserver/radarr:5.15.1
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -118,7 +118,7 @@ services:
 
   prowlarr:
     container_name: prowlarr
-    image: linuxserver/prowlarr:1.25.4
+    image: linuxserver/prowlarr:1.27.0
     restart: unless-stopped
     environment: *environment
     volumes:
