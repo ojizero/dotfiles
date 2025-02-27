@@ -12,7 +12,7 @@ x-environment: &environment
 services:
   jellyfin:
     container_name: jellyfin
-    image: linuxserver/jellyfin:10.10.3
+    image: linuxserver/jellyfin:10.10.6
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -31,7 +31,7 @@ services:
 
   watcharr:
     container_name: watcharr
-    image: ghcr.io/sbondco/watcharr:v1.44.2
+    image: ghcr.io/sbondco/watcharr:v2.0.2
     restart: unless-stopped
     environment: *environment
     # Watcharr image doesn't support the PUID and PGID environment variables
@@ -52,7 +52,7 @@ services:
 
   sonarr:
     container_name: sonarr
-    image: linuxserver/sonarr:4.0.11
+    image: linuxserver/sonarr:4.0.13
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -74,7 +74,7 @@ services:
 
   radarr:
     container_name: radarr
-    image: linuxserver/radarr:5.15.1
+    image: linuxserver/radarr:5.19.3
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -96,7 +96,7 @@ services:
 
   bazarr:
     container_name: bazarr
-    image: linuxserver/bazarr:1.4.5
+    image: linuxserver/bazarr:1.5.1
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -118,7 +118,7 @@ services:
 
   prowlarr:
     container_name: prowlarr
-    image: linuxserver/prowlarr:1.27.0
+    image: linuxserver/prowlarr:1.31.2
     restart: unless-stopped
     environment: *environment
     volumes:
