@@ -174,6 +174,60 @@ services:
     networks:
       - mediasphere
 
+  # I slightly prefer TubeSync (https://github.com/meeb/tubesync)
+  # over MeTube, however for my current use case MeTube is
+  # much more useful and straighforward.
+  metube:
+    container_name: metube
+    image: ghcr.io/alexta69/metube:2025-03-22
+    restart: unless-stopped
+    environment:
+      <<: *environment
+      UID: ${PUID:-1000}
+      GID: ${PGID:-1000}
+      DOWNLOAD_DIR: /data/downloads/metube
+      STATE_DIR: /data/downloads/metube/.metube
+      TEMP_DIR: /data/downloads/metube/.metube
+      OUTPUT_TEMPLATE: "%(channel)s/%(title)s.%(ext)s"
+      OUTPUT_TEMPLATE_PLAYLIST: "%(playlist_title)s/%(playlist_index)s - %(title)s.%(ext)s"
+      # Embeds English subtitles and chapter markers (for videos that have them),
+      # and also changes the permissions on the downloaded video and sets the
+      # file modification timestamp to the date of when it was downloaded.
+      YTDL_OPTIONS: |
+        {
+          "writesubtitles": true,
+          "subtitleslangs": ["en"],
+          "updatetime": false,
+          "postprocessors": [
+            {
+              "key": "Exec",
+              "exec_cmd": "chmod 0664",
+              "when": "after_move"
+            },
+            {
+              "key": "FFmpegEmbedSubtitle",
+              "already_have_subtitle": false
+            },
+            {
+              "key": "FFmpegMetadata",
+              "add_chapters": true
+            }
+          ]
+        }
+    volumes:
+      - ./configs/metube:/config
+      - <<: *data-vault
+    expose:
+      - "8081"
+    networks:
+      - servicenet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.metube.entrypoints=web-secure
+      - traefik.http.routers.metube.rule=Host(`ytdl.tn.ojizero.dev`) || Host(`ytdl.ln.ojizero.dev`)
+      - traefik.http.routers.metube.service=metube
+      - traefik.http.services.metube.loadbalancer.server.port=8081
+
 networks:
   servicenet:
     name: servicenet
