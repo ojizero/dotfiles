@@ -2,7 +2,7 @@
 services:
   tunnel:
     container_name: cloudflared
-    image: cloudflare/cloudflared:2024.11.1
+    image: cloudflare/cloudflared:2025.4.2
     restart: unless-stopped
     command: tunnel --no-autoupdate run
     env_file: .env
