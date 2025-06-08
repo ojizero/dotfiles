@@ -6,8 +6,16 @@ alias -- -='cd -'
 #
 
 export HOMEBREW_NO_ANALYTICS=1
+
+# We allow for EDITOR to be predefined for cases where
+# we want this to be controlled externally, e.g. in
+# case the terminal is coming from a code editor
+# that sets this value for us.
+export EDITOR="${EDITOR:-vim}"
+
 export PAGER='less -RFX'
 export AWS_PAGER='less -RFX'
+
 export ERL_AFLAGS="-kernel shell_history enabled"
 export ASDF_GOLANG_MOD_VERSION_ENABLED=true
 
