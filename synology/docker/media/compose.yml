@@ -12,7 +12,7 @@ x-environment: &environment
 services:
   jellyfin:
     container_name: jellyfin
-    image: linuxserver/jellyfin:10.10.7
+    image: linuxserver/jellyfin:10.10.7ubu2404-ls65
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -31,7 +31,7 @@ services:
 
   watcharr:
     container_name: watcharr
-    image: ghcr.io/sbondco/watcharr:v2.0.2
+    image: ghcr.io/sbondco/watcharr:v2.1.0
     restart: unless-stopped
     environment: *environment
     # Watcharr image doesn't support the PUID and PGID environment variables
@@ -52,7 +52,7 @@ services:
 
   sonarr:
     container_name: sonarr
-    image: linuxserver/sonarr:4.0.14
+    image: linuxserver/sonarr:4.0.14.2939-ls283
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -74,7 +74,7 @@ services:
 
   radarr:
     container_name: radarr
-    image: linuxserver/radarr:5.22.4
+    image: linuxserver/radarr:5.25.0.10024-ls275
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -96,7 +96,7 @@ services:
 
   bazarr:
     container_name: bazarr
-    image: linuxserver/bazarr:1.5.1
+    image: linuxserver/bazarr:v1.5.2-ls306
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -118,7 +118,7 @@ services:
 
   prowlarr:
     container_name: prowlarr
-    image: linuxserver/prowlarr:1.35.1
+    image: linuxserver/prowlarr:1.37.0.5076-ls119
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -140,7 +140,7 @@ services:
   # qBittorrent and Deluge.
   transmission:
     container_name: transmission
-    image: linuxserver/transmission:4.0.6
+    image: linuxserver/transmission:4.0.6-r4-ls295
     restart: unless-stopped
     environment:
       <<: *environment
@@ -166,7 +166,7 @@ services:
   # Proxy between us an Indexers to solve Cloudflare challenges
   flaresolverr:
     container_name: flaresolverr
-    image: flaresolverr/flaresolverr:v3.3.21
+    image: flaresolverr/flaresolverr:v3.3.24
     restart: unless-stopped
     environment: *environment
     expose:
@@ -179,7 +179,7 @@ services:
   # much more useful and straighforward.
   metube:
     container_name: metube
-    image: ghcr.io/alexta69/metube:2025-03-22
+    image: ghcr.io/alexta69/metube:2025-06-06
     restart: unless-stopped
     environment:
       <<: *environment

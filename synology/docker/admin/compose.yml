@@ -2,7 +2,7 @@
 services:
   docker-proxy:
     container_name: docker-socket-proxy
-    image: linuxserver/socket-proxy:3.0.10
+    image: linuxserver/socket-proxy:3.0.10-r0-ls50
     restart: unless-stopped
     environment:
       - CONTAINERS=1
