@@ -41,7 +41,6 @@ brew "zoxide"
 #
 
 cask "adguard"
-cask "arc"
 cask "bartender"
 cask "discord"
 cask "docker"
