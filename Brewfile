@@ -3,7 +3,6 @@
 
 tap "homebrew/aliases"
 tap "homebrew/bundle"
-tap "homebrew/cask-fonts"
 tap "homebrew/services"
 tap "jandedobbeleer/oh-my-posh"
 tap "ojizero/tap"
