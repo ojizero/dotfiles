@@ -24,6 +24,7 @@ function git {
 }
 alias g='git'
 alias gg='git gone'
+alias lg='lazygit'
 
 function npm {
   if [[ $# -gt 0 ]]; then
