@@ -5,3 +5,6 @@ home_gitconfig="${HOME}/.gitconfig"
 
 rm -fr "${home_gitconfig}"
 ln -s "${cfg_gitconfig}" "${home_gitconfig}"
+
+# Install the gh-dash extension to GitHub's CLI
+gh extension install dlvhdr/gh-dash
