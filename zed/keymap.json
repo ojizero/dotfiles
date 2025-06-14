@@ -1,0 +1,31 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  {
+    "context": "Workspace",
+    "bindings": {}
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "cmd-e": "outline::Toggle",
+      "cmd-g": "go_to_line::Toggle",
+      // Move inline assist to use CMD+> (CMD+SHIFT+.) and disable CTRL+ENTER for it
+      "cmd->": "assistant::InlineAssist",
+      "ctrl-enter": null
+    }
+  },
+  {
+    "context": "Terminal",
+    "bindings": {
+      // Move inline assist to use CMD+> (CMD+SHIFT+.) and disable CTRL+ENTER for it
+      "cmd->": "assistant::InlineAssist",
+      "ctrl-enter": null
+    }
+  }
+]

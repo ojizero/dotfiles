@@ -1,0 +1,62 @@
+[
+  // Git workflow
+  {
+    "label": "git: gone",
+    "command": "git gone",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "never",
+    "hide": "always",
+    "shell": "system"
+  },
+
+  // Code reviews workflow
+  {
+    "label": "code: review work tree",
+    "command": "code",
+    "args": ["--profile", "'Code Reviews'", "$ZED_WORKTREE_ROOT"],
+    "use_new_terminal": false,
+    "allow_concurrent_runs": true,
+    "reveal": "never",
+    "hide": "never",
+    "shell": "system"
+  },
+
+  // Elixir workflow
+  {
+    "label": "iex: mix",
+    "command": "iex -S mix",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": true,
+    "reveal": "always",
+    "hide": "on_success",
+    "shell": "system"
+  },
+  {
+    "label": "mix: phx.server",
+    "command": "mix phx.server",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "never",
+    "hide": "always",
+    "shell": "system"
+  },
+  {
+    "label": "iex: mix phx.server",
+    "command": "iex -S mix phx.server",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "hide": "always",
+    "shell": "system"
+  },
+  {
+    "label": "mix: test",
+    "command": "mix test",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "no_focus",
+    "hide": "on_success",
+    "shell": "system"
+  }
+]
