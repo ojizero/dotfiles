@@ -94,13 +94,13 @@
     "enabled": true,
     "button": true,
     "inline_assistant_model": {
-      "provider": "copilot_chat",
-      "model": "claude-3.5-sonnet"
+      "provider": "zed.dev",
+      "model": "claude-sonnet-4"
     },
-    "default_profile": "ask",
+    "default_profile": "write",
     "default_model": {
-      "provider": "copilot_chat",
-      "model": "claude-3.5-sonnet"
+      "provider": "zed.dev",
+      "model": "claude-sonnet-4"
     }
   },
   "context_servers": {

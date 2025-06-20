@@ -9,6 +9,33 @@
     "hide": "always",
     "shell": "system"
   },
+  {
+    "label": "git: stash push",
+    "command": "git stash push --include-untracked",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "never",
+    "hide": "always",
+    "shell": "system"
+  },
+  {
+    "label": "git: stash pop",
+    "command": "git stash pop",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "never",
+    "hide": "always",
+    "shell": "system"
+  },
+  {
+    "label": "git: stash apply",
+    "command": "git stash apply",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "never",
+    "hide": "always",
+    "shell": "system"
+  },
 
   // Code reviews workflow
   {
