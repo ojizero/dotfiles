@@ -1,0 +1,82 @@
+---
+x-data-target: &data-target /data
+
+x-data-vault: &data-vault
+  type: bind
+  source: ${DATA_VAULT_PATH:-/archive}
+  target: *data-target
+
+services:
+  karakeep-web:
+    container_name: karakeep-web
+    image: ghcr.io/karakeep-app/karakeep:0.25.0
+    restart: unless-stopped
+    environment:
+      DATA_DIR: *data-target
+      MEILI_ADDR: http://karakeep-meilisearch:7700
+      BROWSER_WEB_URL: http://karakeep-chrome:9222
+      NEXTAUTH_URL: https://keep.tn.ojizero.dev
+      # OPENAI_API_KEY: ...
+    env_file:
+      - .env
+    user: ${PUID:-1000}:${PGID:-1000}
+    volumes:
+      - <<: *data-vault
+    expose:
+      - "3000"
+    networks:
+      - servicenet
+      - archive-sphere
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.karakeep.entrypoints=web-secure
+      - traefik.http.routers.karakeep.rule=Host(`keep.tn.ojizero.dev`) || Host(`keep.ln.ojizero.dev`)
+      - traefik.http.routers.karakeep.service=karakeep
+      - traefik.http.services.karakeep.loadbalancer.server.port=3000
+
+  karakeep-chrome:
+    container_name: karakeep-chrome
+    image: gcr.io/zenika-hub/alpine-chrome:123
+    restart: unless-stopped
+    user: ${PUID:-1000}:${PGID:-1000}
+    command:
+      - --no-sandbox
+      - --disable-gpu
+      - --disable-dev-shm-usage
+      - --remote-debugging-address=0.0.0.0
+      - --remote-debugging-port=9222
+      - --hide-scrollbars
+    expose:
+      - "9222"
+    networks:
+      - archive-sphere
+
+  karakeep-meilisearch:
+    container_name: karakeep-meilisearch
+    image: getmeili/meilisearch:v1.13.3
+    restart: unless-stopped
+    # user: ${PUID:-1000}:${PGID:-1000}
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+    env_file:
+      - .env
+    volumes:
+      - ./meilisearch:/meili_data
+    expose:
+      - "7700"
+    networks:
+      - offline-sphere
+
+networks:
+  servicenet:
+    name: servicenet
+    external: true
+
+  archive-sphere:
+    name: archive-sphere
+    driver: bridge
+
+  offline-sphere:
+    name: archive-offline-sphere
+    driver: bridge
+    internal: true
