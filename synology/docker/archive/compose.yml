@@ -14,12 +14,11 @@ services:
     environment:
       DATA_DIR: *data-target
       MEILI_ADDR: http://karakeep-meilisearch:7700
-      BROWSER_WEB_URL: http://karakeep-chrome:9222
       NEXTAUTH_URL: https://keep.tn.ojizero.dev
-      # OPENAI_API_KEY: ...
+      BROWSER_WEB_URL: http://karakeep-chrome:9222
     env_file:
       - .env
-    user: ${PUID:-1000}:${PGID:-1000}
+    # user: ${PUID:-1000}:${PGID:-1000}
     volumes:
       - <<: *data-vault
     expose:
@@ -38,7 +37,7 @@ services:
     container_name: karakeep-chrome
     image: gcr.io/zenika-hub/alpine-chrome:123
     restart: unless-stopped
-    user: ${PUID:-1000}:${PGID:-1000}
+    # user: ${PUID:-1000}:${PGID:-1000}
     command:
       - --no-sandbox
       - --disable-gpu
