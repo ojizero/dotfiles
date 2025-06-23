@@ -26,6 +26,7 @@ services:
     networks:
       - servicenet
       - archive-sphere
+      - offline-sphere
     labels:
       - traefik.enable=true
       - traefik.http.routers.karakeep.entrypoints=web-secure
