@@ -87,8 +87,10 @@
 
   "features": { "edit_prediction_provider": "zed" },
   // Append extra patterns to disable predictions in
-  "edit_predictions": { "disabled_globs": ["**/secret*"] },
-
+  "edit_predictions": {
+    "mode": "subtle",
+    "disabled_globs": ["**/secret*"]
+  },
   "agent": {
     "version": "2",
     "enabled": true,
