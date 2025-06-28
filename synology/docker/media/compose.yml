@@ -12,7 +12,7 @@ x-environment: &environment
 services:
   jellyfin:
     container_name: jellyfin
-    image: linuxserver/jellyfin:10.10.7ubu2404-ls65
+    image: linuxserver/jellyfin:10.10.7ubu2404-ls67
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -52,7 +52,7 @@ services:
 
   sonarr:
     container_name: sonarr
-    image: linuxserver/sonarr:4.0.14.2939-ls283
+    image: linuxserver/sonarr:4.0.15.2941-ls285
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -74,7 +74,7 @@ services:
 
   radarr:
     container_name: radarr
-    image: linuxserver/radarr:5.25.0.10024-ls275
+    image: linuxserver/radarr:5.26.2.10099-ls276
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -96,7 +96,7 @@ services:
 
   bazarr:
     container_name: bazarr
-    image: linuxserver/bazarr:v1.5.2-ls306
+    image: linuxserver/bazarr:v1.5.2-ls308
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -118,7 +118,7 @@ services:
 
   prowlarr:
     container_name: prowlarr
-    image: linuxserver/prowlarr:1.37.0.5076-ls119
+    image: linuxserver/prowlarr:1.37.0.5076-ls120
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -140,7 +140,7 @@ services:
   # qBittorrent and Deluge.
   transmission:
     container_name: transmission
-    image: linuxserver/transmission:4.0.6-r4-ls295
+    image: linuxserver/transmission:4.0.6-r4-ls299
     restart: unless-stopped
     environment:
       <<: *environment
@@ -166,67 +166,13 @@ services:
   # Proxy between us an Indexers to solve Cloudflare challenges
   flaresolverr:
     container_name: flaresolverr
-    image: flaresolverr/flaresolverr:v3.3.24
+    image: flaresolverr/flaresolverr:v3.3.25
     restart: unless-stopped
     environment: *environment
     expose:
       - "8191"
     networks:
       - mediasphere
-
-  # I slightly prefer TubeSync (https://github.com/meeb/tubesync)
-  # over MeTube, however for my current use case MeTube is
-  # much more useful and straighforward.
-  metube:
-    container_name: metube
-    image: ghcr.io/alexta69/metube:2025-06-06
-    restart: unless-stopped
-    environment:
-      <<: *environment
-      UID: ${PUID:-1000}
-      GID: ${PGID:-1000}
-      DOWNLOAD_DIR: /data/downloads/metube
-      STATE_DIR: /data/downloads/metube/.metube
-      TEMP_DIR: /data/downloads/metube/.metube
-      OUTPUT_TEMPLATE: "%(channel)s/%(title)s.%(ext)s"
-      OUTPUT_TEMPLATE_PLAYLIST: "%(playlist_title)s/%(playlist_index)s - %(title)s.%(ext)s"
-      # Embeds English subtitles and chapter markers (for videos that have them),
-      # and also changes the permissions on the downloaded video and sets the
-      # file modification timestamp to the date of when it was downloaded.
-      YTDL_OPTIONS: |
-        {
-          "writesubtitles": true,
-          "subtitleslangs": ["en"],
-          "updatetime": false,
-          "postprocessors": [
-            {
-              "key": "Exec",
-              "exec_cmd": "chmod 0664",
-              "when": "after_move"
-            },
-            {
-              "key": "FFmpegEmbedSubtitle",
-              "already_have_subtitle": false
-            },
-            {
-              "key": "FFmpegMetadata",
-              "add_chapters": true
-            }
-          ]
-        }
-    volumes:
-      - ./configs/metube:/config
-      - <<: *data-vault
-    expose:
-      - "8081"
-    networks:
-      - servicenet
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.metube.entrypoints=web-secure
-      - traefik.http.routers.metube.rule=Host(`ytdl.tn.ojizero.dev`) || Host(`ytdl.ln.ojizero.dev`)
-      - traefik.http.routers.metube.service=metube
-      - traefik.http.services.metube.loadbalancer.server.port=8081
 
 networks:
   servicenet:
