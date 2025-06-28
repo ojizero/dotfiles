@@ -85,6 +85,20 @@
     "metrics": false
   },
 
+  "languages": {
+    "Elixir": {
+      // Using Mix in place of the LSP as the ElixirLS LSP seems to sometimes
+      // break with some plugins arbitrarily. While a tiny bit slower
+      // this is more stable/consistent in behaviour.
+      "formatter": {
+        "external": {
+          "command": "mix",
+          "arguments": ["format", "--stdin-filename", "{buffer_path}", "-"]
+        }
+      }
+    }
+  },
+
   "features": { "edit_prediction_provider": "zed" },
   // Append extra patterns to disable predictions in
   "edit_predictions": {
