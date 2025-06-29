@@ -154,6 +154,26 @@ services:
       - traefik.http.routers.transmission.service=transmission
       - traefik.http.services.transmission.loadbalancer.server.port=9091
 
+  cleanuparr:
+    container_name: cleanuparr
+    image: ghcr.io/cleanuparr/cleanuparr:2.0.5
+    restart: unless-stopped
+    environment: *environment
+    volumes:
+      - ./configs/cleanuparr:/config
+    expose:
+      - "11011"
+    networks:
+      - servicenet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.cleanuparr.entrypoints=web-secure
+      - traefik.http.routers.cleanuparr.rule=Host(`crr.tn.ojizero.dev`) || Host(`crr.ln.ojizero.dev`)
+      - traefik.http.routers.cleanuparr.service=cleanuparr
+      - traefik.http.routers.cleanuparr.middlewares=cleanuparr-basic-auth
+      - traefik.http.middlewares.cleanuparr-basic-auth.basicauth.users=${CLEANUPARR_USER}:${CLEANUPARR_PASS_HASH}
+      - traefik.http.services.cleanuparr.loadbalancer.server.port=11011
+
   # Proxy between us an Indexers to solve Cloudflare challenges
   flaresolverr:
     container_name: flaresolverr
