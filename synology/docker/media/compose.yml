@@ -68,9 +68,6 @@ services:
       - traefik.http.routers.sonarr.rule=Host(`srr.tn.ojizero.dev`) || Host(`srr.ln.ojizero.dev`)
       - traefik.http.routers.sonarr.service=sonarr
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
-    # Given to Sonarr to allow access to DSM's DownloadStation
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
   radarr:
     container_name: radarr
@@ -90,9 +87,6 @@ services:
       - traefik.http.routers.radarr.rule=Host(`rrr.tn.ojizero.dev`) || Host(`rrr.ln.ojizero.dev`)
       - traefik.http.routers.radarr.service=radarr
       - traefik.http.services.radarr.loadbalancer.server.port=7878
-    # Given to Radarr to allow access to DSM's DownloadStation
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
   bazarr:
     container_name: bazarr
@@ -135,9 +129,6 @@ services:
       - traefik.http.routers.prowlarr.service=prowlarr
       - traefik.http.services.prowlarr.loadbalancer.server.port=9696
 
-  # As an alternative for DSM's DownloadStation, Transmission
-  # had the best UI IMO compared to the attorcious
-  # qBittorrent and Deluge.
   transmission:
     container_name: transmission
     image: linuxserver/transmission:4.0.6-r4-ls299
