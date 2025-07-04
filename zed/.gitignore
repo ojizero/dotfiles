@@ -1,0 +1,9 @@
+# For now let's ignore everything, later we can reverse that
+# when we know better what to exclude
+
+*
+!.gitignore
+!keymap.json
+!settings.json
+!tasks.json
+!snippets
