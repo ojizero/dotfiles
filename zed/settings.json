@@ -62,8 +62,8 @@
     "max_scroll_history_lines": 100000,
     "toolbar": { "breadcrumbs": false },
     "env": {
-      // When in Zed's terminal, tell terminal tools to use Zed for the editor
-      "EDITOR": "zed"
+      // // When in Zed's terminal, tell terminal tools to use Zed for the editor
+      // "EDITOR": "zed"
     }
   },
   "title_bar": {
@@ -75,6 +75,7 @@
     "button": false,
     "dock": "left"
   },
+  "notification_panel": { "button": false },
 
   "calls": {
     "mute_on_join": true,
@@ -106,7 +107,6 @@
     "disabled_globs": ["**/secret*"]
   },
   "agent": {
-    "version": "2",
     "enabled": true,
     "button": true,
     "inline_assistant_model": {
