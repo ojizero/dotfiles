@@ -12,7 +12,7 @@ x-environment: &environment
 services:
   jellyfin:
     container_name: jellyfin
-    image: linuxserver/jellyfin:10.10.7ubu2404-ls67
+    image: linuxserver/jellyfin:10.10.7ubu2404-ls75
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -31,7 +31,7 @@ services:
 
   watcharr:
     container_name: watcharr
-    image: ghcr.io/sbondco/watcharr:v2.1.0
+    image: ghcr.io/sbondco/watcharr:v2.1.1
     restart: unless-stopped
     environment: *environment
     # Watcharr image doesn't support the PUID and PGID environment variables
@@ -52,7 +52,7 @@ services:
 
   sonarr:
     container_name: sonarr
-    image: linuxserver/sonarr:4.0.15.2941-ls285
+    image: linuxserver/sonarr:4.0.15.2941-ls291
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -71,7 +71,7 @@ services:
 
   radarr:
     container_name: radarr
-    image: linuxserver/radarr:5.26.2.10099-ls276
+    image: linuxserver/radarr:5.26.2.10099-ls281
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -90,7 +90,7 @@ services:
 
   bazarr:
     container_name: bazarr
-    image: linuxserver/bazarr:v1.5.2-ls308
+    image: linuxserver/bazarr:v1.5.2-ls316
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -112,7 +112,7 @@ services:
 
   prowlarr:
     container_name: prowlarr
-    image: linuxserver/prowlarr:1.37.0.5076-ls120
+    image: linuxserver/prowlarr:2.0.5.5160-ls125
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -131,7 +131,7 @@ services:
 
   transmission:
     container_name: transmission
-    image: linuxserver/transmission:4.0.6-r4-ls299
+    image: linuxserver/transmission:4.0.6-r4-ls308
     restart: unless-stopped
     environment:
       <<: *environment
@@ -156,7 +156,7 @@ services:
 
   cleanuparr:
     container_name: cleanuparr
-    image: ghcr.io/cleanuparr/cleanuparr:2.0.5
+    image: ghcr.io/cleanuparr/cleanuparr:2.1.6
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -177,7 +177,7 @@ services:
   # Proxy between us an Indexers to solve Cloudflare challenges
   flaresolverr:
     container_name: flaresolverr
-    image: flaresolverr/flaresolverr:v3.3.25
+    image: flaresolverr/flaresolverr:v3.4.0
     restart: unless-stopped
     environment: *environment
     expose:

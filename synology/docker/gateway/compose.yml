@@ -9,13 +9,13 @@
 services:
   proxy:
     container_name: traefik
-    image: traefik:v3.4.1
+    image: traefik:v3.5.1
     restart: unless-stopped
     env_file: .env
     volumes:
       - ./config/traefik.yml:/etc/traefik/traefik.yml:ro # static traefik configuration
       - ./config/dynamic.yml:/etc/traefik/dynamic.yml:ro # dynamic traefik configuration
-      - ./config/acme.json:/etc/traefik/acme.json        # TLS certificate storage
+      - ./config/acme.json:/etc/traefik/acme.json # TLS certificate storage
     ports:
       - 80:80/udp
       - 80:80/tcp
