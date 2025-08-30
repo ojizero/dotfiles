@@ -27,5 +27,25 @@
       "cmd->": "assistant::InlineAssist",
       "ctrl-enter": null
     }
+  },
+  {
+    "bindings": {
+      "cmd-k cmd-u": "editor::ConvertToUpperCase"
+    }
+  },
+  {
+    "bindings": {
+      "cmd-k cmd-p": "editor::ConvertToUpperCamelCase"
+    }
+  },
+  {
+    "bindings": {
+      "cmd-k cmd-l": "editor::ConvertToLowerCase"
+    }
+  },
+  {
+    "bindings": {
+      "cmd-k cmd-c": "editor::ConvertToLowerCamelCase"
+    }
   }
 ]
