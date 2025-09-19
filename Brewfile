@@ -41,8 +41,6 @@ brew "zoxide"
 #
 
 cask "adguard"
-cask "bartender"
-cask "chatgpt"
 cask "claude"
 cask "docker-desktop"
 cask "epic-games"
@@ -55,7 +53,6 @@ cask "jellyfin-media-player"
 cask "obs"
 cask "obsidian"
 cask "oh-my-posh"
-cask "protonvpn"
 cask "rapidapi"
 cask "signal"
 cask "stats"
@@ -79,7 +76,6 @@ mas "Data Jar", id: 1453273600
 mas "DeArrow", id: 6451469297
 mas "Fantastical", id: 975937182
 mas "Flighty", id: 1358823008
-mas "Flycut", id: 442160987
 mas "GarageBand", id: 682658836
 mas "Hand Mirror", id: 1502839586
 mas "iMovie", id: 408981434
@@ -89,7 +85,6 @@ mas "Noir", id: 1592917505
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 mas "Refined GitHub", id: 1519867270
-mas "Slack", id: 803453959
 mas "Speediness", id: 1596706466
 mas "SponsorBlock", id: 1573461917
 mas "StopTheMadness Pro", id: 6471380298
