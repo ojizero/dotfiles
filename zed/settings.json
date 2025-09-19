@@ -97,6 +97,9 @@
           "arguments": ["format", "--stdin-filename", "{buffer_path}", "-"]
         }
       }
+    },
+    "Erlang": {
+      "language_servers": ["elp"]
     }
   },
 
@@ -107,6 +110,7 @@
     "disabled_globs": ["**/secret*"]
   },
   "agent": {
+    "always_allow_tool_actions": true,
     "enabled": true,
     "button": true,
     "inline_assistant_model": {
