@@ -67,9 +67,10 @@
     }
   },
   "title_bar": {
+    "show": "never",
     "show_branch_icon": true,
-    "show_onboarding_banner": false,
-    "show_user_picture": true
+    "show_user_picture": true,
+    "show_onboarding_banner": false
   },
   "outline_panel": {
     "button": false,
@@ -117,10 +118,56 @@
       "provider": "zed.dev",
       "model": "claude-sonnet-4"
     },
-    "default_profile": "write",
+    "default_profile": "ask",
     "default_model": {
       "provider": "zed.dev",
       "model": "claude-sonnet-4"
+    },
+    "profiles": {
+      // Expand the Ask profile of the Zed Agent to allow it additional tools
+      "ask": {
+        "name": "Ask",
+        "tools": {
+          "contents": true,
+          "diagnostics": true,
+          "fetch": true,
+          "list_directory": true,
+          "project_notifications": false,
+          "now": true,
+          "find_path": true,
+          "read_file": true,
+          "open": true,
+          "grep": true,
+          "thinking": true,
+          "web_search": true
+        },
+        "enable_all_context_servers": false,
+        "context_servers": {
+          "docker-mcp-gateway": {
+            "tools": {
+              "search_documentation": true,
+              "resolve-library-id": true,
+              "list_users": true,
+              "list_teams": true,
+              "list_projects": true,
+              "list_project_labels": true,
+              "list_issues": true,
+              "list_issue_statuses": true,
+              "list_issue_labels": true,
+              "list_documents": true,
+              "list_cycles": true,
+              "list_comments": true,
+              "get_user": true,
+              "get_team": true,
+              "get_project": true,
+              "get_issue_status": true,
+              "get_issue": true,
+              "get_document": true,
+              "get-library-docs": true
+            }
+          }
+        }
+      }
     }
   },
   "context_servers": {
