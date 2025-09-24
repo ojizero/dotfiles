@@ -1,0 +1,17 @@
+name: ojizero
+displayName: ojizero
+registry:
+  linear:
+    description: Linear's MCP server providing tools for finding, creating, and updating objects in Linear like issues, projects, and comments.
+    title: Linear
+    type: remote
+    icon: https://www.google.com/s2/favicons?domain=linear.app&sz=64
+    remote:
+      transport_type: sse
+      url: https://mcp.linear.app/sse
+      headers:
+        Authorization: "Bearer ${LINEAR_PERSONAL_API_KEY}"
+    secrets:
+      - name: linear.personal_api_key
+        env: LINEAR_PERSONAL_API_KEY
+        example: <your personal api key>
