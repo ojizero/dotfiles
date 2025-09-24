@@ -124,21 +124,12 @@
     }
   },
   "context_servers": {
-    // "mcp-docker": {
-    //   "command": {
-    //     "path": "docker",
-    //     "args": [
-    //       "run",
-    //       "-l",
-    //       "mcp.client=zed",
-    //       "-i",
-    //       "--rm",
-    //       "alpine/socat",
-    //       "STDIO",
-    //       "TCP:host.docker.internal:8811"
-    //     ]
-    //   },
-    //   "settings": {}
-    // }
+    "docker-mcp-gateway": {
+      "source": "custom",
+      "enabled": true,
+      "command": "docker",
+      "args": ["mcp", "gateway", "run"],
+      "env": {}
+    }
   }
 }
