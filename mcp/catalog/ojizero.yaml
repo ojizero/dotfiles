@@ -24,7 +24,7 @@ registry:
       transport_type: sse
       url: https://mcp.atlassian.com/v1/sse
       headers:
-        Authorization: "Bearer ${LINEAR_PERSONAL_API_KEY}"
+        Authorization: "Bearer ${ATLAS_PERSONAL_ACCESS_TOKEN}"
     secrets:
       - name: atlassian-edge.personal_access_token
         env: ATLAS_PERSONAL_ACCESS_TOKEN
