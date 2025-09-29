@@ -2,8 +2,8 @@ name: ojizero
 displayName: ojizero
 registry:
   linear:
-    description: Linear's MCP server providing tools for finding, creating, and updating objects in Linear like issues, projects, and comments.
     title: Linear
+    description: Linear's MCP server providing tools for finding, creating, and updating objects in Linear like issues, projects, and comments.
     type: remote
     icon: https://www.google.com/s2/favicons?domain=linear.app&sz=64
     remote:
@@ -14,4 +14,18 @@ registry:
     secrets:
       - name: linear.personal_api_key
         env: LINEAR_PERSONAL_API_KEY
+        example: <your personal api key>
+  atlassian-edge:
+    title: Atlassian
+    description: Tools for Atlassian products (Confluence and Jira). This integration supports both Atlassian Cloud and Jira Server/Data Center deployments.
+    type: remote
+    icon: https://www.google.com/s2/favicons?domain=atlassian.com&sz=64
+    remote:
+      transport_type: sse
+      url: https://mcp.atlassian.com/v1/sse
+      headers:
+        Authorization: "Bearer ${LINEAR_PERSONAL_API_KEY}"
+    secrets:
+      - name: atlassian-edge.personal_access_token
+        env: ATLAS_PERSONAL_ACCESS_TOKEN
         example: <your personal api key>
