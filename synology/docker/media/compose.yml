@@ -88,6 +88,25 @@ services:
       - traefik.http.routers.radarr.service=radarr
       - traefik.http.services.radarr.loadbalancer.server.port=7878
 
+  lidarr:
+    container_name: lidarr
+    image: linuxserver/lidarr:2.13.3.4711-ls4
+    restart: unless-stopped
+    environment: *environment
+    volumes:
+      - ./configs/lidarr:/config
+      - <<: *data-vault
+    expose:
+      - "8686"
+    networks:
+      - servicenet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.lidarr.entrypoints=web-secure
+      - traefik.http.routers.lidarr.rule=Host(`lrr.tn.ojizero.dev`) || Host(`lrr.ln.ojizero.dev`)
+      - traefik.http.routers.lidarr.service=lidarr
+      - traefik.http.services.lidarr.loadbalancer.server.port=8686
+
   bazarr:
     container_name: bazarr
     image: linuxserver/bazarr:v1.5.2-ls316
