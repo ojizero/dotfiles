@@ -47,5 +47,11 @@
     "bindings": {
       "cmd-k cmd-c": "editor::ConvertToLowerCamelCase"
     }
+  },
+  {
+    "context": "Terminal",
+    "bindings": {
+      "cmd-k cmd-k": "terminal::Clear"
+    }
   }
 ]

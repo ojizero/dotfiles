@@ -1,36 +1,18 @@
 {
   "auto_install_extensions": {
-    // Make it look good-er
     "catppuccin": true,
     "catppuccin-icons": true,
-
-    // Docker &-compose syntax
     "dockerfile": true,
     "docker-compose": true,
-
-    // Extending language support
     "sql": true,
     "html": true,
     "elixir": true,
     "erlang": true,
-
-    // Spell checker
     "cspell": true,
-
-    // Git syntax
     "git-firefly": true
   },
-
-  "theme": {
-    "mode": "system",
-    "light": "Catppuccin Latte",
-    "dark": "Catppuccin Mocha"
-  },
-  "icon_theme": {
-    "mode": "system",
-    "light": "Catppuccin Latte",
-    "dark": "Catppuccin Mocha"
-  },
+  "theme": { "mode": "system", "light": "Catppuccin Latte", "dark": "Catppuccin Mocha" },
+  "icon_theme": { "mode": "system", "light": "Catppuccin Latte", "dark": "Catppuccin Mocha" },
   "base_keymap": "VSCode",
   "buffer_font_size": 18,
   "buffer_font_family": "FiraCode Nerd Font",
@@ -55,16 +37,12 @@
   "tab_size": 2,
   "soft_wrap": "bounded",
   "preferred_line_length": 100,
-
   "terminal": {
     "dock": "right",
     "blinking": "on",
     "max_scroll_history_lines": 100000,
     "toolbar": { "breadcrumbs": false },
-    "env": {
-      // // When in Zed's terminal, tell terminal tools to use Zed for the editor
-      // "EDITOR": "zed"
-    }
+    "env": {}
   },
   "title_bar": {
     "show": "never",
@@ -72,26 +50,12 @@
     "show_user_picture": true,
     "show_onboarding_banner": false
   },
-  "outline_panel": {
-    "button": false,
-    "dock": "left"
-  },
+  "outline_panel": { "button": false, "dock": "left" },
   "notification_panel": { "button": false },
-
-  "calls": {
-    "mute_on_join": true,
-    "share_on_join": false
-  },
-  "telemetry": {
-    "diagnostics": false,
-    "metrics": false
-  },
-
+  "calls": { "mute_on_join": true, "share_on_join": false },
+  "telemetry": { "diagnostics": false, "metrics": false },
   "languages": {
     "Elixir": {
-      // Using Mix in place of the LSP as the ElixirLS LSP seems to sometimes
-      // break with some plugins arbitrarily. While a tiny bit slower
-      // this is more stable/consistent in behaviour.
       "formatter": {
         "external": {
           "command": "mix",
@@ -99,32 +63,18 @@
         }
       }
     },
-    "Erlang": {
-      "language_servers": ["elp"]
-    }
+    "Erlang": { "language_servers": ["elp"] }
   },
-
   "features": { "edit_prediction_provider": "zed" },
-  // Append extra patterns to disable predictions in
-  "edit_predictions": {
-    "mode": "subtle",
-    "disabled_globs": ["**/secret*"]
-  },
+  "edit_predictions": { "mode": "subtle", "disabled_globs": ["**/secret*"] },
   "agent": {
     "always_allow_tool_actions": true,
     "enabled": true,
     "button": true,
-    "inline_assistant_model": {
-      "provider": "zed.dev",
-      "model": "claude-sonnet-4"
-    },
+    "inline_assistant_model": { "provider": "zed.dev", "model": "claude-sonnet-4-5" },
     "default_profile": "write",
-    "default_model": {
-      "provider": "zed.dev",
-      "model": "claude-sonnet-4"
-    },
+    "default_model": { "provider": "zed.dev", "model": "claude-sonnet-4-5" },
     "profiles": {
-      // Expand the Ask profile of the Zed Agent to allow it additional tools
       "ask": {
         "name": "Ask",
         "tools": {
