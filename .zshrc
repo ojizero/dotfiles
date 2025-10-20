@@ -1,6 +1,9 @@
 export DOTFILES_PATH="$(dirname $(readlink ${HOME}/.zshrc))"
 
-source <(zoxide init --cmd "${ZOXIDE_CMD_OVERRIDE:-cd}" zsh)
+# Disable it when running in Claude as a workaround for issue
+# https://github.com/anthropics/claude-code/issues/2407
+[ "${CLAUDECODE}" != "1" ] && source <(zoxide init --cmd "${ZOXIDE_CMD_OVERRIDE:-cd}" zsh)
+
 source "$(brew --prefix asdf)/libexec/asdf.sh"
 source <(cat "${DOTFILES_PATH}/omz/auto/"*.zsh)
 
