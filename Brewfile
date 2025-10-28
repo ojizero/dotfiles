@@ -67,8 +67,6 @@ cask "steam"
 cask "synology-drive"
 cask "tableplus"
 cask "tailscale-app"
-cask "telegram"
-cask "vlc"
 cask "zed"
 cask "zoom"
 
