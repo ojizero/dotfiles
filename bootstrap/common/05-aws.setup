@@ -1,7 +1,0 @@
-#!/usr/bin/env zsh
-
-cfg_aws="${DOTFILES_PATH}/.aws"
-home_aws="${HOME}/.aws"
-
-rm -fr "${home_aws}"
-ln -s "${cfg_aws}" "${home_aws}"
