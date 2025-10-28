@@ -6,6 +6,7 @@ tap "homebrew/bundle"
 tap "homebrew/services"
 tap "jandedobbeleer/oh-my-posh"
 tap "ojizero/tap"
+tap "sst/tap"
 
 # Installed formulae
 #
@@ -31,17 +32,24 @@ brew "mkcert"
 brew "ncdu"
 brew "nmap"
 brew "nss"
+brew "ripgrep"
 brew "shellcheck"
+brew "specify"
+brew "tflint"
 brew "tree"
 brew "watch"
 brew "wget"
 brew "zoxide"
+brew "sst/tap/opencode"
 
 # Installed casks
 #
 
 cask "adguard"
+cask "bartender"
 cask "claude"
+cask "claude-code"
+cask "discord"
 cask "docker-desktop"
 cask "epic-games"
 cask "firefox"
@@ -49,7 +57,6 @@ cask "font-fira-code"
 cask "font-fira-code-nerd-font"
 cask "imageoptim"
 cask "iterm2"
-cask "jellyfin-media-player"
 cask "obs"
 cask "obsidian"
 cask "oh-my-posh"
@@ -61,10 +68,8 @@ cask "synology-drive"
 cask "tableplus"
 cask "tailscale-app"
 cask "telegram"
-cask "visual-studio-code"
 cask "vlc"
 cask "zed"
-cask "zen"
 cask "zoom"
 
 # Installed apps from the Mac App Store
@@ -85,7 +90,6 @@ mas "Noir", id: 1592917505
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 mas "Refined GitHub", id: 1519867270
-mas "Speediness", id: 1596706466
 mas "SponsorBlock", id: 1573461917
 mas "StopTheMadness Pro", id: 6471380298
 mas "Strongbox", id: 1481853033
