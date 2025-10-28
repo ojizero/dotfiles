@@ -15,7 +15,17 @@ home_homebrew_lock="${HOME}/.Brewfile.lock.json"
 if ! type brew >/dev/null 2>&1; then
   /usr/bin/env bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
-  eval "$(/opt/homebrew/bin/brew shellenv)"
+  case "$(machine)" in
+    arm*)
+      eval "$(/opt/homebrew/bin/brew shellenv)"
+
+      ;;
+
+    x86_64*)
+      eval "$(/usr/local/bin/brew shellenv)"
+
+      ;;
+  esac
 fi
 
 rm -fr "${home_homebrew_aliases}"
