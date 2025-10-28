@@ -120,6 +120,13 @@
       }
     }
   },
+  "agent_servers": {
+    "OpenCode": {
+      "command": "opencode",
+      "args": ["acp"],
+      "env": {}
+    }
+  },
   "context_servers": {
     "docker-mcp-gateway": {
       "source": "custom",
