@@ -1,4 +1,9 @@
 {
+  "colorize_brackets": true,
+  "indent_guides": {
+    "background_coloring": "disabled",
+    "coloring": "indent_aware"
+  },
   "auto_install_extensions": {
     "catppuccin": true,
     "catppuccin-icons": true,
@@ -71,7 +76,7 @@
     "always_allow_tool_actions": true,
     "enabled": true,
     "button": true,
-    "inline_assistant_model": { "provider": "zed.dev", "model": "claude-sonnet-4-5" },
+    "inline_assistant_model": { "provider": "copilot_chat", "model": "claude-sonnet-4.5" },
     "default_profile": "write",
     "default_model": { "provider": "zed.dev", "model": "claude-sonnet-4-5" },
     "profiles": {
@@ -122,6 +127,7 @@
   },
   "agent_servers": {
     "OpenCode": {
+      "type": "custom",
       "command": "opencode",
       "args": ["acp"],
       "env": {}
@@ -129,7 +135,6 @@
   },
   "context_servers": {
     "docker-mcp-gateway": {
-      "source": "custom",
       "enabled": true,
       "command": "docker",
       "args": ["mcp", "gateway", "run"],
