@@ -52,3 +52,10 @@ find-up() {
   done
   echo "${testing}"
 }
+
+alias -s md='bat'
+
+alias yless='jless --yaml'
+alias -s json='jless'
+alias -s yml='yless'
+alias -s yaml='yless'
