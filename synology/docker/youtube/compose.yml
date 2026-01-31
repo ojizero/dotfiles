@@ -6,6 +6,9 @@ services:
     restart: unless-stopped
     environment:
       INVIDIOUS_CONFIG: |
+        domain: yt.tn.ojizero.dev
+        https_only: true
+        external_port: 443
         db:
           dbname: invidious
           user: ${INVIDIOUS_DB_USER:-kemal}
@@ -39,7 +42,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.invidious.entrypoints=web-secure
-      - traefik.http.routers.invidious.rule=Host(`yt.tn.ojizero.dev`) || Host(`yt.ln.ojizero.dev`)
+      - traefik.http.routers.invidious.rule=Host(`yt.tn.ojizero.dev`)
       - traefik.http.routers.invidious.service=invidious
       - traefik.http.services.invidious.loadbalancer.server.port=3000
 
