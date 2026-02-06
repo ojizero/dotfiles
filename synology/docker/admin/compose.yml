@@ -1,7 +1,7 @@
 ---
 services:
   docker-proxy:
-    container_name: docker-socket-proxy
+    container_name: docker-proxy
     image: linuxserver/socket-proxy:3.2.4-r0-ls55
     restart: unless-stopped
     environment:
