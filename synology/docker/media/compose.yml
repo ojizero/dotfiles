@@ -12,7 +12,7 @@ x-environment: &environment
 services:
   jellyfin:
     container_name: jellyfin
-    image: linuxserver/jellyfin:10.11.6ubu2404-ls19
+    image: linuxserver/jellyfin:10.11.6ubu2404-ls20
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -52,7 +52,7 @@ services:
 
   sonarr:
     container_name: sonarr
-    image: linuxserver/sonarr:4.0.16.2944-ls301
+    image: linuxserver/sonarr:4.0.16.2944-ls302
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -71,7 +71,7 @@ services:
 
   radarr:
     container_name: radarr
-    image: linuxserver/radarr:6.0.4.10291-ls291
+    image: linuxserver/radarr:6.0.4.10291-ls292
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -90,7 +90,7 @@ services:
 
   lidarr:
     container_name: lidarr
-    image: linuxserver/lidarr:3.1.0.4875-ls19
+    image: linuxserver/lidarr:3.1.0.4875-ls20
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -109,7 +109,7 @@ services:
 
   bazarr:
     container_name: bazarr
-    image: linuxserver/bazarr:v1.5.5-ls336
+    image: linuxserver/bazarr:v1.5.5-ls337
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -131,7 +131,7 @@ services:
 
   prowlarr:
     container_name: prowlarr
-    image: linuxserver/prowlarr:2.3.0.5236-ls136
+    image: linuxserver/prowlarr:2.3.0.5236-ls137
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -150,7 +150,7 @@ services:
 
   transmission:
     container_name: transmission
-    image: linuxserver/transmission:4.1.0-r0-ls328
+    image: linuxserver/transmission:4.1.0-r0-ls329
     restart: unless-stopped
     environment:
       <<: *environment
@@ -175,7 +175,7 @@ services:
 
   cleanuparr:
     container_name: cleanuparr
-    image: ghcr.io/cleanuparr/cleanuparr:2.5.1
+    image: ghcr.io/cleanuparr/cleanuparr:2.6.1
     restart: unless-stopped
     environment: *environment
     volumes:

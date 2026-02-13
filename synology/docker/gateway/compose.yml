@@ -9,7 +9,7 @@
 services:
   proxy:
     container_name: traefik
-    image: traefik:v3.5.1
+    image: traefik:v3.6.8
     restart: unless-stopped
     env_file: .env
     volumes:

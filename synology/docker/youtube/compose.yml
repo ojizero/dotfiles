@@ -2,7 +2,7 @@
 services:
   invidious:
     container_name: invidious
-    image: quay.io/invidious/invidious:2026.02.06-29c29f7
+    image: quay.io/invidious/invidious:2026.02.07-118d635
     restart: unless-stopped
     environment:
       INVIDIOUS_CONFIG: |
@@ -70,7 +70,7 @@ services:
 
   invidious-db:
     container_name: invidious-db
-    image: postgres:18.1
+    image: postgres:18.2
     restart: unless-stopped
     environment:
       POSTGRES_DB: invidious

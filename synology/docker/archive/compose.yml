@@ -9,7 +9,7 @@ x-data-vault: &data-vault
 services:
   karakeep-web:
     container_name: karakeep-web
-    image: ghcr.io/karakeep-app/karakeep:0.26.0
+    image: ghcr.io/karakeep-app/karakeep:0.30.0
     restart: unless-stopped
     environment:
       DATA_DIR: *data-target
@@ -53,7 +53,7 @@ services:
 
   karakeep-meilisearch:
     container_name: karakeep-meilisearch
-    image: getmeili/meilisearch:v1.13.3
+    image: getmeili/meilisearch:v1.35.0
     restart: unless-stopped
     # user: ${PUID:-1000}:${PGID:-1000}
     environment:
