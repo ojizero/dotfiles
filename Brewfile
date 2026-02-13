@@ -4,9 +4,10 @@
 tap "homebrew/aliases"
 tap "homebrew/bundle"
 tap "homebrew/services"
+
+tap "anomalyco/tap"
 tap "jandedobbeleer/oh-my-posh"
-tap "ojizero/tap"
-tap "sst/tap"
+tap "steveyegge/beads"
 
 # Installed formulae
 #
@@ -25,6 +26,7 @@ brew "git-lfs"
 brew "gnu-tar"
 brew "gnupg"
 brew "grep"
+brew "jless"
 brew "jq"
 brew "just"
 brew "mas"
@@ -40,7 +42,8 @@ brew "tree"
 brew "watch"
 brew "wget"
 brew "zoxide"
-brew "sst/tap/opencode"
+brew "anomalyco/tap/opencode"
+brew "steveyegge/beads/bd"
 
 # Installed casks
 #

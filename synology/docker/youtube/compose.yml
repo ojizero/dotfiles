@@ -1,0 +1,97 @@
+---
+services:
+  invidious:
+    container_name: invidious
+    image: quay.io/invidious/invidious:2026.02.06-29c29f7
+    restart: unless-stopped
+    environment:
+      INVIDIOUS_CONFIG: |
+        domain: yt.tn.ojizero.dev
+        https_only: true
+        external_port: 443
+        db:
+          dbname: invidious
+          user: ${INVIDIOUS_DB_USER:-kemal}
+          password: ${INVIDIOUS_DB_PASSWORD:-kemal}
+          host: invidious-db
+          port: 5432
+        check_tables: true
+        captcha_enabled: false
+        invidious_companion:
+          - private_url: "http://invidious-companion:8282/companion"
+        invidious_companion_key: "${INVIDIOUS_COMPANION_KEY}"
+        hmac_key: "${INVIDIOUS_HMAC_KEY}"
+    expose:
+      - "3000"
+    networks:
+      - servicenet
+      - invidious-db
+      - invidious-companion
+    depends_on:
+      invidious-db:
+        condition: service_healthy
+    healthcheck:
+      test: wget -nv --tries=1 --spider http://127.0.0.1:3000/api/v1/stats || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 2
+    logging:
+      options:
+        max-size: "1G"
+        max-file: "4"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.invidious.entrypoints=web-secure
+      - traefik.http.routers.invidious.rule=Host(`yt.tn.ojizero.dev`)
+      - traefik.http.routers.invidious.service=invidious
+      - traefik.http.services.invidious.loadbalancer.server.port=3000
+
+  invidious-companion:
+    container_name: invidious-companion
+    image: quay.io/invidious/invidious-companion:master-607cb8d
+    restart: unless-stopped
+    environment:
+      - SERVER_SECRET_KEY=${INVIDIOUS_COMPANION_KEY}
+    expose:
+      - "8282"
+    networks:
+      - invidious-companion
+    volumes:
+      - invidious-companion-cache:/var/tmp/youtubei.js:rw
+    logging:
+      options:
+        max-size: "1G"
+        max-file: "4"
+    cap_drop:
+      - ALL
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+
+  invidious-db:
+    container_name: invidious-db
+    image: postgres:18.1
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: invidious
+      POSTGRES_USER: ${INVIDIOUS_DB_USER:-kemal}
+      POSTGRES_PASSWORD: ${INVIDIOUS_DB_PASSWORD:-kemal}
+    volumes:
+      - ./configs/invidious-db:/var/lib/postgresql
+    networks:
+      - invidious-db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+
+networks:
+  servicenet:
+    name: servicenet
+    external: true
+
+  invidious-db:
+    internal: true
+
+  invidious-companion:
+
+volumes:
+  invidious-companion-cache:

@@ -1,4 +1,9 @@
 {
+  "colorize_brackets": true,
+  "indent_guides": {
+    "background_coloring": "disabled",
+    "coloring": "indent_aware",
+  },
   "auto_install_extensions": {
     "catppuccin": true,
     "catppuccin-icons": true,
@@ -9,7 +14,8 @@
     "elixir": true,
     "erlang": true,
     "cspell": true,
-    "git-firefly": true
+    "git-firefly": true,
+    "opencode": true,
   },
   "theme": { "mode": "system", "light": "Catppuccin Latte", "dark": "Catppuccin Mocha" },
   "icon_theme": { "mode": "system", "light": "Catppuccin Latte", "dark": "Catppuccin Mocha" },
@@ -24,13 +30,13 @@
     "git_status": true,
     "file_icons": true,
     "close_position": "left",
-    "show_diagnostics": "all"
+    "show_diagnostics": "all",
   },
   "toolbar": {
     "breadcrumbs": true,
     "agent_review": false,
     "quick_actions": false,
-    "selections_menu": false
+    "selections_menu": false,
   },
   "collaboration_panel": { "button": false },
   "seed_search_query_from_cursor": "selection",
@@ -42,13 +48,13 @@
     "blinking": "on",
     "max_scroll_history_lines": 100000,
     "toolbar": { "breadcrumbs": false },
-    "env": {}
+    "env": {},
   },
   "title_bar": {
-    "show": "never",
+    // "show": "never",
     "show_branch_icon": true,
     "show_user_picture": true,
-    "show_onboarding_banner": false
+    "show_onboarding_banner": false,
   },
   "outline_panel": { "button": false, "dock": "left" },
   "notification_panel": { "button": false },
@@ -59,11 +65,11 @@
       "formatter": {
         "external": {
           "command": "mix",
-          "arguments": ["format", "--stdin-filename", "{buffer_path}", "-"]
-        }
-      }
+          "arguments": ["format", "--stdin-filename", "{buffer_path}", "-"],
+        },
+      },
     },
-    "Erlang": { "language_servers": ["elp"] }
+    "Erlang": { "language_servers": ["elp"] },
   },
   "features": { "edit_prediction_provider": "zed" },
   "edit_predictions": { "mode": "subtle", "disabled_globs": ["**/secret*"] },
@@ -71,9 +77,9 @@
     "always_allow_tool_actions": true,
     "enabled": true,
     "button": true,
-    "inline_assistant_model": { "provider": "zed.dev", "model": "claude-sonnet-4-5" },
-    "default_profile": "write",
-    "default_model": { "provider": "zed.dev", "model": "claude-sonnet-4-5" },
+    "inline_assistant_model": { "provider": "zed.dev", "model": "claude-opus-4-5" },
+    "default_profile": "ask",
+    "default_model": { "provider": "zed.dev", "model": "claude-opus-4-5-thinking" },
     "profiles": {
       "ask": {
         "name": "Ask",
@@ -89,7 +95,7 @@
           "open": true,
           "grep": true,
           "thinking": true,
-          "web_search": true
+          "web_search": true,
         },
         "enable_all_context_servers": false,
         "context_servers": {
@@ -113,27 +119,27 @@
               "get_issue_status": true,
               "get_issue": true,
               "get_document": true,
-              "get-library-docs": true
-            }
-          }
-        }
-      }
-    }
+              "get-library-docs": true,
+            },
+          },
+        },
+      },
+    },
   },
   "agent_servers": {
-    "OpenCode": {
-      "command": "opencode",
-      "args": ["acp"],
-      "env": {}
-    }
+    // "OpenCode": {
+    //   "type": "custom",
+    //   "command": "opencode",
+    //   "args": ["acp"],
+    //   "env": {},
+    // },
   },
   "context_servers": {
     "docker-mcp-gateway": {
-      "source": "custom",
-      "enabled": true,
+      "enabled": false,
       "command": "docker",
       "args": ["mcp", "gateway", "run"],
-      "env": {}
-    }
-  }
+      "env": {},
+    },
+  },
 }
