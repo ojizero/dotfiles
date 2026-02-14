@@ -2015,6 +2015,10 @@
 	<false/>
 	<key>HotkeyMigratedFromSingleToMulti</key>
 	<true/>
+	<key>NeverWarnAboutShortLivedSessions_B08F31AD-B155-4007-88B3-A6793051B77F</key>
+	<true/>
+	<key>NeverWarnAboutShortLivedSessions_B08F31AD-B155-4007-88B3-A6793051B77F_selection</key>
+	<integer>0</integer>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
