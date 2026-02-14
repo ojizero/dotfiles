@@ -35,4 +35,4 @@ git clone git@github.com:ojizero/dotfiles.git
 #
 export DOTFILES_PATH="${DOTFILES_CLONE_PATH}/dotfiles"
 cd "${DOTFILES_PATH}"
-./m dotfiles setup
+./m/m dotfiles setup
