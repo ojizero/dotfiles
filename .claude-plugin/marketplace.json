@@ -8,5 +8,10 @@
     "version": "0.1.0",
     "pluginRoot": "./claude"
   },
-  "plugins": []
+  "plugins": [
+    {
+      "name": "skill-creator",
+      "path": "skill-creator"
+    }
+  ]
 }
