@@ -1,0 +1,11 @@
+{
+  "name": "skill-creator",
+  "version": "1.0.0",
+  "description": "Guide for creating effective Claude Code skills. Helps design, scaffold, validate, and package new skills.",
+  "author": {
+    "name": "Anthropic",
+    "url": "https://github.com/anthropics"
+  },
+  "repository": "https://github.com/anthropics/skills",
+  "license": "Apache-2.0"
+}
