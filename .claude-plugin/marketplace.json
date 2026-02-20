@@ -1,0 +1,12 @@
+{
+  "name": "ojizero-dotfiles",
+  "owner": {
+    "name": "ojizero"
+  },
+  "metadata": {
+    "description": "Personal Claude Code plugin marketplace",
+    "version": "0.1.0",
+    "pluginRoot": "./claude"
+  },
+  "plugins": []
+}
