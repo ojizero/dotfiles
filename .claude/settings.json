@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker compose config:*)",
+      "Bash(brew search:*)",
+      "Bash(brew info:*)",
+      "Bash(asdf list:*)",
+      "Bash(asdf list all:*)",
+      "Bash(asdf plugin list:*)"
+    ],
+    "deny": [
+      "Bash(sudo:*)",
+      "Bash(ssh:*)",
+      "Bash(docker compose down:*)",
+      "Bash(docker compose rm:*)",
+      "Bash(docker compose stop:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-env-write.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/validate-compose.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
