@@ -90,3 +90,8 @@ Temporary Items
 ### AWSCLI ###
 .aws
 !.aws/cli/alias
+
+### Claude Code ###
+.claude/worktrees/
+.claude/settings.local.json
+CLAUDE.local.md
