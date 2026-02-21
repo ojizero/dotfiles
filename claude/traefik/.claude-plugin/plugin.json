@@ -1,0 +1,8 @@
+{
+  "name": "traefik",
+  "version": "1.0.0",
+  "description": "Reference guides for Traefik routing — Docker label-based and file-based dynamic configuration.",
+  "author": {
+    "name": "ojizero"
+  }
+}

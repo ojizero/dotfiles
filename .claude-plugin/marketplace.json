@@ -11,6 +11,18 @@
     {
       "name": "skill-creator",
       "source": "./claude/skill-creator"
+    },
+    {
+      "name": "synology",
+      "source": "./claude/synology"
+    },
+    {
+      "name": "self-hosting",
+      "source": "./claude/self-hosting"
+    },
+    {
+      "name": "traefik",
+      "source": "./claude/traefik"
     }
   ]
 }

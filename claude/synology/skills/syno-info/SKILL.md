@@ -8,22 +8,11 @@ disable-model-invocation: true
 
 Query the Synology NAS for system information via the DSM Web API.
 
-## Prerequisites
-
-Environment variables must be set:
-- `$SYNOLOGY_HOST` — NAS hostname or IP (e.g. `atlas.tn.ojizero.dev`)
-- `$SYNOLOGY_USER` — DSM admin username
-- `$SYNOLOGY_PASS` — DSM admin password
-
 ## Workflow
 
 ### 1. Authenticate
 
-```bash
-curl -s -k "https://${SYNOLOGY_HOST}:5001/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account=${SYNOLOGY_USER}&passwd=${SYNOLOGY_PASS}&format=sid"
-```
-
-Extract `sid` from the response JSON.
+Use the shared auth flow from the plugin context.
 
 ### 2. Query System Info
 
@@ -38,10 +27,6 @@ curl -s -k "https://${SYNOLOGY_HOST}:5001/webapi/entry.cgi?api=SYNO.Core.System.
 ```
 
 ### 3. Logout
-
-```bash
-curl -s -k "https://${SYNOLOGY_HOST}:5001/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=logout&_sid=${SID}"
-```
 
 ### 4. Present Results
 

@@ -1,10 +1,3 @@
----
-name: symlink-audit
-description: Audit all dotfile symlinks — verify they exist and point to correct targets. Use when checking dotfiles health.
-context: fork
-agent: Explore
----
-
 # Symlink Audit
 
 Parse all bootstrap scripts in `bootstrap/common/` to extract expected symlinks, then verify each one exists and points to the correct target.

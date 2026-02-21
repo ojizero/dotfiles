@@ -1,29 +1,20 @@
----
-name: upgrade-stacks
-description: Upgrade Docker Compose stacks — check for image updates, analyze changelogs, migrate configs, and generate deployment commands. Uses parallel Claude sessions per stack.
-disable-model-invocation: true
-argument-hint: "<stack-name|all>"
----
-
 # Upgrade Stacks
 
-Orchestrate the full upgrade process for Docker Compose stacks under `synology/docker/`. Uses Claude teams (parallel sessions) to process each stack concurrently.
+Orchestrate the full upgrade process for Docker Compose stacks. Uses Claude teams (parallel sessions) to process each stack concurrently.
 
-Target: $ARGUMENTS
+Arguments: $ARGUMENTS
+
+The first argument is the target — a stack name or `all`. The second optional argument is the path to the directory containing stack subdirectories. If no path is given, ask the user.
 
 ## Inventory
 
-Scan `synology/docker/*/compose.yml` to identify stacks and their images:
-!`grep -rh 'image:' synology/docker/*/compose.yml | sed 's/.*image: *//' | sort -u`
-
-Available stacks:
-!`ls -d synology/docker/*/compose.yml 2>/dev/null | sed 's|synology/docker/||;s|/compose.yml||'`
+Scan `<stacks-dir>/*/compose.yml` to identify stacks and their images.
 
 ## Workflow
 
 ### Phase 1: Inventory
 
-If `$ARGUMENTS` is `all`, enumerate every stack. Otherwise, target only the named stack(s).
+If target is `all`, enumerate every stack. Otherwise, target only the named stack(s).
 
 For each stack, extract all `image:tag` references from its `compose.yml`.
 
@@ -49,18 +40,17 @@ For each image with an available update:
 
 #### c. Config Migration
 Based on changelog findings, apply necessary changes:
-- **New/renamed env vars** → update `.env.sample`, flag `.env` for manual update
-- **Changed ports** → update Traefik labels and `expose`/`ports`
-- **Changed volume paths** → update `volumes:` entries
-- **New dependencies** → update `depends_on`, add services
-- **Deprecated options** → remove or replace in compose file
-- **Traefik label changes** → update labels per the traefik-docker skill conventions
+- **New/renamed env vars** — update `.env.sample`, flag `.env` for manual update
+- **Changed ports** — update Traefik labels and `expose`/`ports`
+- **Changed volume paths** — update `volumes:` entries
+- **New dependencies** — update `depends_on`, add services
+- **Deprecated options** — remove or replace in compose file
 
-After changes, validate: `docker compose -f synology/docker/{stack}/compose.yml config`
+After changes, validate: `docker compose -f <stacks-dir>/{stack}/compose.yml config`
 
 #### d. Per-Stack Report
 Produce for each stack:
-- Image: current version → available version
+- Image: current version -> available version
 - Change type: patch / minor / major
 - Breaking changes and what was done to address them
 - Config diff summary (what files were changed and how)
@@ -86,7 +76,7 @@ Present the consolidated report. User confirms per stack which upgrades to:
 
 For each approved stack, generate:
 ```bash
-cd /path/to/synology/docker/{stack}
+cd <stacks-dir>/{stack}
 docker compose pull
 docker compose up -d
 ```

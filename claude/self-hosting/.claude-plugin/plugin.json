@@ -1,0 +1,8 @@
+{
+  "name": "self-hosting",
+  "version": "1.0.0",
+  "description": "Manage self-hosted Docker Compose service stacks — upgrade images, analyze changelogs, migrate configs.",
+  "author": {
+    "name": "ojizero"
+  }
+}

@@ -11,13 +11,6 @@ List and manage DSM packages via the Synology Web API.
 
 Command: $ARGUMENTS
 
-## Prerequisites
-
-Environment variables must be set:
-- `$SYNOLOGY_HOST` — NAS hostname or IP (e.g. `atlas.tn.ojizero.dev`)
-- `$SYNOLOGY_USER` — DSM admin username
-- `$SYNOLOGY_PASS` — DSM admin password
-
 ## Subcommands
 
 ### `list` — Show installed packages
@@ -46,7 +39,7 @@ curl -s -k "https://${SYNOLOGY_HOST}:5001/webapi/entry.cgi?api=SYNO.Core.Package
 
 ## Authentication
 
-Same auth flow as other syno-* commands — login, get SID, use it, logout.
+Use the shared auth flow from the plugin context.
 
 ## Output
 

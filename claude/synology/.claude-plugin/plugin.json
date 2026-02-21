@@ -1,0 +1,8 @@
+{
+  "name": "synology",
+  "version": "1.0.0",
+  "description": "Manage a Synology NAS via the DSM Web API — system info, packages, storage, and scheduled tasks.",
+  "author": {
+    "name": "ojizero"
+  }
+}
