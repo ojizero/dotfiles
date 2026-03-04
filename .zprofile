@@ -5,13 +5,11 @@
 case "$(machine)" in
   arm*)
     eval "$(/opt/homebrew/bin/brew shellenv)"
-    eval "$(mise activate zsh --shims)"
 
     ;;
 
   x86_64*)
     eval "$(/usr/local/bin/brew shellenv)"
-    eval "$(mise activate zsh --shims)"
 
     ;;
 esac
@@ -27,6 +25,10 @@ fi
 if [[ -f "${HOME}/.local/.zprofile" ]]; then
   source "${HOME}/.local/.zprofile"
 fi
+
+# Mise shims for non-interactive shells (IDEs, scripts, cron)
+# Interactive shells use `mise activate zsh` in .zshrc instead
+[[ ! -o interactive ]] && eval "$(mise activate zsh --shims)"
 
 # Added by Obsidian
 export PATH="$PATH:/Applications/Obsidian.app/Contents/MacOS"
