@@ -12,7 +12,6 @@ tap "steveyegge/beads"
 # Installed formulae
 #
 
-brew "asdf"
 brew "bat"
 brew "coreutils"
 brew "diff-so-fancy"
@@ -30,6 +29,7 @@ brew "jless"
 brew "jq"
 brew "just"
 brew "mas"
+brew "mise"
 brew "mkcert"
 brew "ncdu"
 brew "nmap"

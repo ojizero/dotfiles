@@ -14,8 +14,7 @@ From the bootstrap scripts, these symlinks should exist:
 | `~/.zshrc` | `.zshrc` | `bootstrap/common/02-zsh.setup` |
 | `~/.zprofile` | `.zprofile` | `bootstrap/common/02-zsh.setup` |
 | `~/.gitconfig` | `.gitconfig` | `bootstrap/common/03-git.setup` |
-| `~/.asdfrc` | `.asdfrc` | `bootstrap/common/04-asdf.setup` |
-| `~/.tool-versions` | `.tool-versions` | `bootstrap/common/04-asdf.setup` |
+| `~/.config/mise/config.toml` | `mise.toml` | `bootstrap/common/05-mise.setup` |
 
 ## Verification Steps
 

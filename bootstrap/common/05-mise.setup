@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+
+cfg_mise="${DOTFILES_PATH}/mise.toml"
+home_mise_dir="${HOME}/.config/mise"
+home_mise="${home_mise_dir}/config.toml"
+
+# Ensure the mise config directory exists
+mkdir -p "${home_mise_dir}"
+
+# Symlink global mise config
+rm -fr "${home_mise}"
+ln -s "${cfg_mise}" "${home_mise}"
+
+# Trust the config file (mise requires explicit trust for files with env vars/templates)
+mise trust "${cfg_mise}"
+
+# Install all tools defined in mise.toml
+mise install
+
+# Install Python via UV (UV manages Python, not Mise)
+uv python install 3.14.0t

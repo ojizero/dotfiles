@@ -7,7 +7,7 @@ Personal dotfiles for macOS and self-hosted Docker Compose service stacks runnin
 ```
 .zshrc, .zprofile          # Shell config (zsh + Oh-My-Zsh + oh-my-posh)
 .gitconfig                 # Git config (aliases, SSH URLs, diff-so-fancy)
-.asdfrc, .tool-versions    # ASDF version manager
+mise.toml                  # Mise version manager
 Brewfile                   # Homebrew packages
 omp.toml                   # Oh-My-Posh prompt config
 omz/auto/*.zsh             # Auto-loaded shell modules (aliases, completions, history, keybindings, misc)
@@ -34,8 +34,7 @@ Managed symlinks:
 - `~/.zshrc` -> `.zshrc`
 - `~/.zprofile` -> `.zprofile`
 - `~/.gitconfig` -> `.gitconfig`
-- `~/.asdfrc` -> `.asdfrc`
-- `~/.tool-versions` -> `.tool-versions`
+- `~/.config/mise/config.toml` -> `mise.toml`
 - `~/.local` -> `.local`
 - `~/.brew-aliases` -> `.brew-aliases`
 - `~/.Brewfile` -> `Brewfile`
