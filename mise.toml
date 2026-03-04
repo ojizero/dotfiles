@@ -12,4 +12,3 @@ ERL_AFLAGS = "-kernel shell_history enabled"
 
 [settings]
 idiomatic_version_file = true
-disable_tools = ["python"]
