@@ -15,13 +15,13 @@
 	<key>AITermAPI</key>
 	<integer>2</integer>
 	<key>AIVectorStore</key>
-	<integer>1</integer>
+	<integer>0</integer>
 	<key>AiMaxTokens</key>
-	<integer>1000000</integer>
+	<integer>400000</integer>
 	<key>AiModel</key>
-	<string>gpt-4.1</string>
+	<string>gpt-5.2</string>
 	<key>AiResponseMaxTokens</key>
-	<integer>32768</integer>
+	<integer>128000</integer>
 	<key>AitermURL</key>
 	<string>https://api.openai.com/v1/responses</string>
 	<key>AllowClipboardAccess</key>
@@ -1993,6 +1993,8 @@
 	<string>B08F31AD-B155-4007-88B3-A6793051B77F</string>
 	<key>Default Browser Profile Guid</key>
 	<string>B08F31AD-B155-4007-88B3-A6793051B77F</string>
+	<key>DimInactiveSplitPanes</key>
+	<true/>
 	<key>DoubleClickPerformsSmartSelection</key>
 	<true/>
 	<key>GlobalKeyMap</key>
@@ -2042,6 +2044,8 @@
 			<true/>
 			<key>Ambiguous Double Width</key>
 			<false/>
+			<key>Animate Movement</key>
+			<true/>
 			<key>Ansi 0 Color</key>
 			<dict>
 				<key>Blue Component</key>
@@ -2639,8 +2643,6 @@
 				<key>Red Component</key>
 				<real>0.93725490196078431</real>
 			</dict>
-			<key>Background Image Location</key>
-			<string></string>
 			<key>Badge Color</key>
 			<dict>
 				<key>Alpha Component</key>
@@ -2681,13 +2683,15 @@
 				<real>0.92929404973983765</real>
 			</dict>
 			<key>Blend</key>
-			<real>0.41202279135818876</real>
+			<real>0.40000000000000002</real>
+			<key>Blink Allowed</key>
+			<true/>
 			<key>Blinking Cursor</key>
 			<true/>
 			<key>Blur</key>
 			<true/>
 			<key>Blur Radius</key>
-			<real>12.096453951806133</real>
+			<real>16</real>
 			<key>Bold Color</key>
 			<dict>
 				<key>Blue Component</key>
@@ -3444,7 +3448,7 @@
 			<key>Terminal Type</key>
 			<string>xterm-256color</string>
 			<key>Transparency</key>
-			<real>0.45629108861549611</real>
+			<real>0.32000000000000001</real>
 			<key>Unlimited Scrollback</key>
 			<true/>
 			<key>Use Bold Font</key>
@@ -3524,6 +3528,8 @@
 	<true/>
 	<key>SoundForEsc</key>
 	<false/>
+	<key>SplitPaneDimmingAmount</key>
+	<real>0.14999999999999999</real>
 	<key>StatusBarPosition</key>
 	<integer>1</integer>
 	<key>TabStyleWithAutomaticOption</key>
