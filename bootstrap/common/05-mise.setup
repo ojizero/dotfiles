@@ -16,6 +16,3 @@ mise trust "${cfg_mise}"
 
 # Install all tools defined in mise.toml
 mise install
-
-# Install Python via UV (UV manages Python, not Mise)
-uv python install 3.14.0t
