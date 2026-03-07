@@ -4,13 +4,6 @@
     "DISABLE_AUTOUPDATER": "1"
   },
   "permissions": {
-    "allow": [
-      "Bash(git add:*)",
-      "Bash(asdf latest:*)",
-      "Bash(asdf install:*)",
-      "Bash(git push:*)",
-      "Bash(git:*)"
-    ],
     "defaultMode": "default"
   },
   "model": "opus",
