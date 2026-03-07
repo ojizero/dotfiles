@@ -1,0 +1,17 @@
+#!/usr/bin/env zsh
+
+cfg_settings="${DOTFILES_PATH}/.claude/settings.json"
+cfg_statusline="${DOTFILES_PATH}/.claude/statusline-command.sh"
+
+home_claude_dir="${HOME}/.claude"
+home_settings="${home_claude_dir}/settings.json"
+home_statusline="${home_claude_dir}/statusline-command.sh"
+
+# Ensure ~/.claude/ exists
+mkdir -p "${home_claude_dir}"
+
+rm -fr "${home_settings}"
+ln -s "${cfg_settings}" "${home_settings}"
+
+rm -fr "${home_statusline}"
+ln -s "${cfg_statusline}" "${home_statusline}"
