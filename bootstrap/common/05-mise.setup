@@ -1,8 +1,10 @@
 #!/usr/bin/env zsh
 
 cfg_mise="${DOTFILES_PATH}/mise.toml"
+cfg_mise_local="${DOTFILES_PATH}/mise.local.toml"
 home_mise_dir="${HOME}/.config/mise"
 home_mise="${home_mise_dir}/config.toml"
+home_mise_local="${home_mise_dir}/config.local.toml"
 
 # Ensure the mise config directory exists
 mkdir -p "${home_mise_dir}"
@@ -11,8 +13,22 @@ mkdir -p "${home_mise_dir}"
 rm -fr "${home_mise}"
 ln -s "${cfg_mise}" "${home_mise}"
 
-# Trust the config file (mise requires explicit trust for files with env vars/templates)
+# Create local mise config if it doesn't exist
+if [[ ! -f "${cfg_mise_local}" ]]; then
+  cat > "${cfg_mise_local}" <<'EOF'
+# System-specific mise configuration
+# This file is git-ignored and serves as a local override layer
+# on top of the base config (~/.config/mise/config.toml)
+EOF
+fi
+
+# Symlink local mise config
+rm -fr "${home_mise_local}"
+ln -s "${cfg_mise_local}" "${home_mise_local}"
+
+# Trust the config files (mise requires explicit trust for files with env vars/templates)
 mise trust "${cfg_mise}"
+mise trust "${cfg_mise_local}"
 
 # Install all tools defined in mise.toml
 mise install
