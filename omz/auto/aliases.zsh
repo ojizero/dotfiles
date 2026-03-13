@@ -59,3 +59,5 @@ alias yless='jless --yaml'
 alias -s json='jless'
 alias -s yml='yless'
 alias -s yaml='yless'
+
+alias cc='claude --dangerously-skip-permissions'
