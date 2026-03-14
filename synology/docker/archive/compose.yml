@@ -9,7 +9,7 @@ x-data-vault: &data-vault
 services:
   karakeep-web:
     container_name: karakeep-web
-    image: ghcr.io/karakeep-app/karakeep:0.30.0
+    image: ghcr.io/karakeep-app/karakeep:0.31.0
     restart: unless-stopped
     environment:
       DATA_DIR: *data-target
@@ -36,7 +36,7 @@ services:
 
   karakeep-chrome:
     container_name: karakeep-chrome
-    image: ghcr.io/browserless/chromium:v2.40.0
+    image: ghcr.io/browserless/chromium:v2.43.0
     restart: unless-stopped
     environment:
       - CONCURRENT=5
@@ -48,6 +48,7 @@ services:
     networks:
       - archive-sphere
 
+  # Meilisearch is too unstable release to release, careful with upgrades
   karakeep-meilisearch:
     container_name: karakeep-meilisearch
     image: getmeili/meilisearch:v1.35.0
