@@ -242,6 +242,11 @@ if [[ -n "$usage_data" ]] && echo "$usage_data" | jq -e . &>/dev/null; then
   fi
 fi
 
+# ── Fallback: API key user (no OAuth data) — show session cost only ──────────
+if [[ ${#usage_lines[@]} -eq 0 ]] && (( $(awk "BEGIN { print ($session_cost > 0) }") )); then
+  usage_lines+=("${gold}⬡${reset} ${dim}session${reset} ${gold}$(format_cost "$session_cost")${reset}")
+fi
+
 # ── Render ────────────────────────────────────────────────────────────────────
 line1_ansi="${blue}${display_path}${reset}${git_part_ansi}"
 
