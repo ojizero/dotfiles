@@ -6,6 +6,7 @@ input=$(cat)
 cwd=$(echo "$input" | jq -r '.cwd // .workspace.current_dir // ""')
 model=$(echo "$input" | jq -r '.model.display_name // ""')
 used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // ""')
+session_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
 
 # ── ANSI color codes ──────────────────────────────────────────────────────────
 reset=$'\033[0m'
@@ -14,6 +15,7 @@ green=$'\033[32m'
 red=$'\033[31m'
 cyan=$'\033[36m'
 yellow=$'\033[33m'
+gold=$'\033[38;2;230;200;0m'
 dim=$'\033[2m'
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -53,6 +55,11 @@ format_reset_time() {
   [[ -z "$epoch" ]] && return
 
   date -j -r "$epoch" +"%l:%M%p" 2>/dev/null | sed 's/^ //; s/\.//g' | tr '[:upper:]' '[:lower:]'
+}
+
+format_cost() {
+  local cost=$1
+  awk "BEGIN { printf \"\\$%.2f\", $cost }"
 }
 
 # ── Line 1: pwd · git branch + status ────────────────────────────────────────
@@ -106,7 +113,14 @@ if [[ -n "$used_pct" ]]; then
 fi
 
 # ── Fetch usage from OAuth API (cached) ──────────────────────────────────────
-cache_file="/tmp/claude/statusline-usage-cache.json"
+# Resolve keychain service name based on CLAUDE_CONFIG_DIR
+keychain_service="Claude Code-credentials"
+if [[ -n "$CLAUDE_CONFIG_DIR" ]]; then
+  hash_suffix=$(echo -n "$CLAUDE_CONFIG_DIR" | shasum -a 256 | cut -c1-8)
+  keychain_service="Claude Code-credentials-${hash_suffix}"
+fi
+
+cache_file="/tmp/claude/statusline-usage-$(echo -n "$keychain_service" | shasum -a 256 | cut -c1-8).json"
 cache_max_age=60
 mkdir -p /tmp/claude 2>/dev/null
 
@@ -125,9 +139,8 @@ fi
 
 if $needs_refresh; then
   token=""
-  # Try macOS Keychain
   if command -v security &>/dev/null; then
-    blob=$(security find-generic-password -s "Claude Code-credentials" -w 2>/dev/null)
+    blob=$(security find-generic-password -s "$keychain_service" -w 2>/dev/null)
     if [[ -n "$blob" ]]; then
       token=$(echo "$blob" | jq -r '.claudeAiOauth.accessToken // empty' 2>/dev/null)
     fi
@@ -139,7 +152,7 @@ if $needs_refresh; then
       -H "Authorization: Bearer $token" \
       -H "anthropic-beta: oauth-2025-04-20" \
       "https://api.anthropic.com/api/oauth/usage" 2>/dev/null)
-    if [[ -n "$response" ]] && echo "$response" | jq -e '.five_hour' &>/dev/null; then
+    if [[ -n "$response" ]] && echo "$response" | jq -e . &>/dev/null; then
       usage_data="$response"
       echo "$response" > "$cache_file"
     fi
@@ -150,31 +163,83 @@ if $needs_refresh; then
   fi
 fi
 
-# ── Lines 3-4: rate limits ───────────────────────────────────────────────────
-line3_ansi="" line4_ansi=""
+# ── Usage lines ──────────────────────────────────────────────────────────────
+usage_lines=()
 
 if [[ -n "$usage_data" ]] && echo "$usage_data" | jq -e . &>/dev/null; then
+  # ── Rate limits (subscription) ─────────────────────────────────────────────
+  has_limits=false
+
   # 5-hour (session) limit
-  five_pct=$(echo "$usage_data" | jq -r '.five_hour.utilization // 0' | awk '{printf "%.0f", $1}')
-  five_reset_iso=$(echo "$usage_data" | jq -r '.five_hour.resets_at // empty')
-  five_reset=$(format_reset_time "$five_reset_iso")
+  if echo "$usage_data" | jq -e '.five_hour != null' &>/dev/null; then
+    has_limits=true
+    five_pct=$(echo "$usage_data" | jq -r '.five_hour.utilization // 0' | awk '{printf "%.0f", $1}')
+    five_reset=$(format_reset_time "$(echo "$usage_data" | jq -r '.five_hour.resets_at // empty')")
+    five_col=$(color_for_pct "$five_pct")
+    five_circle=$(circle_for_pct "$five_pct")
 
-  five_col=$(color_for_pct "$five_pct")
-  five_circle=$(circle_for_pct "$five_pct")
-
-  line3_ansi="${five_col}${five_circle}${reset} ${dim}session${reset} ${five_col}${five_pct}%${reset}"
-  [[ -n "$five_reset" ]] && line3_ansi+=" ${dim}⟳ ${five_reset}${reset}"
+    line="${five_col}${five_circle}${reset} ${dim}session${reset} ${five_col}${five_pct}%${reset}"
+    [[ -n "$five_reset" ]] && line+=" ${dim}⟳ ${five_reset}${reset}"
+    usage_lines+=("$line")
+  fi
 
   # 7-day (weekly) limit
-  seven_pct=$(echo "$usage_data" | jq -r '.seven_day.utilization // 0' | awk '{printf "%.0f", $1}')
-  seven_reset_iso=$(echo "$usage_data" | jq -r '.seven_day.resets_at // empty')
-  seven_reset=$(format_reset_time "$seven_reset_iso")
+  if echo "$usage_data" | jq -e '.seven_day != null' &>/dev/null; then
+    seven_pct=$(echo "$usage_data" | jq -r '.seven_day.utilization // 0' | awk '{printf "%.0f", $1}')
+    seven_reset=$(format_reset_time "$(echo "$usage_data" | jq -r '.seven_day.resets_at // empty')")
+    seven_col=$(color_for_pct "$seven_pct")
+    seven_circle=$(circle_for_pct "$seven_pct")
 
-  seven_col=$(color_for_pct "$seven_pct")
-  seven_circle=$(circle_for_pct "$seven_pct")
+    line="${seven_col}${seven_circle}${reset} ${dim}weekly${reset}  ${seven_col}${seven_pct}%${reset}"
+    [[ -n "$seven_reset" ]] && line+=" ${dim}⟳ ${seven_reset}${reset}"
+    usage_lines+=("$line")
+  fi
 
-  line4_ansi="${seven_col}${seven_circle}${reset} ${dim}weekly${reset}  ${seven_col}${seven_pct}%${reset}"
-  [[ -n "$seven_reset" ]] && line4_ansi+=" ${dim}⟳ ${seven_reset}${reset}"
+  # 7-day Sonnet limit
+  if echo "$usage_data" | jq -e '.seven_day_sonnet != null' &>/dev/null; then
+    sonnet_pct=$(echo "$usage_data" | jq -r '.seven_day_sonnet.utilization // 0' | awk '{printf "%.0f", $1}')
+    sonnet_reset=$(format_reset_time "$(echo "$usage_data" | jq -r '.seven_day_sonnet.resets_at // empty')")
+    sonnet_col=$(color_for_pct "$sonnet_pct")
+    sonnet_circle=$(circle_for_pct "$sonnet_pct")
+
+    line="${sonnet_col}${sonnet_circle}${reset} ${dim}sonnet${reset}  ${sonnet_col}${sonnet_pct}%${reset}"
+    [[ -n "$sonnet_reset" ]] && line+=" ${dim}⟳ ${sonnet_reset}${reset}"
+    usage_lines+=("$line")
+  fi
+
+  # ── Extra usage / credits ──────────────────────────────────────────────────
+  if echo "$usage_data" | jq -e '.extra_usage.is_enabled == true' &>/dev/null; then
+    cost_parts=()
+
+    # Session cost from statusline JSON
+    if (( $(awk "BEGIN { print ($session_cost > 0) }") )); then
+      cost_parts+=("${dim}session${reset} ${gold}$(format_cost "$session_cost")${reset}")
+    fi
+
+    # Total credits spent
+    used_credits=$(echo "$usage_data" | jq -r '.extra_usage.used_credits // 0')
+    if (( $(awk "BEGIN { print ($used_credits > 0) }") )); then
+      credits_display=$(awk "BEGIN { printf \"\\$%.2f\", $used_credits / 100 }")
+      cost_parts+=("${dim}total${reset} ${gold}${credits_display}${reset}")
+    fi
+
+    # Utilization gauge (when monthly limit is set)
+    extra_util=$(echo "$usage_data" | jq -r '.extra_usage.utilization // empty')
+    if [[ -n "$extra_util" && "$extra_util" != "null" ]]; then
+      extra_pct=$(awk "BEGIN { printf \"%.0f\", $extra_util }")
+      extra_col=$(color_for_pct "$extra_pct")
+      extra_circle=$(circle_for_pct "$extra_pct")
+      cost_parts+=("${extra_col}${extra_circle} ${extra_pct}%${reset}")
+    fi
+
+    if [[ ${#cost_parts[@]} -gt 0 ]]; then
+      cost_line="${gold}⬡${reset} ${cost_parts[1]}"
+      for part in "${cost_parts[@]:1}"; do
+        cost_line+=" ${dim}·${reset} ${part}"
+      done
+      usage_lines+=("$cost_line")
+    fi
+  fi
 fi
 
 # ── Render ────────────────────────────────────────────────────────────────────
@@ -182,5 +247,6 @@ line1_ansi="${blue}${display_path}${reset}${git_part_ansi}"
 
 printf "%b" "$line1_ansi"
 [[ -n "$line2_ansi" ]] && printf "\n%b" "$line2_ansi"
-[[ -n "$line3_ansi" ]] && printf "\n%b" "$line3_ansi"
-[[ -n "$line4_ansi" ]] && printf "\n%b" "$line4_ansi"
+for uline in "${usage_lines[@]}"; do
+  printf "\n%b" "$uline"
+done
