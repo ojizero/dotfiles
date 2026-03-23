@@ -113,17 +113,57 @@ if [[ -n "$used_pct" ]]; then
   fi
 fi
 
-# ── Fetch usage from OAuth API (cached) ──────────────────────────────────────
-# Resolve keychain service name based on CLAUDE_CONFIG_DIR
+# ── Resolve OAuth token & cache paths ────────────────────────────────────────
+# Token extracted once upfront and reused for profile + usage fetches.
+# Cache key uses CLAUDE_CONFIG_DIR hash (or "default") to isolate accounts.
 keychain_service="Claude Code-credentials"
+cache_key="default"
 if [[ -n "$CLAUDE_CONFIG_DIR" ]]; then
-  hash_suffix=$(echo -n "$CLAUDE_CONFIG_DIR" | shasum -a 256 | cut -c1-8)
-  keychain_service="Claude Code-credentials-${hash_suffix}"
+  cache_key=$(echo -n "$CLAUDE_CONFIG_DIR" | shasum -a 256 | cut -c1-8)
+  keychain_service="Claude Code-credentials-${cache_key}"
 fi
 
-cache_file="/tmp/claude/statusline-usage-$(echo -n "$keychain_service" | shasum -a 256 | cut -c1-8).json"
+token=""
+if command -v security &>/dev/null; then
+  blob=$(security find-generic-password -s "$keychain_service" -w 2>/dev/null)
+  [[ -n "$blob" ]] && token=$(echo "$blob" | jq -r '.claudeAiOauth.accessToken // empty' 2>/dev/null)
+fi
+
+cache_file="/tmp/claude/statusline-usage-${cache_key}.json"
 cache_max_age=60
 mkdir -p /tmp/claude 2>/dev/null
+
+# ── Fetch profile (cached indefinitely per account) ──────────────────────────
+profile_cache="/tmp/claude/statusline-profile-${cache_key}.json"
+org_name=""
+org_type=""
+
+if [[ -f "$profile_cache" ]]; then
+  org_name=$(jq -r '.organization.name // empty' "$profile_cache" 2>/dev/null)
+  org_type=$(jq -r '.organization.organization_type // empty' "$profile_cache" 2>/dev/null)
+elif [[ -n "$token" && "$token" != "null" ]]; then
+  profile_resp=$(curl -s --max-time 3 \
+    -H "Accept: application/json" \
+    -H "Authorization: Bearer $token" \
+    -H "anthropic-beta: oauth-2025-04-20" \
+    "https://api.anthropic.com/api/oauth/profile" 2>/dev/null)
+  if [[ -n "$profile_resp" ]] && echo "$profile_resp" | jq -e '.organization' &>/dev/null; then
+    echo "$profile_resp" > "$profile_cache"
+    org_name=$(echo "$profile_resp" | jq -r '.organization.name // empty')
+    org_type=$(echo "$profile_resp" | jq -r '.organization.organization_type // empty')
+  fi
+fi
+
+plan_display=""
+if [[ -n "$org_type" ]]; then
+  case "$org_type" in
+    claude_team)       plan_display="Team" ;;
+    claude_pro)        plan_display="Pro" ;;
+    claude_enterprise) plan_display="Enterprise" ;;
+    claude_max)        plan_display="Max" ;;
+    *)                 plan_display="${org_type#claude_}" ;;
+  esac
+fi
 
 needs_refresh=true
 usage_data=""
@@ -139,14 +179,6 @@ if [[ -f "$cache_file" ]]; then
 fi
 
 if $needs_refresh; then
-  token=""
-  if command -v security &>/dev/null; then
-    blob=$(security find-generic-password -s "$keychain_service" -w 2>/dev/null)
-    if [[ -n "$blob" ]]; then
-      token=$(echo "$blob" | jq -r '.claudeAiOauth.accessToken // empty' 2>/dev/null)
-    fi
-  fi
-
   if [[ -n "$token" && "$token" != "null" ]]; then
     response=$(curl -s --max-time 3 \
       -H "Accept: application/json" \
@@ -252,6 +284,14 @@ fi
 line1_ansi="${blue}${display_path}${reset}${git_part_ansi}"
 
 printf "%b" "$line1_ansi"
+
+if [[ -n "$plan_display" ]]; then
+  plan_line=""
+  [[ -n "$org_name" ]] && plan_line+="${dim}${org_name}${reset} ${dim}·${reset} "
+  plan_line+="${dim}${plan_display}${reset}"
+  printf "\n%b" "$plan_line"
+fi
+
 [[ -n "$line2_ansi" ]] && printf "\n%b" "$line2_ansi"
 for uline in "${usage_lines[@]}"; do
   printf "\n%b" "$uline"
