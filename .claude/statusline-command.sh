@@ -105,10 +105,11 @@ if [[ -n "$used_pct" ]]; then
   ctx_color=$(color_for_pct "$pct")
   ctx_circle=$(circle_for_pct "$pct")
 
+  ctx_part="${ctx_color}${ctx_circle}${reset} ${dim}≡${reset} ${ctx_color}${pct}%${reset}"
   if [[ -n "$line2_ansi" ]]; then
-    line2_ansi+=" ${ctx_color}${ctx_circle} ${pct}%${reset}"
+    line2_ansi+=" ${dim}·${reset} ${ctx_part}"
   else
-    line2_ansi+="${ctx_color}${ctx_circle} ${pct}%${reset}"
+    line2_ansi+="${ctx_part}"
   fi
 fi
 
@@ -219,7 +220,7 @@ if [[ -n "$usage_data" ]] && echo "$usage_data" | jq -e . &>/dev/null; then
     # Total credits spent
     used_credits=$(echo "$usage_data" | jq -r '.extra_usage.used_credits // 0')
     if (( $(awk "BEGIN { print ($used_credits > 0) }") )); then
-      credits_display=$(awk "BEGIN { printf \"\\$%.2f\", $used_credits / 100 }")
+      credits_display=$(awk "BEGIN { printf \"≈\\$%.2f\", $used_credits / 100 }")
       cost_parts+=("${dim}total${reset} ${gold}${credits_display}${reset}")
     fi
 
