@@ -69,13 +69,13 @@ display_path="${cwd/#$home_dir/~}"
 
 git_part_ansi=""
 
-if [[ -n "$cwd" ]] && git -C "$cwd" rev-parse --git-dir --no-optional-locks &>/dev/null; then
+if [[ -n "$cwd" ]] && git -C "$cwd" rev-parse --git-dir &>/dev/null; then
   branch=$(git -C "$cwd" symbolic-ref --short HEAD 2>/dev/null \
            || git -C "$cwd" rev-parse --short HEAD 2>/dev/null)
 
   dirty=""
-  if ! git -C "$cwd" diff --quiet --no-optional-locks 2>/dev/null \
-     || ! git -C "$cwd" diff --cached --quiet --no-optional-locks 2>/dev/null; then
+  if ! git --no-optional-locks -C "$cwd" diff --quiet 2>/dev/null \
+     || ! git --no-optional-locks -C "$cwd" diff --cached --quiet 2>/dev/null; then
     dirty="*"
   fi
 
