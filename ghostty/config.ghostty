@@ -1,0 +1,57 @@
+# Font
+font-family = FiraCode Nerd Font Mono
+font-style = Retina
+font-size = 16
+font-feature = calt
+font-feature = liga
+
+# Window
+window-width = 80
+window-height = 25
+
+# Background (transparency disabled - interacts poorly with split pane dimming)
+# background-opacity = 0.68
+# background-opacity-cells = true
+# background-blur = 16
+
+# Theme - auto-switch with system appearance
+theme = light:catppuccin-latte,dark:catppuccin-mocha
+
+# Cursor
+cursor-style-blink = true
+
+# Scrollback (100MB - approximate "unlimited")
+scrollback-limit = 100000000
+
+# Bell - dock bounce on bell (audio silenced, no visual-flash equivalent in Ghostty)
+bell-features = attention
+
+# Clipboard
+clipboard-read = allow
+copy-on-select = false
+
+unfocused-split-opacity = 0.5
+split-inherit-working-directory = true
+
+# Close without confirmation
+confirm-close-surface = false
+
+# Shell integration
+shell-integration = detect
+
+# Bold text uses bright colors
+bold-color = bright
+
+# macOS specific
+macos-option-as-alt = true
+macos-titlebar-style = tabs
+
+# Keybindings
+# Cmd+Backspace = kill line (Ctrl-U)
+keybind = super+backspace=text:\x15
+# Cmd+Left = beginning of line (Ctrl-A)
+keybind = super+left=text:\x01
+# Cmd+Right = end of line (Ctrl-E)
+keybind = super+right=text:\x05
+# Option+Backspace = backward delete word (ESC DEL)
+keybind = alt+backspace=text:\x1b\x7f

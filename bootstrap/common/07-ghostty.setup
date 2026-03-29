@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+
+cfg_ghostty="${DOTFILES_PATH}/ghostty"
+home_ghostty="${HOME}/.config/ghostty"
+
+# Symlink ghostty config directory
+rm -fr "${home_ghostty}"
+ln -s "${cfg_ghostty}" "${home_ghostty}"
