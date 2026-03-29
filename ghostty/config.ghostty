@@ -18,6 +18,7 @@ window-height = 25
 theme = light:catppuccin-latte,dark:catppuccin-mocha
 
 # Cursor
+cursor-style = block
 cursor-style-blink = true
 
 # Scrollback (100MB - approximate "unlimited")
@@ -36,8 +37,9 @@ split-inherit-working-directory = true
 # Close without confirmation
 confirm-close-surface = false
 
-# Shell integration
+# Shell integration (no-cursor: keep block cursor at prompt instead of bar)
 shell-integration = detect
+shell-integration-features = no-cursor
 
 # Bold text uses bright colors
 bold-color = bright
