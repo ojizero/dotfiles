@@ -61,3 +61,7 @@ alias -s yml='yless'
 alias -s yaml='yless'
 
 alias cc='claude --dangerously-skip-permissions'
+
+alias v='nvim'
+alias nv='nvim'
+alias vm='nvim'

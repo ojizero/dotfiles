@@ -1,0 +1,15 @@
+#!/usr/bin/env zsh
+
+cfg_nvim="${DOTFILES_PATH}/nvim"
+home_nvim="${HOME}/.config/nvim"
+home_local_nvim="${HOME}/.local/nvim"
+
+# Ensure ~/.config exists
+mkdir -p "${HOME}/.config"
+
+# Symlink nvim config directory
+rm -fr "${home_nvim}"
+ln -s "${cfg_nvim}" "${home_nvim}"
+
+# Create local nvim override directory if it doesn't exist
+mkdir -p "${home_local_nvim}"
