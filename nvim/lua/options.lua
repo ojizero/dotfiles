@@ -33,6 +33,7 @@ vim.o.incsearch = true
 vim.o.termguicolors = true
 vim.o.signcolumn = "yes"
 vim.o.cursorline = true
+vim.o.laststatus = 3
 
 -- Splits
 vim.o.splitright = true

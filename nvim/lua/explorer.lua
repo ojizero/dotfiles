@@ -40,6 +40,14 @@ require("neo-tree").setup({
   },
 })
 
+-- Apply higher-contrast cursorline in Neo-tree windows (see theme.lua)
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "neo-tree",
+  callback = function()
+    vim.wo.winhighlight = "CursorLine:NeoTreeCursorLine"
+  end,
+})
+
 -- Persist Neo-tree open/closed state across sessions
 local state_dir = vim.fn.stdpath("state")
 local state_file = state_dir .. "/neo-tree-open"

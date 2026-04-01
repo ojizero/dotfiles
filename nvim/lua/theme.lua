@@ -4,6 +4,13 @@ require("catppuccin").setup({
   flavour = "auto", -- follows vim.o.background
   background = { light = "latte", dark = "mocha" },
   transparent_background = false,
+  custom_highlights = function(colors)
+    return {
+      -- CursorLine bg is nearly identical to mantle in Latte; use surface0 for sidebar/float contrast
+      NeoTreeCursorLine = { bg = colors.surface0 },
+      FzfLuaCursorLine = { bg = colors.surface0 },
+    }
+  end,
   integrations = {
     blink_cmp = true,
     gitsigns = true,
