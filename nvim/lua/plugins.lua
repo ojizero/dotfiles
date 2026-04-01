@@ -46,5 +46,8 @@ vim.pack.add({
 
 -- 99 (gated)
 if vim.g.enable_99 then
-  vim.pack.add({ gh .. "ThePrimeagen/99" })
+  vim.pack.add({
+    gh .. "ThePrimeagen/99",
+    { src = gh .. "saghen/blink.compat", version = vim.version.range("2.x") },
+  })
 end
