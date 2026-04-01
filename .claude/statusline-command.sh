@@ -129,12 +129,19 @@ if command -v security &>/dev/null; then
   [[ -n "$blob" ]] && token=$(echo "$blob" | jq -r '.claudeAiOauth.accessToken // empty' 2>/dev/null)
 fi
 
-cache_file="/tmp/claude/statusline-usage-${cache_key}.json"
+# Derive a token-scoped suffix so that switching accounts (same CLAUDE_CONFIG_DIR,
+# different token) never serves a stale profile or usage cache from the old account.
+token_key="$cache_key"
+if [[ -n "$token" && "$token" != "null" ]]; then
+  token_key="${cache_key}-$(echo -n "$token" | shasum -a 256 | cut -c1-8)"
+fi
+
+cache_file="/tmp/claude/statusline-usage-${token_key}.json"
 cache_max_age=60
 mkdir -p /tmp/claude 2>/dev/null
 
-# ── Fetch profile (cached indefinitely per account) ──────────────────────────
-profile_cache="/tmp/claude/statusline-profile-${cache_key}.json"
+# ── Fetch profile (cached indefinitely per token identity) ────────────────────
+profile_cache="/tmp/claude/statusline-profile-${token_key}.json"
 org_name=""
 org_type=""
 
@@ -275,8 +282,11 @@ if [[ -n "$usage_data" ]] && echo "$usage_data" | jq -e . &>/dev/null; then
   fi
 fi
 
-# ── Fallback: API key user (no OAuth data) — show session cost only ──────────
-if [[ ${#usage_lines[@]} -eq 0 ]] && (( $(awk "BEGIN { print ($session_cost > 0) }") )); then
+# ── Fallback: API key user (no OAuth token at all) — show session cost only ───
+# Only show session cost when there is no OAuth token (i.e., not a subscription
+# user). If a token exists but produced no usage lines, the user is a subscription
+# user whose rate limits just happen to be empty — don't show cost there.
+if [[ ${#usage_lines[@]} -eq 0 && -z "$token" ]] && (( $(awk "BEGIN { print ($session_cost > 0) }") )); then
   usage_lines+=("${gold}⬡${reset} ${dim}session${reset} ${gold}$(format_cost "$session_cost")${reset}")
 fi
 
