@@ -13,7 +13,7 @@ map({ "n", "v" }, "C", '"_C', { desc = "Change to EOL without yanking" })
 
 -- File finder (Cmd+P equivalent)
 map("n", "<leader>f", "<cmd>FzfLua files<cr>", { desc = "Find files" })
-map("n", "<leader>b", "<cmd>FzfLua buffers<cr>", { desc = "Switch buffer" })
+map("n", "<leader>sb", "<cmd>FzfLua buffers<cr>", { desc = "Switch buffer" })
 map("n", "<leader>sg", "<cmd>FzfLua live_grep<cr>", { desc = "Live grep" })
 map("n", "<leader>:", "<cmd>FzfLua commands<cr>", { desc = "Command palette" })
 map("n", "<leader>o", "<cmd>FzfLua lsp_document_symbols<cr>", { desc = "Document symbols" })
@@ -25,7 +25,7 @@ map("n", "<leader>sd", "<cmd>FzfLua diagnostics_document<cr>", { desc = "Documen
 map("n", "<leader>m", "<cmd>FzfLua marks<cr>", { desc = "Search marks" })
 
 -- File explorer
-map("n", "<leader>e", "<cmd>Neotree toggle<cr>", { desc = "Toggle file explorer" })
+map("n", "<leader>b", "<cmd>Neotree toggle<cr>", { desc = "Toggle file explorer" })
 
 -- Go to line
 map("n", "<leader>gl", ":", { desc = "Go to line" })

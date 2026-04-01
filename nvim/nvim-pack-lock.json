@@ -1,5 +1,9 @@
 {
   "plugins": {
+    "99": {
+      "rev": "0172d3caae2d8b967c9d47aa7557295f1481e5df",
+      "src": "https://github.com/ThePrimeagen/99"
+    },
     "Comment.nvim": {
       "rev": "e30b7f2008e52442154b66f7c519bfd2f1e32acb",
       "src": "https://github.com/numToStr/Comment.nvim"
@@ -8,6 +12,11 @@
       "rev": "451168851e8e2466bc97ee3e026c3dcb9141ce07",
       "src": "https://github.com/saghen/blink.cmp",
       "version": "1.0.0 - 2.0.0"
+    },
+    "blink.compat": {
+      "rev": "2ed6d9a28b07fa6f3bface818470605f8896408c",
+      "src": "https://github.com/saghen/blink.compat",
+      "version": "2.0.0 - 3.0.0"
     },
     "codecompanion.nvim": {
       "rev": "190cb215a449f0a7dba49951d90f1f167aa708c5",
