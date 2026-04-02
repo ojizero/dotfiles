@@ -6,7 +6,7 @@ Personal dotfiles for macOS and self-hosted Docker Compose service stacks runnin
 
 ```
 .zshrc, .zprofile          # Shell config (zsh + Oh-My-Zsh + oh-my-posh)
-.gitconfig                 # Git config (aliases, SSH URLs, diff-so-fancy)
+.gitconfig                 # Git config (aliases, SSH URLs, delta)
 mise.toml                  # Mise version manager
 Brewfile                   # Homebrew packages
 omp.toml                   # Oh-My-Posh prompt config
