@@ -53,7 +53,28 @@ find-up() {
   echo "${testing}"
 }
 
-alias -s md='bat'
+function glow {
+  local style="${DOTFILES_PATH}/glow/themes/catppuccin-mocha.json"
+  if [[ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" != "Dark" ]]; then
+    style="${DOTFILES_PATH}/glow/themes/catppuccin-latte.json"
+  fi
+
+  local tui=1
+  local args=()
+  for arg in "$@"; do
+    case "${arg}" in
+      --tui|-t)       ;;                         # already the default, strip
+      --no-tui|-T)    tui=0 ;;                   # suppress TUI, strip
+      --pager|-p)     tui=0; args+=("${arg}") ;; # pager implies no TUI
+      *)              args+=("${arg}") ;;
+    esac
+  done
+
+  (( tui )) && args=(--tui --line-numbers "${args[@]}")
+  command glow -s "${style}" "${args[@]}"
+}
+
+alias -s md='glow'
 
 alias -s json='fx'
 alias -s yml='fx'
