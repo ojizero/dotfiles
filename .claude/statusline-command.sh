@@ -54,7 +54,15 @@ format_reset_time() {
   fi
   [[ -z "$epoch" ]] && return
 
-  date -j -r "$epoch" +"%l:%M%p" 2>/dev/null | sed 's/^ //; s/\.//g' | tr '[:upper:]' '[:lower:]'
+  local today=$(date +%Y-%m-%d)
+  local reset_day=$(date -j -r "$epoch" +"%Y-%m-%d" 2>/dev/null)
+  local time_str=$(date -j -r "$epoch" +"%l:%M%p" 2>/dev/null | sed 's/^ //; s/\.//g' | tr '[:upper:]' '[:lower:]')
+  if [[ "$reset_day" != "$today" ]]; then
+    local day_str=$(date -j -r "$epoch" +"%a" 2>/dev/null)
+    echo "${day_str} ${time_str}"
+  else
+    echo "$time_str"
+  fi
 }
 
 format_cost() {
@@ -218,7 +226,7 @@ if [[ -n "$usage_data" ]] && echo "$usage_data" | jq -e . &>/dev/null; then
     five_col=$(color_for_pct "$five_pct")
     five_circle=$(circle_for_pct "$five_pct")
 
-    line="${five_col}${five_circle}${reset} ${dim}session${reset} ${five_col}${five_pct}%${reset}"
+    line="${five_col}${five_circle}${reset} ${dim}session${reset} ${five_col}$(printf '%3s' "$five_pct")%${reset}"
     [[ -n "$five_reset" ]] && line+=" ${dim}⟳ ${five_reset}${reset}"
     usage_lines+=("$line")
   fi
@@ -230,7 +238,7 @@ if [[ -n "$usage_data" ]] && echo "$usage_data" | jq -e . &>/dev/null; then
     seven_col=$(color_for_pct "$seven_pct")
     seven_circle=$(circle_for_pct "$seven_pct")
 
-    line="${seven_col}${seven_circle}${reset} ${dim}weekly${reset}  ${seven_col}${seven_pct}%${reset}"
+    line="${seven_col}${seven_circle}${reset} ${dim}weekly${reset}  ${seven_col}$(printf '%3s' "$seven_pct")%${reset}"
     [[ -n "$seven_reset" ]] && line+=" ${dim}⟳ ${seven_reset}${reset}"
     usage_lines+=("$line")
   fi
@@ -242,7 +250,7 @@ if [[ -n "$usage_data" ]] && echo "$usage_data" | jq -e . &>/dev/null; then
     sonnet_col=$(color_for_pct "$sonnet_pct")
     sonnet_circle=$(circle_for_pct "$sonnet_pct")
 
-    line="${sonnet_col}${sonnet_circle}${reset} ${dim}sonnet${reset}  ${sonnet_col}${sonnet_pct}%${reset}"
+    line="${sonnet_col}${sonnet_circle}${reset} ${dim}sonnet${reset}  ${sonnet_col}$(printf '%3s' "$sonnet_pct")%${reset}"
     [[ -n "$sonnet_reset" ]] && line+=" ${dim}⟳ ${sonnet_reset}${reset}"
     usage_lines+=("$line")
   fi
