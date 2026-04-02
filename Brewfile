@@ -39,15 +39,14 @@ brew "nmap"
 brew "nss"
 brew "ripgrep"
 brew "shellcheck"
-brew "specify"
 brew "tflint"
 brew "tree"
 brew "tree-sitter-cli"
+brew "viu"
 brew "watch"
 brew "wget"
 brew "zoxide"
 brew "anomalyco/tap/opencode"
-brew "steveyegge/beads/bd"
 
 # Installed casks
 #
