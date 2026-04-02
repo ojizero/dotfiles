@@ -9,6 +9,13 @@ require("nvim-treesitter").install({
   "typescript", "yaml",
 })
 
+-- Auto-enable treesitter highlighting for any filetype with an installed parser
+vim.api.nvim_create_autocmd("FileType", {
+  callback = function(ev)
+    pcall(vim.treesitter.start, ev.buf)
+  end,
+})
+
 -- Rainbow delimiters (colorized brackets)
 require("rainbow-delimiters.setup").setup({})
 
