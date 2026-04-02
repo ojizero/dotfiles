@@ -6,6 +6,7 @@ elixir = "1.19.5-otp-28"
 elixir-ls = "0.30.0"
 
 "npm:bash-language-server" = "5.6.0"
+"npm:vscode-langservers-extracted" = "4.10.0"
 "npm:@agentclientprotocol/claude-agent-acp" = "0.24.2"
 
 [env]
