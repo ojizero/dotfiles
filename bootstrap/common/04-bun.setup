@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+
+cfg_bunfig="${DOTFILES_PATH}/bunfig.toml"
+home_bunfig="${HOME}/.bunfig.toml"
+
+rm -fr "${home_bunfig}"
+ln -s "${cfg_bunfig}" "${home_bunfig}"

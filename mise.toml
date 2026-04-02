@@ -17,5 +17,5 @@ MISE_ENV_FILE=".env"
 ERL_AFLAGS = "-kernel shell_history enabled"
 
 [settings]
-idiomatic_version_file = true
-idiomatic_version_file_enable_tools = ["node"]
+
+npm.package_manager = "bun"

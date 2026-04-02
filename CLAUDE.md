@@ -8,6 +8,7 @@ Personal dotfiles for macOS and self-hosted Docker Compose service stacks runnin
 .zshrc, .zprofile          # Shell config (zsh + Oh-My-Zsh + oh-my-posh)
 .gitconfig                 # Git config (aliases, SSH URLs, delta)
 mise.toml                  # Mise version manager
+bunfig.toml                # Bun package manager config
 Brewfile                   # Homebrew packages
 omp.toml                   # Oh-My-Posh prompt config
 omz/auto/*.zsh             # Auto-loaded shell modules (aliases, completions, history, keybindings, misc)
@@ -38,6 +39,7 @@ Managed symlinks:
 - `~/.local` -> `.local`
 - `~/.brew-aliases` -> `.brew-aliases`
 - `~/.Brewfile` -> `Brewfile`
+- `~/.bunfig.toml` -> `bunfig.toml`
 
 ### Local Override Pattern
 `.local/` is git-ignored. It provides per-machine customization:

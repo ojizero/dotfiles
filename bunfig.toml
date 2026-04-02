@@ -1,0 +1,12 @@
+# Global Bun configuration
+# Symlinked to ~/.bunfig.toml via bootstrap
+
+[install]
+# Delay resolution to versions published at least 7 days ago
+# Mitigates supply chain attacks from compromised recent publishes
+minimumReleaseAge = 604800
+
+# NOTE: Bun blocks lifecycle scripts by default. Its built-in trusted list
+# (~367 packages) cannot be disabled globally via bunfig.toml.
+# Per-project control: set "trustedDependencies" in package.json.
+# Tracking: https://github.com/oven-sh/bun/issues/7642
