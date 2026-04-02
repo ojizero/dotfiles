@@ -19,6 +19,36 @@ vim.o.colorcolumn = "100"
 vim.o.number = true
 vim.o.relativenumber = true
 
+-- Folding (treesitter-based)
+vim.o.foldmethod = "expr"
+vim.o.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.o.foldlevelstart = 99
+vim.o.foldtext = ""
+
+-- Gutter: signs + line number + clickable fold indicator
+vim.o.foldcolumn = "0"
+_G.fold_click = function()
+  local pos = vim.fn.getmousepos()
+  vim.api.nvim_win_set_cursor(pos.winid, { pos.line, 0 })
+  vim.cmd("normal! za")
+end
+_G.fold_indicator = function()
+  local lnum = vim.v.lnum
+  local level = vim.fn.foldlevel(lnum)
+  if level <= 0 then return " " end
+  if vim.fn.foldclosed(lnum) ~= -1 then return "▶" end
+  local fde = vim.wo.foldexpr
+  if fde ~= "" then
+    local ok, result = pcall(vim.fn.eval, fde)
+    if ok and type(result) == "string" and result:sub(1, 1) == ">" then
+      return "▼"
+    end
+  end
+  if level > vim.fn.foldlevel(lnum + 1) then return "▲" end
+  return " "
+end
+vim.o.statuscolumn = '%s%l %@v:lua.fold_click@%{v:lua.fold_indicator()}%X'
+
 -- Scrolling
 vim.o.scrolloff = 8
 vim.o.sidescrolloff = 8
