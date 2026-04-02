@@ -69,6 +69,7 @@
 	navigate = true
 	line-numbers = true
 	side-by-side = false
+	pager = less -RFX --mouse --wheel-lines=3
 
 [diff]
 	colorMoved = default
