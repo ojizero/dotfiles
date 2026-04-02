@@ -11,7 +11,7 @@ export HOMEBREW_NO_ANALYTICS=1
 # we want this to be controlled externally, e.g. in
 # case the terminal is coming from a code editor
 # that sets this value for us.
-export EDITOR="${EDITOR:-vim}"
+export EDITOR="${EDITOR:-nvim}"
 
 export PAGER='less -RFX'
 export AWS_PAGER='less -RFX'
