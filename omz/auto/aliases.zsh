@@ -55,13 +55,14 @@ find-up() {
 
 alias -s md='bat'
 
-alias yless='jless --yaml'
-alias -s json='jless'
-alias -s yml='yless'
-alias -s yaml='yless'
+alias -s json='fx'
+alias -s yml='fx'
+alias -s yaml='fx'
+alias -s toml='fx'
 
 alias cc='claude --dangerously-skip-permissions'
 
 alias v='nvim'
 alias nv='nvim'
 alias vm='nvim'
+alias vim='nvim'
