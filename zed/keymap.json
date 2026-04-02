@@ -8,50 +8,55 @@
 [
   {
     "context": "Workspace",
-    "bindings": {}
+    "bindings": {},
   },
   {
     "context": "Editor",
     "bindings": {
-      "cmd-e": "outline::Toggle",
       "cmd-g": "go_to_line::Toggle",
       // Move inline assist to use CMD+> (CMD+SHIFT+.) and disable CTRL+ENTER for it
       "cmd->": "assistant::InlineAssist",
-      "ctrl-enter": null
-    }
+      "ctrl-enter": null,
+    },
   },
   {
     "context": "Terminal",
     "bindings": {
       // Move inline assist to use CMD+> (CMD+SHIFT+.) and disable CTRL+ENTER for it
       "cmd->": "assistant::InlineAssist",
-      "ctrl-enter": null
-    }
+      "ctrl-enter": null,
+    },
   },
   {
     "bindings": {
-      "cmd-k cmd-u": "editor::ConvertToUpperCase"
-    }
+      "cmd-k cmd-u": "editor::ConvertToUpperCase",
+    },
   },
   {
     "bindings": {
-      "cmd-k cmd-p": "editor::ConvertToUpperCamelCase"
-    }
+      "cmd-k cmd-p": "editor::ConvertToUpperCamelCase",
+    },
   },
   {
     "bindings": {
-      "cmd-k cmd-l": "editor::ConvertToLowerCase"
-    }
+      "cmd-k cmd-l": "editor::ConvertToLowerCase",
+    },
   },
   {
     "bindings": {
-      "cmd-k cmd-c": "editor::ConvertToLowerCamelCase"
-    }
+      "cmd-k cmd-c": "editor::ConvertToLowerCamelCase",
+    },
   },
   {
     "context": "Terminal",
     "bindings": {
-      "cmd-k cmd-k": "terminal::Clear"
-    }
-  }
+      "cmd-k cmd-k": "terminal::Clear",
+    },
+  },
+
+  {
+    "bindings": {
+      "cmd-e": "outline::Toggle",
+    },
+  },
 ]

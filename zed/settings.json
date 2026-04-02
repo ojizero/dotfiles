@@ -71,10 +71,12 @@
     },
     "Erlang": { "language_servers": ["elp"] },
   },
-  "features": { "edit_prediction_provider": "zed" },
-  "edit_predictions": { "mode": "subtle", "disabled_globs": ["**/secret*"] },
+  "edit_predictions": { "provider": "zed",
+                        "mode": "subtle", "disabled_globs": ["**/secret*"] },
   "agent": {
-    "always_allow_tool_actions": true,
+    "tool_permissions": {
+      "default": "allow"
+    },
     "enabled": true,
     "button": true,
     "inline_assistant_model": { "provider": "zed.dev", "model": "claude-opus-4-5" },
@@ -133,13 +135,12 @@
     //   "args": ["acp"],
     //   "env": {},
     // },
-  },
-  "context_servers": {
-    "docker-mcp-gateway": {
-      "enabled": false,
-      "command": "docker",
-      "args": ["mcp", "gateway", "run"],
-      "env": {},
+    "claude-acp": {
+      "type": "registry"
     },
+    "opencode": {
+      "type": "registry"
+    }
   },
+  "context_servers": {},
 }
