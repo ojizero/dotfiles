@@ -76,6 +76,9 @@ if [[ -n "${terminfo[kcbt]}" ]]; then
   bindkey -M vicmd "${terminfo[kcbt]}" reverse-menu-complete
 fi
 
+# [Ctrl-U] - delete from cursor to beginning of line (not whole line)
+bindkey '^U' backward-kill-line
+
 # [Backspace] - delete backward
 bindkey -M emacs '^?' backward-delete-char
 bindkey -M viins '^?' backward-delete-char

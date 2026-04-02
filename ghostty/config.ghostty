@@ -50,7 +50,7 @@ macos-option-as-alt = true
 macos-titlebar-style = tabs
 
 # Keybindings
-# Cmd+Backspace = kill line (Ctrl-U)
+# Cmd+Backspace = backward kill line (Ctrl-U)
 keybind = super+backspace=text:\x15
 # Cmd+Left = beginning of line (Ctrl-A)
 keybind = super+left=text:\x01
