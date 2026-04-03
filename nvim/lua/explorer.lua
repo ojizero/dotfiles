@@ -10,6 +10,9 @@ require("neo-tree").setup({
   window = {
     position = "left",
     width = 30,
+    mappings = {
+      ["b"] = "noop", -- free <leader>b for global toggle
+    },
   },
   filesystem = {
     follow_current_file = { enabled = true },
@@ -45,6 +48,7 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = "neo-tree",
   callback = function()
     vim.wo.winhighlight = "CursorLine:NeoTreeCursorLine"
+    vim.wo.statuscolumn = ""
   end,
 })
 
