@@ -14,6 +14,7 @@ if vim.g.enable_avante then
       provider = "fzf",
     },
   })
+  vim.cmd("AvanteBuild")
 end
 
 -- :ToggleAvante runtime command
