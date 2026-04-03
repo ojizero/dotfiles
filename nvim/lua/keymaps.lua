@@ -83,8 +83,13 @@ map("n", "<C-j>", "<C-w>j", { desc = "Move to below window" })
 map("n", "<C-k>", "<C-w>k", { desc = "Move to above window" })
 map("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
 
--- Clear search highlight
-map("n", "<Esc>", "<cmd>nohlsearch<cr>", { desc = "Clear search highlight" })
+-- Smart Escape: dismiss noice, close panels, or clear search highlight
+map("n", "<Esc>", function()
+  require("noice").cmd("dismiss")
+  pcall(vim.cmd, "cclose")
+  pcall(vim.cmd, "lclose")
+  vim.cmd("nohlsearch")
+end, { desc = "Close panels/floats or clear search" })
 
 -- Better escape from terminal mode
 map("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
