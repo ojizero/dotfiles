@@ -10,8 +10,6 @@ elixir-ls = "latest"
 "npm:vscode-langservers-extracted" = "latest"
 "github:WhatsApp/erlang-language-platform" = "latest"
 
-"npm:@agentclientprotocol/claude-agent-acp" = "0.24.2"
-
 [env]
 MISE_ENV_FILE=".env"
 ERL_AFLAGS = "-kernel shell_history enabled"
