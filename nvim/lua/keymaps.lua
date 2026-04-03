@@ -68,10 +68,6 @@ map("v", "<leader>kc", function()
   vim.cmd('normal! gv"vp')
 end, { desc = "camelCase" })
 
--- AI (CodeCompanion)
-map({ "n", "v" }, "<leader>ai", "<cmd>CodeCompanionActions<cr>", { desc = "AI actions" })
-map({ "n", "v" }, "<leader>ac", "<cmd>CodeCompanionChat toggle<cr>", { desc = "AI chat" })
-
 -- Git (gitsigns)
 map("n", "<leader>gb", "<cmd>Gitsigns blame_line<cr>", { desc = "Git blame line" })
 map("n", "]h", "<cmd>Gitsigns next_hunk<cr>", { desc = "Next hunk" })

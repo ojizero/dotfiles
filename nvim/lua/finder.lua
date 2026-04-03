@@ -4,6 +4,9 @@ local function bat_theme()
   return vim.o.background == "light" and "Catppuccin Latte" or "Catppuccin Mocha"
 end
 
+-- Use fzf-lua for vim.ui.select (used by AvanteACPModels, etc.)
+require("fzf-lua").register_ui_select()
+
 require("fzf-lua").setup({
   winopts = {
     preview = {

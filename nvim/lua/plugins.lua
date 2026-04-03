@@ -40,9 +40,23 @@ vim.pack.add({
   -- TODO comments
   gh .. "folke/todo-comments.nvim",
 
-  -- AI
-  gh .. "olimorris/codecompanion.nvim",
+  -- Markdown rendering (always-on; also used by avante)
+  gh .. "MeanderingProgrammer/render-markdown.nvim",
 })
+
+-- avante (default on, toggle via :ToggleAvante)
+if vim.g.enable_avante then
+  vim.pack.add({
+    gh .. "yetone/avante.nvim",
+  })
+end
+
+-- CodeCompanion (gated)
+if vim.g.enable_codecompanion then
+  vim.pack.add({
+    gh .. "olimorris/codecompanion.nvim",
+  })
+end
 
 -- 99 (gated)
 if vim.g.enable_99 then

@@ -1,25 +1,102 @@
--- AI integration: CodeCompanion (ACP only) + 99 (gated)
+-- AI integration: avante (default on) + CodeCompanion (gated) + 99 (gated)
 
--- CodeCompanion — ACP adapters only, no direct API key providers
--- NOTE: inline/cmd/background interactions only support HTTP adapters,
---       so they are left unconfigured (ACP adapters silently no-op).
-require("codecompanion").setup({
-  strategies = {
-    chat = { adapter = "opencode" },
-    agent = { adapter = "opencode" },
-  },
-  adapters = {
-    -- Disable all preset HTTP (API key) adapters
-    http = {
-      opts = { show_presets = false },
-    },
-    -- Disable all preset ACP adapters, then enable only the ones we want
-    acp = {
-      opts = { show_presets = false },
-      opencode = "opencode",
-    },
-  },
+-- render-markdown.nvim — always-on; renders markdown buffers + avante sidebar
+-- Including "Avante" in file_types is harmless when avante is off (filetype never appears)
+require("render-markdown").setup({
+  file_types = { "markdown", "Avante" },
 })
+
+-- avante.nvim — AI sidebar using opencode via ACP
+if vim.g.enable_avante then
+  require("avante").setup({
+    provider = "opencode",
+    file_selector = {
+      provider = "fzf",
+    },
+  })
+end
+
+-- :ToggleAvante runtime command
+local _avante_active = vim.g.enable_avante or false
+
+vim.api.nvim_create_user_command("ToggleAvante", function()
+  if _avante_active then
+    _avante_active = false
+    pcall(function() require("avante").toggle() end)
+    vim.notify("avante disabled (restart nvim to fully unload)", vim.log.levels.INFO)
+  else
+    if not pcall(require, "avante") then
+      vim.pack.add({ "https://github.com/yetone/avante.nvim" })
+      require("avante").setup({
+        provider = "opencode",
+        file_selector = { provider = "fzf" },
+      })
+    end
+    _avante_active = true
+    vim.notify("avante enabled", vim.log.levels.INFO)
+  end
+end, {})
+
+-- CodeCompanion — gated by vim.g.enable_codecompanion
+if vim.g.enable_codecompanion then
+  require("codecompanion").setup({
+    strategies = {
+      chat = { adapter = "opencode" },
+      agent = { adapter = "opencode" },
+    },
+    adapters = {
+      http = { opts = { show_presets = false } },
+      acp = {
+        opts = { show_presets = false },
+        opencode = "opencode",
+      },
+    },
+  })
+end
+
+-- :ToggleCodeCompanion runtime command
+local _cc_active = vim.g.enable_codecompanion or false
+
+local function set_cc_keymaps()
+  vim.keymap.set({ "n", "v" }, "<leader>ai", "<cmd>CodeCompanionActions<cr>", { desc = "CC: actions" })
+  vim.keymap.set({ "n", "v" }, "<leader>ac", "<cmd>CodeCompanionChat toggle<cr>", { desc = "CC: chat" })
+end
+
+local function clear_cc_keymaps()
+  pcall(vim.keymap.del, "n", "<leader>ai")
+  pcall(vim.keymap.del, "v", "<leader>ai")
+  pcall(vim.keymap.del, "n", "<leader>ac")
+  pcall(vim.keymap.del, "v", "<leader>ac")
+end
+
+if _cc_active then
+  set_cc_keymaps()
+end
+
+vim.api.nvim_create_user_command("ToggleCodeCompanion", function()
+  if _cc_active then
+    clear_cc_keymaps()
+    _cc_active = false
+    vim.notify("CodeCompanion disabled", vim.log.levels.INFO)
+  else
+    if not pcall(require, "codecompanion") then
+      vim.pack.add({ "https://github.com/olimorris/codecompanion.nvim" })
+      require("codecompanion").setup({
+        strategies = {
+          chat = { adapter = "opencode" },
+          agent = { adapter = "opencode" },
+        },
+        adapters = {
+          http = { opts = { show_presets = false } },
+          acp = { opts = { show_presets = false }, opencode = "opencode" },
+        },
+      })
+    end
+    set_cc_keymaps()
+    _cc_active = true
+    vim.notify("CodeCompanion enabled", vim.log.levels.INFO)
+  end
+end, {})
 
 -- Toggle AI completion source
 local ai_completion_enabled = true

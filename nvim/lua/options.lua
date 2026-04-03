@@ -3,6 +3,10 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- AI feature flags (override in ~/.local/nvim/init.lua via :Toggle* commands)
+if vim.g.enable_avante == nil then vim.g.enable_avante = true end
+if vim.g.enable_codecompanion == nil then vim.g.enable_codecompanion = false end
+
 -- Indentation
 vim.o.tabstop = 2
 vim.o.shiftwidth = 2
