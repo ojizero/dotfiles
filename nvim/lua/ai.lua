@@ -1,4 +1,4 @@
--- AI integration: avante (default on) + CodeCompanion (gated) + 99 (gated)
+-- AI integration: avante (gated) + CodeCompanion (gated) + 99 (gated)
 
 -- render-markdown.nvim — always-on; renders markdown buffers + avante sidebar
 -- Including "Avante" in file_types is harmless when avante is off (filetype never appears)
@@ -14,7 +14,7 @@ if vim.g.enable_avante then
       provider = "fzf",
     },
   })
-  vim.cmd("AvanteBuild")
+  vim.cmd("silent! AvanteBuild")
 end
 
 -- :ToggleAvante runtime command
