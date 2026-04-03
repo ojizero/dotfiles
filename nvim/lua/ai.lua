@@ -1,11 +1,12 @@
 -- AI integration: CodeCompanion (ACP only) + 99 (gated)
 
 -- CodeCompanion — ACP adapters only, no direct API key providers
+-- NOTE: inline/cmd/background interactions only support HTTP adapters,
+--       so they are left unconfigured (ACP adapters silently no-op).
 require("codecompanion").setup({
   strategies = {
-    chat = { adapter = "claude_code" },
-    inline = { adapter = "claude_code" },
-    agent = { adapter = "claude_code" },
+    chat = { adapter = "opencode" },
+    agent = { adapter = "opencode" },
   },
   adapters = {
     -- Disable all preset HTTP (API key) adapters
@@ -15,7 +16,6 @@ require("codecompanion").setup({
     -- Disable all preset ACP adapters, then enable only the ones we want
     acp = {
       opts = { show_presets = false },
-      claude_code = "claude_code",
       opencode = "opencode",
     },
   },
