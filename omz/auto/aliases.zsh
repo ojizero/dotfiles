@@ -75,6 +75,12 @@ function glow {
   command glow -s "${style}" "${args[@]}"
 }
 
+# Reset terminal state after Claude Code exits — it can leave bracketed paste,
+# application cursor keys, and other modes stuck on dirty exit.
+function claude {
+  command claude "$@"
+  printf '\e[?2004l\e[?1l\e[?25h\ec'
+}
 alias cc='claude --dangerously-skip-permissions'
 
 alias v='nvim'
