@@ -60,6 +60,7 @@ function glow {
   fi
 
   local tui=1
+  [[ ! -t 1 ]] && tui=0
   local args=()
   for arg in "$@"; do
     case "${arg}" in
