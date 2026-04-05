@@ -52,6 +52,7 @@ map("n", "<leader>b", "<cmd>Neotree toggle<cr>", { desc = "Toggle file explorer"
 -- Buffer navigation
 map("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Previous buffer" })
 map("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next buffer" })
+map("n", "<leader>w", "<cmd>bdelete<cr>", { desc = "Close buffer" })
 map("n", "<leader>bd", "<cmd>bdelete<cr>", { desc = "Delete buffer" })
 
 -- Git log (current file)

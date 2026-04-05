@@ -170,3 +170,16 @@ vim.api.nvim_create_autocmd("BufReadPre", {
     end
   end,
 })
+
+-- Keep Neovim open when the last buffer is deleted
+vim.api.nvim_create_autocmd("BufDelete", {
+  callback = function(ev)
+    local remaining = 0
+    for _, buf in ipairs(vim.fn.getbufinfo({ buflisted = 1 })) do
+      if buf.bufnr ~= ev.buf then remaining = remaining + 1 end
+    end
+    if remaining == 0 then
+      vim.api.nvim_win_set_buf(0, vim.api.nvim_create_buf(true, true))
+    end
+  end,
+})
