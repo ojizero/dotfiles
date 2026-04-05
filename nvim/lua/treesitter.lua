@@ -18,9 +18,3 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- Rainbow delimiters (colorized brackets)
 require("rainbow-delimiters.setup").setup({})
-
--- Indent guides (indent-aware coloring)
-require("ibl").setup({
-  indent = { char = "│" },
-  scope = { enabled = true },
-})

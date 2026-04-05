@@ -15,7 +15,6 @@ vim.pack.add({
   -- Syntax
   gh .. "nvim-treesitter/nvim-treesitter",
   gh .. "HiPhish/rainbow-delimiters.nvim",
-  gh .. "lukas-reineke/indent-blankline.nvim",
   gh .. "folke/ts-comments.nvim",
 
   -- LSP, completion, formatting
@@ -26,19 +25,16 @@ vim.pack.add({
   gh .. "b0o/SchemaStore.nvim",
 
   -- Navigation
-  gh .. "nvim-neo-tree/neo-tree.nvim",
-  gh .. "ibhagwan/fzf-lua",
   gh .. "folke/flash.nvim",
 
   -- UI
+  gh .. "folke/snacks.nvim",
   gh .. "nvim-lualine/lualine.nvim",
-  gh .. "rcarriga/nvim-notify",
   gh .. "folke/noice.nvim",
   gh .. "folke/which-key.nvim",
   gh .. "folke/trouble.nvim",
 
   -- Editing
-  gh .. "karb94/neoscroll.nvim",
   gh .. "MagicDuck/grug-far.nvim",
 
   -- Git

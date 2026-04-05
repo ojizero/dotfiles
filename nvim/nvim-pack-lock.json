@@ -113,6 +113,10 @@
       "rev": "c7188a8f9d2953696b6303caccbf39c51fa2c1b1",
       "src": "ssh://git@github.com/MeanderingProgrammer/render-markdown.nvim"
     },
+    "snacks.nvim": {
+      "rev": "ad9ede6a9cddf16cedbd31b8932d6dcdee9b716e",
+      "src": "https://github.com/folke/snacks.nvim"
+    },
     "todo-comments.nvim": {
       "rev": "31e3c38ce9b29781e4422fc0322eb0a21f4e8668",
       "src": "ssh://git@github.com/folke/todo-comments.nvim"

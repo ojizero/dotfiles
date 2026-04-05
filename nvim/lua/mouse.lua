@@ -17,6 +17,11 @@ local function define_menu(name, items)
   end
 end
 
+-- Helper: run an action on the snacks explorer picker
+local function explorer_action(action)
+  return ("<cmd>lua do local p = Snacks.picker.get({ source = 'explorer' })[1] if p then p:action('%s') end end<cr>"):format(action)
+end
+
 -- Buffer menu: LSP + editing + git
 define_menu("PopUp", {
   { "Go to Definition",  "<cmd>lua vim.lsp.buf.definition()<cr>" },
@@ -31,19 +36,17 @@ define_menu("PopUp", {
   { "Toggle Blame",      "<cmd>Gitsigns toggle_current_line_blame<cr>" },
 })
 
--- Neo-tree menu: file operations
-define_menu("NeoTreeMenu", {
-  { "Open",              "<cmd>lua require('neo-tree.sources.common.commands').open_tabnew(require('neo-tree.sources.manager').get_state('filesystem'))<cr>" },
-  { "New File",          "<cmd>lua require('neo-tree.sources.common.commands').add(require('neo-tree.sources.manager').get_state('filesystem'))<cr>" },
-  { "New Directory",     "<cmd>lua require('neo-tree.sources.common.commands').add_directory(require('neo-tree.sources.manager').get_state('filesystem'))<cr>" },
+-- Explorer menu: file operations via snacks.picker actions
+define_menu("ExplorerMenu", {
+  { "Open",              explorer_action("confirm") },
+  { "New File",          explorer_action("explorer_add") },
   { sep = "-sep1-" },
-  { "Rename",            "<cmd>lua require('neo-tree.sources.common.commands').rename(require('neo-tree.sources.manager').get_state('filesystem'))<cr>" },
-  { "Delete",            "<cmd>lua require('neo-tree.sources.common.commands').delete(require('neo-tree.sources.manager').get_state('filesystem'))<cr>" },
-  { "Copy",              "<cmd>lua require('neo-tree.sources.common.commands').copy_to_clipboard(require('neo-tree.sources.manager').get_state('filesystem'))<cr>" },
-  { "Cut",               "<cmd>lua require('neo-tree.sources.common.commands').cut_to_clipboard(require('neo-tree.sources.manager').get_state('filesystem'))<cr>" },
-  { "Paste",             "<cmd>lua require('neo-tree.sources.common.commands').paste_from_clipboard(require('neo-tree.sources.manager').get_state('filesystem'))<cr>" },
+  { "Rename",            explorer_action("explorer_rename") },
+  { "Delete",            explorer_action("explorer_del") },
+  { "Copy",              explorer_action("explorer_copy") },
+  { "Move",              explorer_action("explorer_move") },
   { sep = "-sep2-" },
-  { "Copy Path",         "<cmd>lua local n = require('neo-tree.ui.renderer').get_node_at_cursor() if n then vim.fn.setreg('+', n:get_id()) vim.notify('Copied: ' .. n:get_id()) end<cr>" },
+  { "Copy Path",         explorer_action("explorer_yank") },
 })
 
 -- Terminal menu: just paste
@@ -71,8 +74,8 @@ vim.keymap.set({ "n", "v", "i" }, "<RightMouse>", function()
   local ft = vim.bo[buf].filetype
   local buftype = vim.bo[buf].buftype
 
-  if ft == "neo-tree" then
-    vim.cmd("popup NeoTreeMenu")
+  if ft == "snacks_picker_list" then
+    vim.cmd("popup ExplorerMenu")
   elseif buftype == "terminal" then
     vim.cmd("popup TerminalMenu")
   else

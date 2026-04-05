@@ -13,18 +13,14 @@ require("catppuccin").setup({
   custom_highlights = function(colors)
     return {
       -- CursorLine bg is nearly identical to mantle in Latte; use surface0 for sidebar/float contrast
-      NeoTreeCursorLine = { bg = colors.surface0 },
-      FzfLuaCursorLine = { bg = colors.surface0 },
       GitSignsCurrentLineBlame = { fg = colors.overlay0, italic = true },
     }
   end,
   integrations = {
     blink_cmp = { enabled = true, style = "bordered" },
     gitsigns = true,
-    indent_blankline = { enabled = true },
-    neotree = true,
     noice = true,
-    notify = true,
+    snacks = true,
     rainbow_delimiters = true,
     trouble = true,
     which_key = true,

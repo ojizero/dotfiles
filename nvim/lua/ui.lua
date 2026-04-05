@@ -1,10 +1,5 @@
--- noice.nvim + nvim-notify for modern UI
-
-require("notify").setup({
-  stages = "fade",
-  timeout = 3000,
-  render = "compact",
-})
+-- noice.nvim for modern command palette and message routing
+-- Notifications are handled by snacks.notifier (see snacks.lua)
 
 require("noice").setup({
   lsp = {
@@ -38,4 +33,7 @@ require("noice").setup({
 -- Noice keymaps
 vim.keymap.set("n", "<leader>nh", function() require("noice").cmd("history") end, { desc = "Noice history" })
 vim.keymap.set("n", "<leader>nl", function() require("noice").cmd("last") end, { desc = "Noice last message" })
-vim.keymap.set("n", "<leader>nd", function() require("noice").cmd("dismiss") end, { desc = "Dismiss notifications" })
+vim.keymap.set("n", "<leader>nd", function()
+  require("noice").cmd("dismiss")
+  Snacks.notifier.hide()
+end, { desc = "Dismiss notifications" })

@@ -27,39 +27,39 @@ map("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move selection up" })
 map("v", "<", "<gv")
 map("v", ">", ">gv")
 
--- File finder (Cmd+P equivalent)
-map("n", "<leader>f", "<cmd>FzfLua files<cr>", { desc = "Find files" })
-map("n", "<leader>sb", "<cmd>FzfLua buffers<cr>", { desc = "Switch buffer" })
-map("n", "<leader>sg", "<cmd>FzfLua live_grep<cr>", { desc = "Live grep" })
-map("n", "<leader>:", "<cmd>FzfLua commands<cr>", { desc = "Command palette" })
-map("n", "<leader>o", "<cmd>FzfLua lsp_document_symbols<cr>", { desc = "Document symbols" })
-map("n", "<leader>O", "<cmd>FzfLua lsp_workspace_symbols<cr>", { desc = "Workspace symbols" })
-map("n", "<leader>sw", "<cmd>FzfLua grep_cword<cr>", { desc = "Grep word under cursor" })
-map("n", "<leader>sh", "<cmd>FzfLua help_tags<cr>", { desc = "Help tags" })
-map("n", "<leader>sd", "<cmd>FzfLua diagnostics_document<cr>", { desc = "Document diagnostics" })
-map("n", "<leader>sD", "<cmd>FzfLua diagnostics_workspace<cr>", { desc = "Workspace diagnostics" })
-map("n", "<leader>s.", "<cmd>FzfLua resume<cr>", { desc = "Resume last picker" })
-map("n", "<leader>sk", "<cmd>FzfLua keymaps<cr>", { desc = "Keymaps" })
-map("n", '<leader>s"', "<cmd>FzfLua registers<cr>", { desc = "Registers" })
-map("n", "<leader>so", "<cmd>FzfLua oldfiles<cr>", { desc = "Recent files" })
+-- Pickers (snacks.picker)
+map("n", "<leader>f", function() Snacks.picker.files() end, { desc = "Find files" })
+map("n", "<leader>sb", function() Snacks.picker.buffers() end, { desc = "Switch buffer" })
+map("n", "<leader>sg", function() Snacks.picker.grep() end, { desc = "Live grep" })
+map("n", "<leader>:", function() Snacks.picker.commands() end, { desc = "Command palette" })
+map("n", "<leader>o", function() Snacks.picker.lsp_symbols() end, { desc = "Document symbols" })
+map("n", "<leader>O", function() Snacks.picker.lsp_symbols({ workspace = true }) end, { desc = "Workspace symbols" })
+map("n", "<leader>sw", function() Snacks.picker.grep_word() end, { desc = "Grep word under cursor" })
+map("n", "<leader>sh", function() Snacks.picker.help() end, { desc = "Help tags" })
+map("n", "<leader>sd", function() Snacks.picker.diagnostics_buffer() end, { desc = "Document diagnostics" })
+map("n", "<leader>sD", function() Snacks.picker.diagnostics() end, { desc = "Workspace diagnostics" })
+map("n", "<leader>s.", function() Snacks.picker.resume() end, { desc = "Resume last picker" })
+map("n", "<leader>sk", function() Snacks.picker.keymaps() end, { desc = "Keymaps" })
+map("n", '<leader>s"', function() Snacks.picker.registers() end, { desc = "Registers" })
+map("n", "<leader>so", function() Snacks.picker.recent() end, { desc = "Recent files" })
 
 -- Marks / bookmarks
-map("n", "<leader>m", "<cmd>FzfLua marks<cr>", { desc = "Search marks" })
+map("n", "<leader>m", function() Snacks.picker.marks() end, { desc = "Search marks" })
 
 -- File explorer
-map("n", "<leader>b", "<cmd>Neotree toggle<cr>", { desc = "Toggle file explorer" })
+map("n", "<leader>b", function() Snacks.explorer() end, { desc = "Toggle file explorer" })
 
 -- Buffer navigation
 map("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Previous buffer" })
 map("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next buffer" })
-map("n", "<leader>w", "<cmd>bdelete<cr>", { desc = "Close buffer" })
-map("n", "<leader>bd", "<cmd>bdelete<cr>", { desc = "Delete buffer" })
+map("n", "<leader>w", function() Snacks.bufdelete() end, { desc = "Close buffer" })
+map("n", "<leader>bd", function() Snacks.bufdelete() end, { desc = "Delete buffer" })
 
 -- Git log (current file)
-map("n", "<leader>gl", "<cmd>FzfLua git_bcommits<cr>", { desc = "Git log (file)" })
+map("n", "<leader>gl", function() Snacks.picker.git_log_file() end, { desc = "Git log (file)" })
 
 -- TODO comments
-map("n", "<leader>st", function() require("todo-comments.fzf").todo() end, { desc = "Search TODOs" })
+map("n", "<leader>st", function() Snacks.picker.todo_comments() end, { desc = "Search TODOs" })
 map("n", "]t", function() require("todo-comments").jump_next() end, { desc = "Next TODO" })
 map("n", "[t", function() require("todo-comments").jump_prev() end, { desc = "Previous TODO" })
 
@@ -97,9 +97,9 @@ end, { desc = "camelCase" })
 
 -- Git (gitsigns)
 map("n", "<leader>gb", "<cmd>Gitsigns blame_line<cr>", { desc = "Git blame line" })
-map("n", "<leader>gc", "<cmd>FzfLua git_commits<cr>", { desc = "Git commits" })
-map("n", "<leader>gs", "<cmd>FzfLua git_status<cr>", { desc = "Git status" })
-map("n", "<leader>gS", "<cmd>FzfLua git_stash<cr>", { desc = "Git stash" })
+map("n", "<leader>gc", function() Snacks.picker.git_log() end, { desc = "Git commits" })
+map("n", "<leader>gs", function() Snacks.picker.git_status() end, { desc = "Git status" })
+map("n", "<leader>gS", function() Snacks.picker.git_stash() end, { desc = "Git stash" })
 map("n", "]h", "<cmd>Gitsigns next_hunk<cr>", { desc = "Next hunk" })
 map("n", "[h", "<cmd>Gitsigns prev_hunk<cr>", { desc = "Previous hunk" })
 
@@ -138,9 +138,10 @@ map("n", "<leader>xt", "<cmd>Trouble todo toggle<cr>", { desc = "TODOs (Trouble)
 map("n", "<leader>sr", function() require("grug-far").open() end, { desc = "Search and replace" })
 map("v", "<leader>sr", function() require("grug-far").with_visual_selection() end, { desc = "Search and replace (selection)" })
 
--- Smart Escape: dismiss noice, close panels, or clear search highlight
+-- Smart Escape: dismiss notifications, close panels, or clear search highlight
 map("n", "<Esc>", function()
   require("noice").cmd("dismiss")
+  Snacks.notifier.hide()
   pcall(vim.cmd, "cclose")
   pcall(vim.cmd, "lclose")
   vim.cmd("nohlsearch")
@@ -148,6 +149,20 @@ end, { desc = "Close panels/floats or clear search" })
 
 -- Better escape from terminal mode
 map("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+
+-- Git browse (open file on GitHub)
+map("n", "<leader>go", function() Snacks.gitbrowse() end, { desc = "Open in browser" })
+
+-- LSP reference navigation
+map("n", "]]", function() Snacks.words.jump(1) end, { desc = "Next reference" })
+map("n", "[[", function() Snacks.words.jump(-1) end, { desc = "Previous reference" })
+
+-- Toggles (snacks.toggle integrates with which-key)
+Snacks.toggle.option("spell", { name = "Spelling" }):map("<leader>us")
+Snacks.toggle.option("wrap", { name = "Wrap" }):map("<leader>uw")
+Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>uL")
+Snacks.toggle.diagnostics():map("<leader>ud")
+Snacks.toggle.inlay_hints():map("<leader>uh")
 
 -- which-key.nvim — keybinding discovery popup
 require("which-key").setup()
@@ -159,4 +174,5 @@ require("which-key").add({
   { "<leader>x", group = "Trouble" },
   { "<leader>k", group = "Case" },
   { "<leader>n", group = "Noice" },
+  { "<leader>u", group = "Toggle" },
 })

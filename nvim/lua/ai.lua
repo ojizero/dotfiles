@@ -11,7 +11,7 @@ if vim.g.enable_avante then
   require("avante").setup({
     provider = "opencode",
     file_selector = {
-      provider = "fzf",
+      provider = "native",
     },
   })
   vim.cmd("silent! AvanteBuild")
@@ -30,7 +30,7 @@ vim.api.nvim_create_user_command("ToggleAvante", function()
       vim.pack.add({ "https://github.com/yetone/avante.nvim" })
       require("avante").setup({
         provider = "opencode",
-        file_selector = { provider = "fzf" },
+        file_selector = { provider = "native" },
       })
     end
     _avante_active = true
