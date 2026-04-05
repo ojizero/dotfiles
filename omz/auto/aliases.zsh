@@ -79,7 +79,7 @@ function glow {
 # application cursor keys, and other modes stuck on dirty exit.
 function claude {
   command claude "$@"
-  printf '\e[?2004l\e[?1l\e[?25h\ec'
+  printf '\e[?2004l\e[?1l\e[?25h'
 }
 alias cc='claude --dangerously-skip-permissions'
 
