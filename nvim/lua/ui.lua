@@ -12,7 +12,6 @@ require("noice").setup({
     override = {
       ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
       ["vim.lsp.util.stylize_markdown"] = true,
-      ["cmp.entry.get_documentation"] = true,
     },
   },
   presets = {
@@ -21,4 +20,22 @@ require("noice").setup({
     long_message_to_split = true,
     lsp_doc_border = true,
   },
+  routes = {
+    {
+      filter = {
+        event = "msg_show",
+        any = {
+          { find = "%d+L, %d+B" },
+          { find = "; after #%d+" },
+          { find = "; before #%d+" },
+        },
+      },
+      view = "mini",
+    },
+  },
 })
+
+-- Noice keymaps
+vim.keymap.set("n", "<leader>nh", function() require("noice").cmd("history") end, { desc = "Noice history" })
+vim.keymap.set("n", "<leader>nl", function() require("noice").cmd("last") end, { desc = "Noice last message" })
+vim.keymap.set("n", "<leader>nd", function() require("noice").cmd("dismiss") end, { desc = "Dismiss notifications" })

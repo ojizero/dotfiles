@@ -62,20 +62,24 @@ vim.o.ignorecase = true
 vim.o.smartcase = true
 vim.o.hlsearch = true
 vim.o.incsearch = true
+vim.o.grepprg = "rg --vimgrep"
+vim.o.grepformat = "%f:%l:%c:%m"
 
 -- Appearance
 vim.o.termguicolors = true
 vim.o.signcolumn = "yes"
+vim.o.showmode = false
+vim.o.inccommand = "nosplit"
 vim.o.cursorline = true
 vim.o.laststatus = 3
 
 -- Splits
 vim.o.splitright = true
 vim.o.splitbelow = true
+vim.o.splitkeep = "screen"
 
 -- Mouse
 vim.o.mouse = "a"
-vim.o.mousemodel = "extend"
 
 -- System clipboard
 vim.o.clipboard = "unnamedplus"
@@ -93,6 +97,11 @@ vim.o.undofile = true
 -- Performance
 vim.o.updatetime = 250
 vim.o.timeoutlen = 300
+vim.o.smoothscroll = true
+vim.o.confirm = true
+vim.o.virtualedit = "block"
+vim.o.shiftround = true
+vim.o.undolevels = 10000
 
 -- Disable swap files (persistent undo is enough)
 vim.o.swapfile = false
@@ -100,17 +109,64 @@ vim.o.swapfile = false
 -- GUI font (for remote GUI clients like Neovide)
 vim.o.guifont = "FiraCode Nerd Font:h18"
 
--- Inactive window dimming (approximation of Zed's inactive_opacity: 0.75)
-vim.api.nvim_create_autocmd("ColorScheme", {
+-- Highlight yanked text briefly
+vim.api.nvim_create_autocmd("TextYankPost", {
   callback = function()
-    local normal = vim.api.nvim_get_hl(0, { name = "Normal" })
-    if normal.bg then
-      -- Blend background toward black for inactive windows
-      local bg = normal.bg
-      local r = math.floor(bit.rshift(bit.band(bg, 0xFF0000), 16) * 0.85)
-      local g = math.floor(bit.rshift(bit.band(bg, 0x00FF00), 8) * 0.85)
-      local b = math.floor(bit.band(bg, 0x0000FF) * 0.85)
-      vim.api.nvim_set_hl(0, "NormalNC", { bg = bit.bor(bit.lshift(r, 16), bit.lshift(g, 8), b) })
+    vim.hl.on_yank({ higroup = "IncSearch", timeout = 200 })
+  end,
+})
+
+-- Restore cursor to last known position when opening a file
+vim.api.nvim_create_autocmd("BufReadPost", {
+  callback = function(ev)
+    local mark = vim.api.nvim_buf_get_mark(ev.buf, '"')
+    local lcount = vim.api.nvim_buf_line_count(ev.buf)
+    if mark[1] > 0 and mark[1] <= lcount then
+      pcall(vim.api.nvim_win_set_cursor, 0, mark)
+    end
+  end,
+})
+
+-- Auto-reload files changed outside Neovim
+vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
+  command = "checktime",
+})
+
+-- Close certain filetypes with q
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "help", "qf", "notify", "checkhealth" },
+  callback = function(ev)
+    vim.bo[ev.buf].buflisted = false
+    vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = ev.buf, silent = true })
+  end,
+})
+
+-- Auto-resize splits on terminal resize
+vim.api.nvim_create_autocmd("VimResized", {
+  callback = function() vim.cmd("tabdo wincmd =") end,
+})
+
+-- Auto-create parent directories when saving a file
+vim.api.nvim_create_autocmd("BufWritePre", {
+  callback = function(ev)
+    if ev.match:match("^%w%w+:///") then return end
+    local file = vim.uv.fs_realpath(ev.match) or ev.match
+    vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
+  end,
+})
+
+-- Bigfile protection: disable expensive features on files > 1.5 MB
+vim.api.nvim_create_autocmd("BufReadPre", {
+  callback = function(ev)
+    local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(ev.buf))
+    if ok and stats and stats.size > 1.5 * 1024 * 1024 then
+      vim.b[ev.buf].bigfile = true
+      vim.opt_local.foldmethod = "manual"
+      vim.opt_local.spell = false
+      vim.opt_local.swapfile = false
+      vim.opt_local.undofile = false
+      vim.cmd("syntax clear")
+      pcall(vim.treesitter.stop, ev.buf)
     end
   end,
 })

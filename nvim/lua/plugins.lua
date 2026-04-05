@@ -7,7 +7,7 @@ vim.pack.add({
   -- Shared dependencies
   gh .. "nvim-lua/plenary.nvim",
   gh .. "MunifTanjim/nui.nvim",
-  gh .. "nvim-tree/nvim-web-devicons",
+  gh .. "echasnovski/mini.icons",
 
   -- Theme
   gh .. "catppuccin/nvim",
@@ -16,23 +16,30 @@ vim.pack.add({
   gh .. "nvim-treesitter/nvim-treesitter",
   gh .. "HiPhish/rainbow-delimiters.nvim",
   gh .. "lukas-reineke/indent-blankline.nvim",
+  gh .. "folke/ts-comments.nvim",
 
-  -- LSP and completion
+  -- LSP, completion, formatting
   gh .. "neovim/nvim-lspconfig",
   { src = gh .. "saghen/blink.cmp", version = vim.version.range("1.x") },
+  gh .. "rafamadriz/friendly-snippets",
+  gh .. "stevearc/conform.nvim",
+  gh .. "b0o/SchemaStore.nvim",
 
   -- Navigation
   gh .. "nvim-neo-tree/neo-tree.nvim",
   gh .. "ibhagwan/fzf-lua",
+  gh .. "folke/flash.nvim",
 
   -- UI
   gh .. "nvim-lualine/lualine.nvim",
   gh .. "rcarriga/nvim-notify",
   gh .. "folke/noice.nvim",
+  gh .. "folke/which-key.nvim",
+  gh .. "folke/trouble.nvim",
 
   -- Editing
-  gh .. "numToStr/Comment.nvim",
   gh .. "karb94/neoscroll.nvim",
+  gh .. "MagicDuck/grug-far.nvim",
 
   -- Git
   gh .. "lewis6991/gitsigns.nvim",

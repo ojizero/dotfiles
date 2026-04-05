@@ -3,10 +3,10 @@
 -- nvim-treesitter plugin handles parser installation only
 
 require("nvim-treesitter").install({
-  "bash", "c", "cpp", "css", "dockerfile", "elixir", "erlang",
+  "bash", "c", "cpp", "css", "diff", "dockerfile", "elixir", "erlang",
   "go", "html", "javascript", "json", "lua", "markdown",
-  "markdown_inline", "python", "rust", "sql", "toml", "tsx",
-  "typescript", "yaml",
+  "markdown_inline", "python", "regex", "rust", "sql", "toml", "tsx",
+  "typescript", "vim", "vimdoc", "xml", "yaml",
 })
 
 -- Auto-enable treesitter highlighting for any filetype with an installed parser

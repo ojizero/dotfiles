@@ -4,19 +4,53 @@
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+-- Notify LSP when neo-tree renames/moves files (updates imports)
+local function on_file_rename(args)
+  local changes = {
+    files = {
+      {
+        oldUri = vim.uri_from_fname(args.source),
+        newUri = vim.uri_from_fname(args.destination),
+      },
+    },
+  }
+  for _, client in ipairs(vim.lsp.get_clients()) do
+    if client:supports_method("workspace/willRenameFiles") then
+      local resp = client:request_sync("workspace/willRenameFiles", changes, 1000, 0)
+      if resp and resp.result then
+        vim.lsp.util.apply_workspace_edit(resp.result, client.offset_encoding)
+      end
+    end
+    if client:supports_method("workspace/didRenameFiles") then
+      client:notify("workspace/didRenameFiles", changes)
+    end
+  end
+end
+
+local events = require("neo-tree.events")
+
 require("neo-tree").setup({
   close_if_last_window = true,
   popup_border_style = "rounded",
+  open_files_do_not_replace_types = { "terminal", "Trouble", "qf" },
+  event_handlers = {
+    { event = events.FILE_RENAMED, handler = on_file_rename },
+    { event = events.FILE_MOVED, handler = on_file_rename },
+  },
   window = {
     position = "left",
     width = 30,
     mappings = {
       ["b"] = "noop", -- free <leader>b for global toggle
+      ["<space>"] = "none",
+      ["l"] = "open",
+      ["h"] = "close_node",
     },
   },
   filesystem = {
     follow_current_file = { enabled = true },
     use_libuv_file_watcher = true,
+    bind_to_cwd = false,
     filtered_items = {
       hide_dotfiles = false,
       hide_gitignored = true,
