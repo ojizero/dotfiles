@@ -75,13 +75,6 @@ function glow {
   command glow -s "${style}" "${args[@]}"
 }
 
-alias -s md='glow'
-
-alias -s json='fx'
-alias -s yml='fx'
-alias -s yaml='fx'
-alias -s toml='fx'
-
 alias cc='claude --dangerously-skip-permissions'
 
 alias v='nvim'
