@@ -126,3 +126,7 @@ bindkey '\C-x\C-e' edit-command-line
 
 # file rename magick
 bindkey "^[m" copy-prev-shell-word
+
+# [Shift-Enter] / [Ctrl-Enter] - accept line (Ghostty fixterms encoding: CSI 27;<mod>;13~)
+bindkey '\x1b[27;2;13~' accept-line
+bindkey '\x1b[27;5;13~' accept-line
