@@ -1,4 +1,5 @@
 [tools]
+
 bun = "1.3.11"
 erlang = "28"
 elixir = "1.19.5-otp-28"
@@ -11,6 +12,7 @@ elixir-ls = "latest"
 "github:WhatsApp/erlang-language-platform" = "latest"
 
 [env]
+
 MISE_ENV_FILE=".env"
 ERL_AFLAGS = "-kernel shell_history enabled"
 
