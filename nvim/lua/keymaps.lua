@@ -150,6 +150,21 @@ end, { desc = "Close panels/floats or clear search" })
 -- Better escape from terminal mode
 map("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
+-- Zen mode
+map("n", "<leader>z", function() Snacks.zen() end, { desc = "Toggle zen mode" })
+
+-- Copy file path
+map("n", "<leader>cp", function()
+  local path = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.")
+  vim.fn.setreg("+", path)
+  Snacks.notify(path, { title = "Copied relative path" })
+end, { desc = "Copy relative path" })
+map("n", "<leader>cP", function()
+  local path = vim.api.nvim_buf_get_name(0)
+  vim.fn.setreg("+", path)
+  Snacks.notify(path, { title = "Copied absolute path" })
+end, { desc = "Copy absolute path" })
+
 -- Git browse (open file on GitHub)
 map("n", "<leader>go", function() Snacks.gitbrowse() end, { desc = "Open in browser" })
 

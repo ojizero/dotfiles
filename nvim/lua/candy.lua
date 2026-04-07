@@ -11,6 +11,7 @@ require("snacks").setup({
   words      = { enabled = true },
   input      = { enabled = true },
   rename     = { enabled = true },
+  zen        = { enabled = true },
   picker     = { enabled = true, ui_select = true },
   explorer   = { enabled = true, replace_netrw = true },
   dashboard  = {
