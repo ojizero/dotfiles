@@ -33,6 +33,7 @@ vim.pack.add({
   gh .. "folke/noice.nvim",
   gh .. "folke/which-key.nvim",
   gh .. "folke/trouble.nvim",
+  gh .. "romgrk/barbar.nvim",
 
   -- Editing
   gh .. "MagicDuck/grug-far.nvim",

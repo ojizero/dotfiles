@@ -49,11 +49,13 @@ map("n", "<leader>m", function() Snacks.picker.marks() end, { desc = "Search mar
 -- File explorer
 map("n", "<leader>b", function() Snacks.explorer() end, { desc = "Toggle file explorer" })
 
--- Buffer navigation
-map("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Previous buffer" })
-map("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next buffer" })
-map("n", "<leader>w", function() Snacks.bufdelete() end, { desc = "Close buffer" })
-map("n", "<leader>bd", function() Snacks.bufdelete() end, { desc = "Delete buffer" })
+-- Buffer navigation (barbar)
+map("n", "<S-h>", "<cmd>BufferPrevious<cr>", { desc = "Previous buffer" })
+map("n", "<S-l>", "<cmd>BufferNext<cr>", { desc = "Next buffer" })
+map("n", "<leader>w", "<cmd>BufferClose<cr>", { desc = "Close buffer" })
+map("n", "<leader>bd", "<cmd>BufferClose<cr>", { desc = "Delete buffer" })
+map("n", "<leader>bp", "<cmd>BufferPick<cr>", { desc = "Pick buffer" })
+map("n", "<leader>t", "<cmd>$tabnew<cr>", { desc = "New tab" })
 
 -- Git log (current file)
 map("n", "<leader>gl", function() Snacks.picker.git_log_file() end, { desc = "Git log (file)" })

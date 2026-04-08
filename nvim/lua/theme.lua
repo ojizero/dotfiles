@@ -17,6 +17,7 @@ require("catppuccin").setup({
     }
   end,
   integrations = {
+    barbar = true,
     blink_cmp = { enabled = true, style = "bordered" },
     gitsigns = true,
     noice = true,
