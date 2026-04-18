@@ -6,6 +6,7 @@ elixir = "1.19.5-otp-28"
 
 # Langauge servers
 elixir-ls = "latest"
+lua-language-server = "latest"
 "npm:bash-language-server" = "latest"
 "npm:yaml-language-server" = "latest"
 "npm:vscode-langservers-extracted" = "latest"
@@ -15,6 +16,10 @@ elixir-ls = "latest"
 
 MISE_ENV_FILE=".env"
 ERL_AFLAGS = "-kernel shell_history enabled"
+
+# Disable OMO's Posthog integration
+OMO_DISABLE_POSTHOG=1
+OMO_SEND_ANONYMOUS_TELEMETRY=0
 
 [settings]
 
