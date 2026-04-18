@@ -71,8 +71,34 @@ function glow {
     esac
   done
 
-  (( tui )) && args=(--tui --line-numbers "${args[@]}")
-  command glow -s "${style}" "${args[@]}"
+  if (( tui )); then
+    # Workaround: glow --tui ignores -w; pipe via cat to fix terminal width
+    local flags=() sources=() i=1
+    while (( i <= ${#args[@]} )); do
+      case "${args[$i]}" in
+        --width=*|--style=*|--config=*)
+          flags+=("${args[$i]}") ;;
+        -[ws]|--width|--style|--config)
+          flags+=("${args[$i]}" "${args[$((i+1))]}")
+          (( i++ )) ;;
+        --)
+          sources+=("${args[$((i+1)),-1]}")
+          break ;;
+        -?*)
+          flags+=("${args[$i]}") ;;
+        *)
+          sources+=("${args[$i]}") ;;
+      esac
+      (( i++ ))
+    done
+    if [[ ${#sources[@]} -gt 0 ]]; then
+      cat "${sources[@]}" | command glow -s "${style}" --tui --line-numbers -w $(( $(tput cols) - 4 )) "${flags[@]}"
+    else
+      command glow -s "${style}" --tui --line-numbers -w $(( $(tput cols) - 4 )) "${flags[@]}"
+    fi
+  else
+    command glow -s "${style}" "${args[@]}"
+  fi
 }
 
 # Reset terminal state after Claude Code exits — it can leave bracketed paste,
