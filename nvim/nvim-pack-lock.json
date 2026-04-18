@@ -16,6 +16,10 @@
       "rev": "8c84af0f09e5d9058362ac58401a8e7b047d826e",
       "src": "ssh://git@github.com/yetone/avante.nvim"
     },
+    "barbar.nvim": {
+      "rev": "539d73def39c9172b4d4d769f14090e08f37b29d",
+      "src": "ssh://git@github.com/romgrk/barbar.nvim"
+    },
     "blink.cmp": {
       "rev": "451168851e8e2466bc97ee3e026c3dcb9141ce07",
       "src": "ssh://git@github.com/saghen/blink.cmp",
