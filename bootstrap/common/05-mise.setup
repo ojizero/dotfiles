@@ -26,6 +26,12 @@ fi
 rm -fr "${home_mise_local}"
 ln -s "${cfg_mise_local}" "${home_mise_local}"
 
+# Symlink global mise tasks
+cfg_mise_tasks="${DOTFILES_PATH}/.mise/tasks"
+home_mise_tasks="${home_mise_dir}/tasks"
+rm -fr "${home_mise_tasks}"
+ln -s "${cfg_mise_tasks}" "${home_mise_tasks}"
+
 # Trust the config files (mise requires explicit trust for files with env vars/templates)
 mise trust "${cfg_mise}"
 mise trust "${cfg_mise_local}"

@@ -13,7 +13,7 @@ Brewfile                   # Homebrew packages
 omp.toml                   # Oh-My-Posh prompt config
 omz/auto/*.zsh             # Auto-loaded shell modules (aliases, completions, history, keybindings, misc)
 omz/completions/           # Custom completions
-m/                         # Custom CLI tool - dispatches to m/commands/*
+.mise/tasks/               # Global mise tasks (symlinked to ~/.config/mise/tasks)
 bootstrap/common/          # Cross-platform setup scripts (numbered, sourced in order)
 bootstrap/macos/           # macOS-specific setup scripts
 .local/                    # Git-ignored local overrides (.gitconfig, .zprofile, Brewfile, bin/)
@@ -36,6 +36,7 @@ Managed symlinks:
 - `~/.zprofile` -> `.zprofile`
 - `~/.gitconfig` -> `.gitconfig`
 - `~/.config/mise/config.toml` -> `mise.toml`
+- `~/.config/mise/tasks` -> `.mise/tasks`
 - `~/.local` -> `.local`
 - `~/.brew-aliases` -> `.brew-aliases`
 - `~/.Brewfile` -> `Brewfile`
@@ -45,7 +46,7 @@ Managed symlinks:
 `.local/` is git-ignored. It provides per-machine customization:
 - `.local/.gitconfig` — included via `[include]` in `.gitconfig`
 - `.local/.zprofile` — sourced in `.zprofile` if it exists
-- `.local/Brewfile` — concatenated with main `Brewfile` during `m dotfiles bundle`
+- `.local/Brewfile` — concatenated with main `Brewfile` during `mise run dotfiles:bundle`
 - `.local/bin/` — added to `$PATH`
 
 ### Bootstrap Scripts
@@ -56,8 +57,8 @@ Managed symlinks:
 - All scripts must be idempotent and use `#!/usr/bin/env zsh`
 - Variable convention: `cfg_*` for repo path, `home_*` for home path
 
-### The `m` CLI
-Located at `m/m`. Dispatches to scripts in `m/commands/`. Commands follow a `case/esac` pattern with a `usage` function and `help` subcommand. Has alias support via `convert-alias`.
+### Mise Tasks (the `m` alias)
+Global mise tasks live in `.mise/tasks/` (symlinked to `~/.config/mise/tasks`). Tasks are organized as directory-namespaced file scripts (e.g. `.mise/tasks/dns/flush` becomes `mise run dns:flush`). The shell alias `m='mise run'` provides shorthand: `m dns:flush`, `m update:brew`, etc. Each task is a standalone zsh script with `#MISE` frontmatter for description and options.
 
 ### Shell Auto-Loading
 Files in `omz/auto/*.zsh` are sourced via `cat` glob in `.zshrc`. Adding a file there makes it auto-loaded.

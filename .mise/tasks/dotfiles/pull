@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+#MISE description="Pull latest dotfiles changes"
+
+git -C "${DOTFILES_PATH}" pull -p

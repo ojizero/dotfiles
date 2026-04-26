@@ -1,0 +1,12 @@
+#!/usr/bin/env zsh
+#MISE description="Install all available macOS updates"
+#MISE raw=true
+
+if [[ ! -z "$1" ]] && [[ "$1" = '--with-brew' ]]; then
+  brew update && brew upgrade && brew upgrade --casks
+elif [[ ! -z "$1" ]]; then
+  echo "Unknown option: ${1}" >&2
+  exit 1
+fi
+
+sudo softwareupdate --install --all

@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+#MISE description="Update and upgrade all Homebrew packages"
+
+brew update && brew upgrade && brew upgrade --casks

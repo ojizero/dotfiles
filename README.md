@@ -16,7 +16,7 @@ that should, if run, pull this repo and set everything up.
 ### Manually
 
 1. Pull the repo somewhere.
-1. Run `./m/m setup`.
+1. Run the bootstrap setup scripts (see `bootstrap/install.sh`).
 
 ## Usage
 

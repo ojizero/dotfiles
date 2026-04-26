@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+#MISE description="List available macOS updates"
+#MISE raw=true
+
+sudo softwareupdate --list

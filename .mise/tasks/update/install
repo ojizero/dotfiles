@@ -1,0 +1,10 @@
+#!/usr/bin/env zsh
+#MISE description="Install specific macOS updates"
+#MISE raw=true
+
+if [[ -z "$1" ]]; then
+  echo "usage: m update:install <update-name> [...]" >&2
+  exit 1
+fi
+
+sudo softwareupdate --install "$@"

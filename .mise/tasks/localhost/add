@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+#MISE description="Add a host to /etc/hosts"
+#MISE raw=true
+
+if [[ -z "$1" ]] || [[ -z "$2" ]]; then
+  echo "usage: m localhost:add <IP> <hostname>" >&2
+  exit 1
+fi
+
+sudo echo "$1   $2" | sudo /usr/bin/tee -a /etc/hosts
+
+# Flush DNS after modifying hosts
+VERSION=$(sw_vers -productVersion)
+echo "Flushing dns..."
+if echo $VERSION | grep -E '^10\.10(\.[0-3])?$' >/dev/null 2>&1; then
+  sudo discoveryutil mdnsflushcache
+elif echo $VERSION | grep -E '^10\.6(\.[0-8])?$' >/dev/null 2>&1; then
+  sudo dscacheutil -flushcache
+else
+  sudo killall -HUP mDNSResponder
+fi

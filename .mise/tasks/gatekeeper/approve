@@ -1,0 +1,10 @@
+#!/usr/bin/env zsh
+#MISE description="Whitelist an app with Gatekeeper"
+#MISE raw=true
+
+if [[ -z "$1" ]]; then
+  echo "usage: m gatekeeper:approve <path to app>" >&2
+  exit 1
+fi
+
+spctl --add "${1}"

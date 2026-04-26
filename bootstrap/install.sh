@@ -31,8 +31,19 @@ mkdir -p "${DOTFILES_CLONE_PATH}"
 cd "${DOTFILES_CLONE_PATH}"
 git clone git@github.com:ojizero/dotfiles.git
 
-# Run the setup script
+# Run the setup scripts
 #
 export DOTFILES_PATH="${DOTFILES_CLONE_PATH}/dotfiles"
 cd "${DOTFILES_PATH}"
-./m/m dotfiles setup
+
+for setup in ${DOTFILES_PATH}/bootstrap/common/*.setup; do
+  source $setup
+done
+
+case "${OSTYPE}" in
+  darwin*)
+    for setup in ${DOTFILES_PATH}/bootstrap/macos/*.setup; do
+      source $setup
+    done
+    ;;
+esac

@@ -1,0 +1,6 @@
+#!/usr/bin/env zsh
+#MISE description="List current /etc/hosts entries"
+#MISE raw=true
+
+spacing="            "
+sudo echo "IP $spacing DOMAIN" && cat /etc/hosts | grep -v "#" | grep -v "^$"

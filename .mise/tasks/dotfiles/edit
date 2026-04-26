@@ -1,0 +1,15 @@
+#!/usr/bin/env zsh
+#MISE description="Open dotfiles repo in an editor"
+
+editor="${EDITOR-vim}"
+if [[ ! -z "$1" ]] && [[ "$1" = '--with' ]] && [[ ! -z "$2" ]]; then
+  editor="${2}"
+elif [[ ! -z "$1" ]] && [[ "$1" = '--with' ]] && [[ -z "$2" ]]; then
+  echo "Missing editor to be passed with --with" >&2
+  exit 1
+elif [[ ! -z "$1" ]]; then
+  echo "Unknown option: ${1}" >&2
+  exit 1
+fi
+
+$editor "${DOTFILES_PATH}"

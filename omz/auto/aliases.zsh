@@ -109,6 +109,8 @@ function claude {
 }
 alias cc='claude --dangerously-skip-permissions'
 
+alias m='mise run'
+
 alias v='nvim'
 alias nv='nvim'
 alias vm='nvim'

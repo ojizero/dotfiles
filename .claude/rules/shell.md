@@ -1,7 +1,7 @@
 ---
 paths:
   - "omz/**/*.zsh"
-  - "m/**"
+  - ".mise/tasks/**"
   - ".zshrc"
   - ".zprofile"
 ---
@@ -13,6 +13,6 @@ Shell script conventions:
 - File suffix aliases use the `alias -s ext='cmd'` pattern
 - Functions: use `function name {` or `name() {` consistently with surrounding code
 - Environment exports: `export VAR="value"` with double quotes
-- The `m` CLI commands use `case/esac` dispatch with a `usage` function and `help` subcommand
+- Mise tasks are standalone zsh scripts in `.mise/tasks/` with `#MISE` frontmatter comments
 - Files in `omz/auto/` are auto-loaded via cat glob in `.zshrc`
 - Module placement: aliases in `aliases.zsh`, env vars in `misc.zsh`, completions in `completions.zsh`

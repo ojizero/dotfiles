@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+#MISE description="Remove a host from /etc/hosts"
+#MISE raw=true
+
+if [[ -z "$1" ]]; then
+  echo "usage: m localhost:remove <hostname>" >&2
+  exit 1
+fi
+
+sudo /usr/bin/sed -i '' "/$1/d" /etc/hosts
+
+# Flush DNS after modifying hosts
+VERSION=$(sw_vers -productVersion)
+echo "Flushing dns..."
+if echo $VERSION | grep -E '^10\.10(\.[0-3])?$' >/dev/null 2>&1; then
+  sudo discoveryutil mdnsflushcache
+elif echo $VERSION | grep -E '^10\.6(\.[0-8])?$' >/dev/null 2>&1; then
+  sudo dscacheutil -flushcache
+else
+  sudo killall -HUP mDNSResponder
+fi

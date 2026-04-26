@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+#MISE description="List DNS servers"
+
+echo "List of the DNS servers:"
+cat /etc/resolv.conf | grep nameserver | cut -b 11-

@@ -1,0 +1,13 @@
+#!/usr/bin/env zsh
+#MISE description="Flush local DNS cache"
+#MISE raw=true
+
+VERSION=$(sw_vers -productVersion)
+echo "Flushing dns..."
+if echo $VERSION | grep -E '^10\.10(\.[0-3])?$' >/dev/null 2>&1; then
+  sudo discoveryutil mdnsflushcache
+elif echo $VERSION | grep -E '^10\.6(\.[0-8])?$' >/dev/null 2>&1; then
+  sudo dscacheutil -flushcache
+else
+  sudo killall -HUP mDNSResponder
+fi
