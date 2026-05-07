@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+
+cfg_worktrunk="${DOTFILES_PATH}/worktrunk"
+home_worktrunk="${HOME}/.config/worktrunk"
+
+rm -fr "${home_worktrunk}"
+ln -s "${cfg_worktrunk}" "${home_worktrunk}"

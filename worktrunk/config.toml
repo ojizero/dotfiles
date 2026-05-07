@@ -1,0 +1,10 @@
+skip-shell-integration-prompt = true
+skip-commit-generation-prompt = true
+
+[merge]
+squash = false
+
+[pre-start]
+mise-trust = "if mise trust --show -C {{ primary_worktree_path }} 2>/dev/null | grep -q ': trusted'; then mise trust -C {{ worktree_path }}; fi"
+
+[projects]

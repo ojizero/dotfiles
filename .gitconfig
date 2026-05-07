@@ -1,6 +1,5 @@
 [alias]
 	s = status --short --branch
-	ss = status
 
 	a = add
 	ac = add .
@@ -23,13 +22,6 @@
 	pso = push --set-upstream origin HEAD
 	psu = "!gpsu() { upstream=${1-upstream}; \\git push --set-upstream $upstream HEAD; }; gpsu"
 
-	st = stash
-	sp = stash push
-	sa = stash pop
-	sl = stash list
-
-	b = branch
-
 	d = diff
 	dn = !git --no-pager diff --name-only
 	ds = diff --cached
@@ -43,7 +35,6 @@
 
 	ri = rebase -i
 	re = rebase
-	remaster = rebase master
 
 	ini = init
 

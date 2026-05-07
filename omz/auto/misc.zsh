@@ -28,3 +28,5 @@ setopt interactivecomments  # recognize comments
 # Set to nothing to make it make more sense + be more in line with how i'm used
 # to it coming from OhMyzsh.
 export WORDCHARS=''
+
+if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
