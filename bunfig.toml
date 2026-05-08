@@ -5,7 +5,9 @@
 # Delay resolution to versions published at least 7 days ago
 # Mitigates supply chain attacks from compromised recent publishes
 minimumReleaseAge = 604800
-minimumReleaseAgeExcludes = ["@agentclientprotocol/claude-agent-acp", "@agentclientprotocol/sdk", "@anthropic-ai/claude-agent-sdk"]
+minimumReleaseAgeExcludes = ["@agentclientprotocol/claude-agent-acp", "@agentclientprotocol/sdk",
+"@anthropic-ai/claude-agent-sdk", "playwright", "playwright-core", "@playwright/cli",
+"@zed-industries/codex-acp", "@zed-industries/codex-acp-darwin-arm64"]
 
 # NOTE: Bun blocks lifecycle scripts by default. Its built-in trusted list
 # (~367 packages) cannot be disabled globally via bunfig.toml.

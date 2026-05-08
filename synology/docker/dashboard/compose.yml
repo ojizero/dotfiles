@@ -1,0 +1,34 @@
+---
+services:
+  liminal:
+    container_name: liminal
+    image: ghcr.io/ojizero/liminal:1.0.7
+    restart: unless-stopped
+    environment:
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      DATABASE_PATH: /data/liminal.db
+      PHX_HOST: ${PHX_HOST:-lmnl.ojizero.dev}
+      PORT: "4000"
+      POOL_SIZE: ${POOL_SIZE:-5}
+      SIGNUPS_ENABLED: ${SIGNUPS_ENABLED:-false}
+      LOG_LEVEL: ${LOG_LEVEL:-warning}
+      AUTO_MIGRATE: ${AUTO_MIGRATE:-true}
+      PUID: ${PUID:-911}
+      PGID: ${PGID:-911}
+    volumes:
+      - ./data:/data
+    expose:
+      - "4000"
+    networks:
+      - servicenet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.liminal.entrypoints=web-secure
+      - traefik.http.routers.liminal.rule=Host(`lmnl.tn.ojizero.dev`) || Host(`lmnl.ojizero.dev`)
+      - traefik.http.routers.liminal.service=liminal
+      - traefik.http.services.liminal.loadbalancer.server.port=4000
+
+networks:
+  servicenet:
+    name: servicenet
+    external: true
