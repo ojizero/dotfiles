@@ -2,7 +2,7 @@
 services:
   invidious:
     container_name: invidious
-    image: quay.io/invidious/invidious:2026.03.10-749791c
+    image: quay.io/invidious/invidious:2026.05.21-99390d0
     restart: unless-stopped
     environment:
       INVIDIOUS_CONFIG: |
@@ -48,7 +48,7 @@ services:
 
   invidious-companion:
     container_name: invidious-companion
-    image: quay.io/invidious/invidious-companion:master-acb9294
+    image: quay.io/invidious/invidious-companion:master-d5504eb
     restart: unless-stopped
     environment:
       - SERVER_SECRET_KEY=${INVIDIOUS_COMPANION_KEY}
@@ -70,7 +70,7 @@ services:
 
   invidious-db:
     container_name: invidious-db
-    image: postgres:18.3
+    image: postgres:18.4
     restart: unless-stopped
     environment:
       POSTGRES_DB: invidious
