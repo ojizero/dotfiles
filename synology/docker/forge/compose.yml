@@ -1,0 +1,110 @@
+---
+services:
+  postgres:
+    container_name: forgejo-postgres
+    image: postgres:18.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: forgejo
+      POSTGRES_USER: ${FORGEJO_DB_USER}
+      POSTGRES_PASSWORD: ${FORGEJO_DB_PASSWORD}
+    volumes:
+      - ./configs/postgres:/var/lib/postgresql
+    networks:
+      - forgejo-db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+
+  forgejo:
+    container_name: forgejo
+    image: codeberg.org/forgejo/forgejo:15.0.2
+    restart: unless-stopped
+    environment:
+      USER_UID: ${PUID:-1000}
+      USER_GID: ${PGID:-1000}
+      FORGEJO__database__DB_TYPE: postgres
+      FORGEJO__database__HOST: postgres:5432
+      FORGEJO__database__NAME: forgejo
+      FORGEJO__database__USER: ${FORGEJO_DB_USER}
+      FORGEJO__database__PASSWD: ${FORGEJO_DB_PASSWORD}
+      FORGEJO__server__DOMAIN: forge.ojizero.dev
+      FORGEJO__server__ROOT_URL: https://forge.ojizero.dev/
+      FORGEJO__server__HTTP_PORT: 3000
+      FORGEJO__server__PROTOCOL: http
+      FORGEJO__server__SSH_DOMAIN: forge.ojizero.dev
+      FORGEJO__server__SSH_PORT: 22
+      FORGEJO__server__START_SSH_SERVER: "false"
+      FORGEJO__service__DISABLE_REGISTRATION: "true"
+      FORGEJO__service__REQUIRE_SIGNIN_VIEW: "true"
+      FORGEJO__security__GLOBAL_TWO_FACTOR_REQUIREMENT: admin
+      FORGEJO__security__DISABLE_QUERY_AUTH_TOKEN: "true"
+      FORGEJO__security__REVERSE_PROXY_TRUSTED_PROXIES: ${FORGEJO_REVERSE_PROXY_TRUSTED_PROXIES}
+      FORGEJO__api__ENABLE_SWAGGER: "false"
+      FORGEJO__security__SECRET_KEY: ${FORGEJO_SECRET_KEY}
+      # Don't set this on first install otherwise it would break the setup, once installation
+      # is done, set it to true to disable the installation page fully.
+      # FORGEJO__security__INSTALL_LOCK: ${FORGEJO_INSTALL_LOCK}
+    volumes:
+      - ${FORGEJO_DATA_PATH:-./configs/forgejo/data}:/data
+      - /etc/localtime:/etc/localtime:ro
+    expose:
+      - "3000"
+    networks:
+      - servicenet
+      - forgejo-db
+      - forgejo-actions
+    depends_on:
+      postgres:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.forgejo.entrypoints=web-secure
+      - traefik.http.routers.forgejo.rule=Host(`forge.tn.ojizero.dev`) || Host(`forge.ojizero.dev`)
+      - traefik.http.routers.forgejo.service=forgejo
+      - traefik.http.services.forgejo.loadbalancer.server.port=3000
+
+  # Forgejo Actions (runner + DIND) — disabled for now. Re-enable once the
+  # runner config.yml has been generated, labels set, and a runner registered
+  # in the Forgejo UI (see config.yml.sample). The `forgejo-actions` network
+  # and forgejo's membership in it are left in place so uncommenting these
+  # two services is the only change needed to bring actions back online.
+  # docker-dind:
+  #   container_name: forgejo-dind
+  #   image: docker:29.5.2-dind
+  #   restart: unless-stopped
+  #   privileged: true
+  #   command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
+  #   networks:
+  #     - forgejo-actions
+  #
+  # forgejo-runner:
+  #   container_name: forgejo-runner
+  #   image: code.forgejo.org/forgejo/runner:12.10.1
+  #   restart: unless-stopped
+  #   user: ${PUID:-1000}:${PGID:-1000}
+  #   environment:
+  #     DOCKER_HOST: tcp://docker-dind:2375
+  #   volumes:
+  #     - ${FORGEJO_RUNNER_DATA_PATH:-./configs/runner/data}:/data
+  #   networks:
+  #     - forgejo-actions
+  #   depends_on:
+  #     docker-dind:
+  #       condition: service_started
+  #   command: forgejo-runner daemon --config /data/config.yml
+
+networks:
+  servicenet:
+    name: servicenet
+    external: true
+
+  forgejo-db:
+    name: forgejo-db
+    driver: bridge
+    internal: true
+
+  forgejo-actions:
+    name: forgejo-actions
+    driver: bridge
