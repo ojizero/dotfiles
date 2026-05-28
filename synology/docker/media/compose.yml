@@ -12,7 +12,7 @@ x-environment: &environment
 services:
   jellyfin:
     container_name: jellyfin
-    image: linuxserver/jellyfin:10.11.6ubu2404-ls23
+    image: linuxserver/jellyfin:10.11.10ubu2404-ls34
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -52,7 +52,7 @@ services:
 
   sonarr:
     container_name: sonarr
-    image: linuxserver/sonarr:4.0.16.2944-ls304
+    image: linuxserver/sonarr:4.0.17.2952-ls312
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -71,7 +71,7 @@ services:
 
   radarr:
     container_name: radarr
-    image: linuxserver/radarr:6.0.4.10291-ls295
+    image: linuxserver/radarr:6.1.1.10360-ls303
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -90,7 +90,7 @@ services:
 
   lidarr:
     container_name: lidarr
-    image: linuxserver/lidarr:3.1.0.4875-ls22
+    image: linuxserver/lidarr:3.1.0.4875-ls29
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -109,7 +109,7 @@ services:
 
   bazarr:
     container_name: bazarr
-    image: linuxserver/bazarr:v1.5.6-ls341
+    image: linuxserver/bazarr:v1.5.6-ls349
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -131,7 +131,7 @@ services:
 
   prowlarr:
     container_name: prowlarr
-    image: linuxserver/prowlarr:2.3.0.5236-ls139
+    image: linuxserver/prowlarr:2.3.5.5327-ls147
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -150,7 +150,7 @@ services:
 
   transmission:
     container_name: transmission
-    image: linuxserver/transmission:4.1.1-r1-ls334
+    image: linuxserver/transmission:4.1.1-r1-ls345
     restart: unless-stopped
     environment:
       <<: *environment
@@ -175,7 +175,7 @@ services:
 
   cleanuparr:
     container_name: cleanuparr
-    image: ghcr.io/cleanuparr/cleanuparr:2.8.1
+    image: ghcr.io/cleanuparr/cleanuparr:2.9.13
     restart: unless-stopped
     environment: *environment
     volumes:
@@ -196,7 +196,7 @@ services:
   # Proxy between us an Indexers to solve Cloudflare challenges
   flaresolverr:
     container_name: flaresolverr
-    image: flaresolverr/flaresolverr:v3.4.6
+    image: flaresolverr/flaresolverr:v3.5.0
     restart: unless-stopped
     environment: *environment
     expose:
