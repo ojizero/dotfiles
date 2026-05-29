@@ -6,73 +6,73 @@
 // To see the default key bindings run `zed: open default keymap`
 // from the command palette.
 [
-  {
-    "context": "Workspace",
-    "bindings": {
-      "cmd-e": "outline::Toggle",
-      // Disable default keybindings that open keymap.json
-      "cmd-k cmd-s": null,
-    },
-  },
-  {
-    "context": "Editor && mode == full",
-    "use_key_equivalents": true,
-    "bindings": {
-      "cmd-g": "go_to_line::Toggle",
-      "cmd-e": "outline::Toggle",
-      // Move inline assist to use CMD+> (CMD+SHIFT+.) and disable CTRL+ENTER for it
-      "cmd->": "assistant::InlineAssist",
-      "ctrl-enter": null,
-    },
-  },
-  {
-    "context": "Terminal",
-    "bindings": {
-      "cmd-e": "outline::Toggle",
-      // Move inline assist to use CMD+> (CMD+SHIFT+.) and disable CTRL+ENTER for it
-      "cmd->": "assistant::InlineAssist",
-      "ctrl-enter": null,
-    },
-  },
-  {
-    "bindings": {
-      "cmd-k cmd-u": "editor::ConvertToUpperCase",
-    },
-  },
-  {
-    "bindings": {
-      "cmd-k cmd-p": "editor::ConvertToUpperCamelCase",
-    },
-  },
-  {
-    "bindings": {
-      "cmd-k cmd-l": "editor::ConvertToLowerCase",
-    },
-  },
-  {
-    "bindings": {
-      "cmd-k cmd-c": "editor::ConvertToLowerCamelCase",
-    },
-  },
-  {
-    "context": "Terminal",
-    "bindings": {
-      "cmd-k cmd-k": "terminal::Clear",
-    },
-  },
-
-  {
-    "context": "Pane",
-    "use_key_equivalents": true,
-    "bindings": {
-      "cmd-e": "outline::Toggle",
-    },
-  },
-  {
-    "context": "KeymapEditor",
-    "use_key_equivalents": true,
-    "bindings": {
-      "cmd-e": null,
-    },
-  },
+  //{
+  //"context": "Workspace",
+  //"bindings": {
+  //"cmd-e": "outline::Toggle",
+  //// Disable default keybindings that open keymap.json
+  //"cmd-k cmd-s": null,
+  //},
+  //},
+  //{
+  //"context": "Editor && mode == full",
+  //"use_key_equivalents": true,
+  //"bindings": {
+  //"cmd-g": "go_to_line::Toggle",
+  //"cmd-e": "outline::Toggle",
+  //// Move inline assist to use CMD+> (CMD+SHIFT+.) and disable CTRL+ENTER for it
+  //"cmd->": "assistant::InlineAssist",
+  //"ctrl-enter": null,
+  //},
+  //},
+  //{
+  //"context": "Terminal",
+  //"bindings": {
+  //"cmd-e": "outline::Toggle",
+  //// Move inline assist to use CMD+> (CMD+SHIFT+.) and disable CTRL+ENTER for it
+  //"cmd->": "assistant::InlineAssist",
+  //"ctrl-enter": null,
+  //},
+  //},
+  //{
+  //"bindings": {
+  //"cmd-k cmd-u": "editor::ConvertToUpperCase",
+  //},
+  //},
+  //{
+  //"bindings": {
+  //"cmd-k cmd-p": "editor::ConvertToUpperCamelCase",
+  //},
+  //},
+  //{
+  //"bindings": {
+  //"cmd-k cmd-l": "editor::ConvertToLowerCase",
+  //},
+  //},
+  //{
+  //"bindings": {
+  //"cmd-k cmd-c": "editor::ConvertToLowerCamelCase",
+  //},
+  //},
+  //{
+  //"context": "Terminal",
+  //"bindings": {
+  //"cmd-k cmd-k": "terminal::Clear",
+  //},
+  //},
+  //
+  //{
+  //"context": "Pane",
+  //"use_key_equivalents": true,
+  //"bindings": {
+  //"cmd-e": "outline::Toggle",
+  //},
+  //},
+  //{
+  //"context": "KeymapEditor",
+  //"use_key_equivalents": true,
+  //"bindings": {
+  //"cmd-e": null,
+  //},
+  //},
 ]

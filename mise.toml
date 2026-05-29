@@ -12,6 +12,10 @@ lua-language-server = "latest"
 "npm:vscode-langservers-extracted" = "latest"
 "github:WhatsApp/erlang-language-platform" = "latest"
 
+# Required to get NPM based tools to be installable even if the tools
+# aren't reliant on Node. Main JS runtime is not Node is still Bun.
+node = "lts"
+
 [env]
 
 MISE_ENV_FILE=".env"
