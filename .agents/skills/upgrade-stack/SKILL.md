@@ -94,3 +94,4 @@ Do not push.
 - For databases, stay within the current major line (for example `postgres 18.x` stays in `18.x`)
 - Never create or modify `.env` files
 - If new variables are required, update `.env.sample`
+- **Archive stack — verify Meilisearch compatibility first:** when upgrading `synology/docker/archive`, check the current Karakeep documentation before changing `getmeili/meilisearch`. Keep it pinned to the Karakeep-recommended version for your deployed Karakeep release, and if a bump requires data migration (for example wiping `data.ms` and full bookmark reindex), report that clearly before applying it. See [Karakeep Meilisearch upgrade guide](https://docs.karakeep.app/administration/troubleshooting#upgrading-meilisearch---migrating-the-meilisearch-db-version).

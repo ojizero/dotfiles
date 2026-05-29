@@ -36,7 +36,7 @@ services:
 
   karakeep-chrome:
     container_name: karakeep-chrome
-    image: ghcr.io/browserless/chromium:v2.49.0
+    image: ghcr.io/browserless/chromium:v2.50.0
     restart: unless-stopped
     environment:
       - CONCURRENT=5
@@ -48,10 +48,12 @@ services:
     networks:
       - archive-sphere
 
-  # Meilisearch is too unstable release to release, careful with upgrades
+  # PINNED: keep getmeili/meilisearch at v1.41.0 - do NOT bump when upgrading this stack.
+  # Karakeep targets this exact version; a newer Meilisearch needs wiping data.ms + full reindex.
+  # https://docs.karakeep.app/administration/troubleshooting#upgrading-meilisearch---migrating-the-meilisearch-db-version
   karakeep-meilisearch:
     container_name: karakeep-meilisearch
-    image: getmeili/meilisearch:v1.45.0
+    image: getmeili/meilisearch:v1.41.0
     restart: unless-stopped
     # user: ${PUID:-1000}:${PGID:-1000}
     environment:
