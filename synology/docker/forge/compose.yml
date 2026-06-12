@@ -41,9 +41,9 @@ services:
       FORGEJO__security__REVERSE_PROXY_TRUSTED_PROXIES: ${FORGEJO_REVERSE_PROXY_TRUSTED_PROXIES}
       FORGEJO__api__ENABLE_SWAGGER: "false"
       FORGEJO__security__SECRET_KEY: ${FORGEJO_SECRET_KEY}
-      # Don't set this on first install otherwise it would break the setup, once installation
-      # is done, set it to true to disable the installation page fully.
-      # FORGEJO__security__INSTALL_LOCK: ${FORGEJO_INSTALL_LOCK}
+      FORGEJO__security__INSTALL_LOCK: ${FORGEJO_INSTALL_LOCK:-false}
+      FORGEJO__actions__ENABLED: "true"
+      FORGEJO__actions__DEFAULT_ACTIONS_URL: https://data.forgejo.org
     volumes:
       - ${FORGEJO_DATA_PATH:-./configs/forgejo/data}:/data
       - /etc/localtime:/etc/localtime:ro
@@ -56,6 +56,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/api/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
     security_opt:
       - no-new-privileges:true
     labels:
@@ -65,35 +71,44 @@ services:
       - traefik.http.routers.forgejo.service=forgejo
       - traefik.http.services.forgejo.loadbalancer.server.port=3000
 
-  # Forgejo Actions (runner + DIND) — disabled for now. Re-enable once the
-  # runner config.yml has been generated, labels set, and a runner registered
-  # in the Forgejo UI (see config.yml.sample). The `forgejo-actions` network
-  # and forgejo's membership in it are left in place so uncommenting these
-  # two services is the only change needed to bring actions back online.
-  # docker-dind:
-  #   container_name: forgejo-dind
-  #   image: docker:29.5.2-dind
-  #   restart: unless-stopped
-  #   privileged: true
-  #   command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
-  #   networks:
-  #     - forgejo-actions
-  #
-  # forgejo-runner:
-  #   container_name: forgejo-runner
-  #   image: code.forgejo.org/forgejo/runner:12.10.1
-  #   restart: unless-stopped
-  #   user: ${PUID:-1000}:${PGID:-1000}
-  #   environment:
-  #     DOCKER_HOST: tcp://docker-dind:2375
-  #   volumes:
-  #     - ${FORGEJO_RUNNER_DATA_PATH:-./configs/runner/data}:/data
-  #   networks:
-  #     - forgejo-actions
-  #   depends_on:
-  #     docker-dind:
-  #       condition: service_started
-  #   command: forgejo-runner daemon --config /data/config.yml
+  docker-dind:
+    container_name: forgejo-dind
+    image: docker:29.5.2-dind
+    restart: unless-stopped
+    privileged: true
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
+    networks:
+      - forgejo-dind
+    healthcheck:
+      test: ["CMD", "docker", "-H", "tcp://127.0.0.1:2375", "info"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  forgejo-runner:
+    container_name: forgejo-runner
+    image: code.forgejo.org/forgejo/runner:12.10.1
+    restart: unless-stopped
+    user: ${PUID:-1000}:${PGID:-1000}
+    environment:
+      DOCKER_HOST: tcp://docker-dind:2375
+    volumes:
+      - ${FORGEJO_RUNNER_DATA_PATH:-./configs/runner/data}:/data
+    networks:
+      - forgejo-actions
+      - forgejo-dind
+    depends_on:
+      docker-dind:
+        condition: service_healthy
+      forgejo:
+        condition: service_healthy
+    command:
+      - /bin/sh
+      - -c
+      - exec forgejo-runner daemon --config /data/config.yml
 
 networks:
   servicenet:
@@ -102,6 +117,11 @@ networks:
 
   forgejo-db:
     name: forgejo-db
+    driver: bridge
+    internal: true
+
+  forgejo-dind:
+    name: forgejo-dind
     driver: bridge
     internal: true
 
