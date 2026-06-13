@@ -1,9 +1,26 @@
 # Static set of routers and services for Traefik to proxy
-# - Wildcard router, primarily to define all domains to have a wildcard certificate generated.
+# - Custom void-themed error pages (see static/errors/nginx.conf).
+# - Catch-all router for unmatched hosts → 404 error page.
 # - DSM's own interface.
 # - AdGuard's DNS-over-HTTPS/TLS/QUIC.
 http:
+  middlewares:
+    error-pages:
+      errors:
+        status:
+          - "400-599"
+        service: errors
+        query: "/{status}.html"
+        errorRequestHeaders: []
+
   routers:
+    void-catchall:
+      entryPoints:
+        - web-secure
+      rule: PathPrefix(`/`)
+      priority: 1
+      service: errors
+
     dsm:
       entryPoints:
         - web-secure
@@ -23,6 +40,12 @@ http:
       service: dns
 
   services:
+    errors:
+      loadbalancer:
+        passHostHeader: false
+        servers:
+          - url: http://errors:80
+
     dsm:
       loadbalancer:
         servers:

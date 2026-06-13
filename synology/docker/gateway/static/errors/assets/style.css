@@ -1,0 +1,263 @@
+/* Inlined into *.html via nginx SSI — see nginx.conf. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  color-scheme: dark;
+  --void: #030308;
+  --deep: #0a0618;
+  --nebula: #1a1035;
+  --star: #eef2f8;
+  --muted: #a8b4c8;
+  --dim: #7a8aa4;
+  --accent: #6b7fe8;
+  --glow: #9d7cf7;
+  --panel: rgba(8, 5, 20, 0.78);
+  --panel-border: rgba(140, 160, 220, 0.14);
+  --text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85), 0 0 24px rgba(0, 0, 0, 0.55);
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  font-family: "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  background: radial-gradient(ellipse at 50% 120%, var(--nebula) 0%, var(--deep) 45%, var(--void) 100%);
+  color: var(--star);
+  line-height: 1.6;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.void {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  isolation: isolate;
+}
+
+/* Canvas particle field (driven by particles.js) */
+.particles {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -3;
+}
+
+.stars {
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255, 255, 255, 0.85), transparent),
+    radial-gradient(1px 1px at 30% 65%, rgba(255, 255, 255, 0.65), transparent),
+    radial-gradient(1px 1px at 55% 15%, rgba(255, 255, 255, 0.75), transparent),
+    radial-gradient(1px 1px at 70% 80%, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(1px 1px at 85% 35%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1.5px 1.5px at 20% 85%, rgba(210, 225, 255, 0.9), transparent),
+    radial-gradient(1.5px 1.5px at 45% 45%, rgba(210, 225, 255, 0.75), transparent),
+    radial-gradient(1.5px 1.5px at 90% 70%, rgba(210, 225, 255, 0.85), transparent),
+    radial-gradient(2px 2px at 60% 55%, rgba(190, 210, 255, 0.65), transparent);
+  background-size: 100% 100%;
+  animation: drift 120s linear infinite;
+  opacity: 0.9;
+  z-index: -2;
+}
+
+.stars::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 15% 40%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 40% 10%, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(1px 1px at 75% 25%, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(1px 1px at 95% 90%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 62% 72%, rgba(255, 255, 255, 0.4), transparent);
+  animation: drift 180s linear infinite reverse, twinkle 6s ease-in-out infinite alternate;
+}
+
+.void-core {
+  position: absolute;
+  width: min(42vw, 280px);
+  height: min(42vw, 280px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 55%, #000 0%, #050510 55%, transparent 72%);
+  box-shadow:
+    0 0 80px 20px rgba(0, 0, 0, 0.9),
+    0 0 120px 40px rgba(91, 33, 182, 0.15),
+    inset 0 0 60px 30px rgba(0, 0, 0, 1);
+  z-index: -1;
+  animation: pulse 8s ease-in-out infinite;
+}
+
+.void-ring {
+  position: absolute;
+  width: min(52vw, 340px);
+  height: min(52vw, 340px);
+  border-radius: 50%;
+  border: 1px solid rgba(157, 124, 247, 0.12);
+  box-shadow:
+    0 0 30px rgba(107, 127, 232, 0.08),
+    inset 0 0 30px rgba(107, 127, 232, 0.04);
+  z-index: -1;
+  animation: ring-spin 24s linear infinite;
+}
+
+.void-ring::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  border-top-color: rgba(157, 124, 247, 0.35);
+  border-right-color: rgba(107, 127, 232, 0.15);
+  animation: ring-spin 12s linear infinite reverse;
+}
+
+.content {
+  position: relative;
+  max-width: 36rem;
+  padding: clamp(1.75rem, 5vw, 2.75rem) clamp(1.5rem, 4vw, 2.5rem);
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 1.25rem;
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+    0 0 80px rgba(107, 127, 232, 0.06);
+  animation: rise-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.status {
+  font-size: clamp(3.5rem, 12vw, 6.5rem);
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  margin-bottom: 0.85rem;
+  background: linear-gradient(165deg, var(--muted) 0%, var(--accent) 45%, var(--glow) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 20px rgba(107, 127, 232, 0.35));
+  animation: rise-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+}
+
+h1 {
+  font-size: clamp(1.35rem, 3.8vw, 1.85rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.85rem;
+  color: var(--star);
+  text-shadow: var(--text-shadow);
+  animation: rise-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
+}
+
+.message {
+  max-width: 28rem;
+  margin-inline: auto;
+  font-size: clamp(1.02rem, 2.4vw, 1.12rem);
+  font-weight: 400;
+  color: var(--muted);
+  text-shadow: var(--text-shadow);
+  animation: rise-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
+}
+
+.tagline {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(140, 160, 220, 0.12);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dim);
+  text-shadow: var(--text-shadow);
+  animation: rise-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both;
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-3%, -2%, 0);
+  }
+}
+
+@keyframes twinkle {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.95;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+@keyframes ring-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stars,
+  .stars::after,
+  .void-core,
+  .void-ring,
+  .void-ring::before,
+  .content,
+  .status,
+  h1,
+  .message,
+  .tagline {
+    animation: none;
+  }
+
+  .particles {
+    display: none;
+  }
+}
