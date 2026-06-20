@@ -31,7 +31,7 @@ services:
       FORGEJO__server__ROOT_URL: https://forge.ojizero.dev/
       FORGEJO__server__HTTP_PORT: 3000
       FORGEJO__server__PROTOCOL: http
-      FORGEJO__server__SSH_DOMAIN: forge.ojizero.dev
+      FORGEJO__server__SSH_DOMAIN: ssh-forge.ojizero.dev
       FORGEJO__server__SSH_PORT: 22
       FORGEJO__server__START_SSH_SERVER: "false"
       FORGEJO__service__DISABLE_REGISTRATION: "true"
@@ -48,6 +48,7 @@ services:
       - ${FORGEJO_DATA_PATH:-./configs/forgejo/data}:/data
       - /etc/localtime:/etc/localtime:ro
     expose:
+      - "22"
       - "3000"
     networks:
       - servicenet

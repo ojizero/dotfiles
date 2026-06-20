@@ -6,3 +6,10 @@ services:
     restart: unless-stopped
     command: tunnel --no-autoupdate run
     env_file: .env
+    networks:
+      - servicenet
+
+networks:
+  servicenet:
+    name: servicenet
+    external: true

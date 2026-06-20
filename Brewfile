@@ -13,6 +13,7 @@ tap "steveyegge/beads"
 #
 
 brew "bat"
+brew "cloudflared"
 brew "coreutils"
 brew "gnutls"
 brew "fd"
