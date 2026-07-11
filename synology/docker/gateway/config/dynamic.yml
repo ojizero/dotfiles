@@ -7,8 +7,16 @@ http:
   middlewares:
     error-pages:
       errors:
+        # Whitelist only statuses with custom pages. Broad ranges break apps that
+        # use special 4xx semantics (401 + WWW-Authenticate, 409 + session ID).
         status:
-          - "400-599"
+          - "400"
+          - "403"
+          - "404"
+          - "408"
+          - "429"
+          - "500-504"
+          - "505-599"
         service: errors
         query: "/{status}.html"
         errorRequestHeaders: []
