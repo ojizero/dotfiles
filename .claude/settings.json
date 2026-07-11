@@ -13,5 +13,9 @@
   },
   "enabledPlugins": {},
   "alwaysThinkingEnabled": true,
-  "skipDangerousModePermissionPrompt": true
+  "tui": "fullscreen",
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "auto",
+  "autoCompactEnabled": false,
+  "teammateMode": "auto"
 }
