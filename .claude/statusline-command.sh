@@ -163,7 +163,7 @@ elif [[ -n "$token" && "$token" != "null" ]]; then
     -H "anthropic-beta: oauth-2025-04-20" \
     "https://api.anthropic.com/api/oauth/profile" 2>/dev/null)
   if [[ -n "$profile_resp" ]] && echo "$profile_resp" | jq -e '.organization' &>/dev/null; then
-    echo "$profile_resp" > "$profile_cache"
+    echo "$profile_resp" > "${profile_cache}.$$" && mv -f "${profile_cache}.$$" "$profile_cache"
     org_name=$(echo "$profile_resp" | jq -r '.organization.name // empty')
     org_type=$(echo "$profile_resp" | jq -r '.organization.organization_type // empty')
   fi
@@ -200,9 +200,12 @@ if $needs_refresh; then
       -H "Authorization: Bearer $token" \
       -H "anthropic-beta: oauth-2025-04-20" \
       "https://api.anthropic.com/api/oauth/usage" 2>/dev/null)
-    if [[ -n "$response" ]] && echo "$response" | jq -e . &>/dev/null; then
+    # Only accept responses shaped like usage data — API error bodies (e.g.
+    # {"error": {"type": "rate_limit_error"}}) are valid JSON and must not
+    # overwrite a good cache or mask the stale-cache fallback below.
+    if [[ -n "$response" ]] && echo "$response" | jq -e '.limits or .five_hour' &>/dev/null; then
       usage_data="$response"
-      echo "$response" > "$cache_file"
+      echo "$response" > "${cache_file}.$$" && mv -f "${cache_file}.$$" "$cache_file"
     fi
   fi
   # Fall back to stale cache
