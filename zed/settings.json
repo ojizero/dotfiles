@@ -9,7 +9,6 @@
     "elixir": true,
     "erlang": true,
     "cspell": true,
-    // "opencode": true,
   },
   "vim_mode": true,
   "theme": {
@@ -18,10 +17,10 @@
     "dark": "Catppuccin Mocha",
   },
   "agent_servers": {
-    "opencode": {
+    "cursor": {
       "type": "registry",
     },
-    "cursor": {
+    "opencode": {
       "type": "registry",
     },
   },

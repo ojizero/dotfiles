@@ -28,3 +28,7 @@ OMO_SEND_ANONYMOUS_TELEMETRY=0
 [settings]
 
 npm.package_manager = "bun"
+
+[settings.github]
+
+credential_command = "gh auth token"
