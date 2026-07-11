@@ -79,7 +79,6 @@ tap_to_click = true
 
 "com.apple.dock" = { mineffect = "scale" }
 "NSGlobalDomain" = { AppleInterfaceStyleSwitchesAutomatically = true, AppleShowScrollBars = "Automatic", "com.apple.trackpad.scaling" = 3.0 }
-"com.apple.Safari.SandboxBroker" = { ShowDevelopMenu = true }
 
 [bootstrap.hooks.pre-packages]
 

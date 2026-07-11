@@ -3,6 +3,7 @@
 
 old_ref="$(git -C "${DOTFILES_PATH}" rev-parse HEAD)"
 git -C "${DOTFILES_PATH}" pull -p
+# Apply dotfiles + tools only — avoid full bootstrap (defaults, extras, unconditional bundle)
 mise bootstrap dotfiles apply --yes
 mise install
 

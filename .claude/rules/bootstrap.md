@@ -11,7 +11,7 @@ Bootstrap conventions (Mise):
 - New devices: `bootstrap/install.sh` installs Homebrew + mise, then runs `mise bootstrap --yes --force-dotfiles`
 - Existing devices: `m dotfiles:sync` after pull; avoid `--force-dotfiles` unless status shows conflicts
 - `[bootstrap.hooks.pre-packages]` installs Homebrew only (no symlinks or bundle)
-- `brew bundle` runs in `[bootstrap.hooks.post-dotfiles]` after `~/.Brewfile` symlink exists; `dotfiles:bundle` trusts Brewfile taps first via `dotfiles:trust-taps`
+- `brew bundle` runs in `[bootstrap.hooks.post-dotfiles]` after `~/.Brewfile` symlink exists; `dotfiles:bundle` trusts Brewfile taps inline before installing
 - Do not enable `[bootstrap.mise_shell_activate]` — `.zshrc` already activates mise
 - macOS extras (pmset, gatekeeper, softwareupdate, battery %) live in `bootstrap/macos/extras.setup`, wired via `[tasks.bootstrap]`
 - One-time gatekeeper approval tracked in `bootstrap/.cache/` (git-ignored)

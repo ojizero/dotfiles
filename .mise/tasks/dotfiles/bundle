@@ -8,11 +8,18 @@ elif [[ ! -z "$1" ]]; then
   exit 1
 fi
 
-mise run dotfiles:trust-taps
+for file in "${DOTFILES_PATH}/Brewfile" "${DOTFILES_PATH}/.local/Brewfile"; do
+  [[ -f "${file}" ]] || continue
+
+  while IFS= read -r line; do
+    if [[ "${line}" =~ '^tap "([^"]+)"' ]]; then
+      brew trust --tap "${match[1]}"
+    fi
+  done < "${file}"
+done
 
 if [[ -f "${DOTFILES_PATH}/.local/Brewfile" ]]; then
   # If we have a locally defined Brewfile combine it with the main and run them together.
-  # We disable lock here as it could leak what's in the .local/Brewfile.
   cat "${DOTFILES_PATH}/Brewfile" "${DOTFILES_PATH}/.local/Brewfile" | brew bundle install $opts --file -
 else
   brew bundle install $opts --file "${DOTFILES_PATH}/Brewfile"
