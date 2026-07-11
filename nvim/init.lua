@@ -1,20 +1,2 @@
--- Neovim configuration entry point
--- Requires Neovim 0.11+ (vim.pack)
-
-require("options")
-require("plugins")
-require("candy")
-require("theme")
-require("treesitter")
-require("lsp")
-require("completion")
-require("statusline")
-require("tabline")
-require("git")
-require("ui")
-require("editing")
-require("ai")
-require("tasks")
-require("keymaps")
-require("mouse")
-require("local") -- must be last: overrides anything above
+-- LazyVim entry point. See lua/config/lazy.lua for bootstrap.
+require("config.lazy")
