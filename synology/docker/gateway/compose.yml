@@ -11,6 +11,8 @@ services:
     container_name: traefik
     image: traefik:v3.6.17
     restart: unless-stopped
+    depends_on:
+      - errors
     env_file: .env
     volumes:
       - ./config/traefik.yml:/etc/traefik/traefik.yml:ro # static traefik configuration
@@ -33,6 +35,16 @@ services:
       - traefik.http.routers.traefik.middlewares=traefik-basic-auth
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+  errors:
+    container_name: traefik-errors
+    image: nginx:1.27.4-alpine
+    restart: unless-stopped
+    volumes:
+      - ./static/errors/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./static/errors:/usr/share/nginx/html:ro
+    networks:
+      - servicenet
 
 networks:
   # Grant Traefik access to the administrive docker net

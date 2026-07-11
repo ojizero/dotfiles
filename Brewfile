@@ -10,6 +10,7 @@ tap "xykong/tap"
 #
 
 brew "bat"
+brew "cloudflared"
 brew "coreutils"
 brew "docker", link: false
 brew "fd"
