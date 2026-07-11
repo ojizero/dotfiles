@@ -216,44 +216,67 @@ usage_lines=()
 
 if [[ -n "$usage_data" ]] && echo "$usage_data" | jq -e . &>/dev/null; then
   # ── Rate limits (subscription) ─────────────────────────────────────────────
-  has_limits=false
+  # Dynamically enumerate rate-limit buckets so new per-model weekly buckets
+  # (opus, fable, future models, ...) show up automatically without code changes.
+  #
+  # Prefer the newer `.limits` array — it is the source that drives the
+  # claude.ai settings page and carries per-model "weekly_scoped" buckets like
+  # Fable (scope.model.display_name). Fall back to the legacy top-level keys
+  # (five_hour / seven_day / seven_day_*) when `.limits` is absent.
+  #
+  # Each bucket is emitted as a `label<TAB>percent<TAB>resets_at` row. Labels:
+  #   session · weekly · <model> (e.g. sonnet, opus, fable), lower-cased.
+  bucket_tsv=$(echo "$usage_data" | jq -r '
+    if (.limits | type) == "array" and (.limits | length) > 0 then
+      .limits[]
+      | select(type == "object" and has("percent"))
+      | [ (if   .kind == "session"       then "session"
+           elif .kind == "weekly_all"    then "weekly"
+           elif .kind == "weekly_scoped" then ((.scope.model.display_name // .kind) | ascii_downcase)
+           else .kind end),
+          (.percent // 0 | tostring),
+          (.resets_at // "") ]
+      | @tsv
+    else
+      to_entries
+      | map(select(.value | type == "object" and has("utilization")))
+      | map(select(.key == "five_hour" or (.key | startswith("seven_day"))))
+      | sort_by(if .key == "five_hour" then "0" elif .key == "seven_day" then "1" else "2" + .key end)
+      | .[]
+      | [ (if   .key == "five_hour"                then "session"
+           elif .key == "seven_day"                then "weekly"
+           elif (.key | startswith("seven_day_"))  then .key[10:]
+           else .key end),
+          (.value.utilization // 0 | tostring),
+          (.value.resets_at // "") ]
+      | @tsv
+    end
+  ')
 
-  # 5-hour (session) limit
-  if echo "$usage_data" | jq -e '.five_hour != null' &>/dev/null; then
-    has_limits=true
-    five_pct=$(echo "$usage_data" | jq -r '.five_hour.utilization // 0' | awk '{printf "%.0f", $1}')
-    five_reset=$(format_reset_time "$(echo "$usage_data" | jq -r '.five_hour.resets_at // empty')")
-    five_col=$(color_for_pct "$five_pct")
-    five_circle=$(circle_for_pct "$five_pct")
+  # Parse rows into parallel arrays; compute common label width for alignment.
+  labels=(); pcts=(); resets=()
+  while IFS=$'\t' read -r b_label b_pct b_reset; do
+    [[ -z "$b_label" ]] && continue
+    labels+=("$b_label"); pcts+=("$b_pct"); resets+=("$b_reset")
+  done <<< "$bucket_tsv"
 
-    line="${five_col}${five_circle}${reset} ${dim}session${reset} ${five_col}$(printf '%3s' "$five_pct")%${reset}"
-    [[ -n "$five_reset" ]] && line+=" ${dim}⟳ ${five_reset}${reset}"
+  label_width=0
+  for b_label in "${labels[@]}"; do
+    [[ ${#b_label} -gt $label_width ]] && label_width=${#b_label}
+  done
+
+  for (( i = 1; i <= ${#labels[@]}; i++ )); do
+    padded_label="${(r:label_width:)labels[$i]}"
+
+    pct=$(printf '%.0f' "${pcts[$i]}" 2>/dev/null); [[ -z "$pct" ]] && pct=0
+    bucket_reset=$(format_reset_time "${resets[$i]}")
+    col=$(color_for_pct "$pct")
+    circle=$(circle_for_pct "$pct")
+
+    line="${col}${circle}${reset} ${dim}${padded_label}${reset} ${col}$(printf '%3s' "$pct")%${reset}"
+    [[ -n "$bucket_reset" ]] && line+=" ${dim}⟳ ${bucket_reset}${reset}"
     usage_lines+=("$line")
-  fi
-
-  # 7-day (weekly) limit
-  if echo "$usage_data" | jq -e '.seven_day != null' &>/dev/null; then
-    seven_pct=$(echo "$usage_data" | jq -r '.seven_day.utilization // 0' | awk '{printf "%.0f", $1}')
-    seven_reset=$(format_reset_time "$(echo "$usage_data" | jq -r '.seven_day.resets_at // empty')")
-    seven_col=$(color_for_pct "$seven_pct")
-    seven_circle=$(circle_for_pct "$seven_pct")
-
-    line="${seven_col}${seven_circle}${reset} ${dim}weekly${reset}  ${seven_col}$(printf '%3s' "$seven_pct")%${reset}"
-    [[ -n "$seven_reset" ]] && line+=" ${dim}⟳ ${seven_reset}${reset}"
-    usage_lines+=("$line")
-  fi
-
-  # 7-day Sonnet limit
-  if echo "$usage_data" | jq -e '.seven_day_sonnet != null' &>/dev/null; then
-    sonnet_pct=$(echo "$usage_data" | jq -r '.seven_day_sonnet.utilization // 0' | awk '{printf "%.0f", $1}')
-    sonnet_reset=$(format_reset_time "$(echo "$usage_data" | jq -r '.seven_day_sonnet.resets_at // empty')")
-    sonnet_col=$(color_for_pct "$sonnet_pct")
-    sonnet_circle=$(circle_for_pct "$sonnet_pct")
-
-    line="${sonnet_col}${sonnet_circle}${reset} ${dim}sonnet${reset}  ${sonnet_col}$(printf '%3s' "$sonnet_pct")%${reset}"
-    [[ -n "$sonnet_reset" ]] && line+=" ${dim}⟳ ${sonnet_reset}${reset}"
-    usage_lines+=("$line")
-  fi
+  done
 
   # ── Extra usage / credits ──────────────────────────────────────────────────
   if echo "$usage_data" | jq -e '.extra_usage.is_enabled == true' &>/dev/null; then
