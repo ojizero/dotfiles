@@ -1,7 +1,0 @@
-#!/usr/bin/env zsh
-
-cfg_gitconfig="${DOTFILES_PATH}/.gitconfig"
-home_gitconfig="${HOME}/.gitconfig"
-
-rm -fr "${home_gitconfig}"
-ln -s "${cfg_gitconfig}" "${home_gitconfig}"

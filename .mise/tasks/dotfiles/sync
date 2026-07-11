@@ -1,0 +1,11 @@
+#!/usr/bin/env zsh
+#MISE description="Pull dotfiles and converge machine state"
+
+old_ref="$(git -C "${DOTFILES_PATH}" rev-parse HEAD)"
+git -C "${DOTFILES_PATH}" pull -p
+mise bootstrap dotfiles apply --yes
+mise install
+
+if git -C "${DOTFILES_PATH}" diff --name-only "${old_ref}" HEAD -- Brewfile .local/Brewfile | grep -q .; then
+  mise run dotfiles:bundle
+fi

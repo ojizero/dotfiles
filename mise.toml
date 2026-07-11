@@ -18,6 +18,9 @@ node = "lts"
 
 [env]
 
+# Canonical dotfiles clone path (all repos live under ~/workspace/...)
+DOTFILES_PATH = "{{ env.HOME }}/workspace/self/dotfiles"
+
 MISE_ENV_FILE=".env"
 ERL_AFLAGS = "-kernel shell_history enabled"
 
@@ -27,8 +30,93 @@ OMO_SEND_ANONYMOUS_TELEMETRY=0
 
 [settings]
 
+dotfiles.default_mode = "symlink"
 npm.package_manager = "bun"
 
 [settings.github]
 
 credential_command = "gh auth token"
+
+[dotfiles]
+
+"~/.local" = ".local"
+"~/.brew-aliases" = ".brew-aliases"
+"~/.Brewfile" = "Brewfile"
+"~/.zshrc" = ".zshrc"
+"~/.zprofile" = ".zprofile"
+"~/.gitconfig" = ".gitconfig"
+"~/.bunfig.toml" = "bunfig.toml"
+"~/.config/mise/config.toml" = "mise.toml"
+"~/.config/mise/config.local.toml" = "mise.local.toml"
+"~/.config/mise/tasks" = ".mise/tasks"
+"~/.claude/settings.json" = ".claude/settings.json"
+"~/.claude/statusline-command.sh" = ".claude/statusline-command.sh"
+"~/.config/ghostty" = "ghostty"
+"~/.config/nvim" = "nvim"
+"~/.config/worktrunk" = "worktrunk"
+
+[bootstrap.repos]
+
+"~/workspace/self/dotfiles" = { url = "git@github.com:ojizero/dotfiles.git", ref = "master" }
+
+[bootstrap.macos.dock]
+
+autohide = true
+magnification = true
+mru_spaces = false
+show_recents = false
+
+[bootstrap.macos.finder]
+
+show_pathbar = true
+show_status_bar = true
+
+[bootstrap.macos.trackpad]
+
+tap_to_click = true
+
+[bootstrap.macos.defaults]
+
+"com.apple.dock" = { mineffect = "scale" }
+"NSGlobalDomain" = { AppleInterfaceStyleSwitchesAutomatically = true, AppleShowScrollBars = "Automatic", "com.apple.trackpad.scaling" = 3.0 }
+"com.apple.Safari.SandboxBroker" = { ShowDevelopMenu = true }
+
+[bootstrap.hooks.pre-packages]
+
+run = '''
+export NONINTERACTIVE=1
+if ! command -v brew >/dev/null 2>&1; then
+  /usr/bin/env bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  case "$(machine)" in
+    arm*)
+      eval "$(/opt/homebrew/bin/brew shellenv)"
+      ;;
+    x86_64*)
+      eval "$(/usr/local/bin/brew shellenv)"
+      ;;
+  esac
+fi
+'''
+
+[bootstrap.hooks.post-dotfiles]
+
+run = [
+  "mkdir -p ~/.config ~/.local/nvim",
+  "test -f \"${DOTFILES_PATH}/mise.local.toml\" || cp \"${DOTFILES_PATH}/mise.local.toml.sample\" \"${DOTFILES_PATH}/mise.local.toml\"",
+  "mise run dotfiles:bundle",
+]
+
+[bootstrap.hooks.post-tools]
+
+run = [
+  "mise trust \"${DOTFILES_PATH}/mise.toml\"",
+  "mise trust \"${DOTFILES_PATH}/mise.local.toml\" 2>/dev/null || true",
+]
+
+[bootstrap.hooks.post-defaults]
+
+run = "killall Dock 2>/dev/null || true"
+
+[tasks.bootstrap]
+
+run = '''zsh "${DOTFILES_PATH}/bootstrap/macos/extras.setup"'''

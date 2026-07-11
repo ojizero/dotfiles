@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+#MISE description="Show bootstrap and dotfiles drift status"
+
+mise bootstrap status --missing
+mise bootstrap dotfiles status --missing

@@ -1,4 +1,0 @@
-#!/usr/bin/env zsh
-
-# Run any updates on system
-mise run update:all

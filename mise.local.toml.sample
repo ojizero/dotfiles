@@ -1,0 +1,12 @@
+# System-specific mise configuration
+# This file is git-ignored and serves as a local override layer
+# on top of the base config (~/.config/mise/config.toml)
+
+[settings.pipx]
+# This is the default but I'm setting it still as to self document pipx using uvx
+uvx = true
+
+[tools]
+
+#"npm:@mariozechner/pi-coding-agent" = "latest"
+#"pipx:git+ssh://github.com/FoothillSolutions/agent_playground.git" = "latest"

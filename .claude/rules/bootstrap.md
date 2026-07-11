@@ -1,17 +1,19 @@
 ---
 paths:
   - "bootstrap/**"
+  - "mise.toml"
 ---
 
-Bootstrap script conventions:
+Bootstrap conventions (Mise):
 
-- All scripts start with `#!/usr/bin/env zsh`
-- Scripts must be idempotent — safe to run multiple times
-- Use `rm -fr` before `ln -s` to handle pre-existing symlinks/files
-- Numbered prefix determines execution order: `00`, `01`, `02`, ...
-- The `.setup` extension is required
-- Append `.once` for scripts that should only run once per machine (tracked via `bootstrap/.cache/`)
-- Append `.disable` to prevent a `.once` script from running
-- `$DOTFILES_PATH` is available in the environment
-- Variable naming: `cfg_*` for repo path, `home_*` for home path
-- `bootstrap/common/` runs on all platforms, `bootstrap/macos/` on macOS only
+- Machine setup is declared in `mise.toml`: `[dotfiles]`, `[bootstrap.*]`, `[tasks.bootstrap]`
+- Converge with `mise bootstrap --yes` or `m dotfiles:bootstrap`
+- New devices: `bootstrap/install.sh` installs Homebrew + mise, then runs `mise bootstrap --yes --force-dotfiles`
+- Existing devices: `m dotfiles:sync` after pull; avoid `--force-dotfiles` unless status shows conflicts
+- `[bootstrap.hooks.pre-packages]` installs Homebrew only (no symlinks or bundle)
+- `brew bundle` runs in `[bootstrap.hooks.post-dotfiles]` after `~/.Brewfile` symlink exists; `dotfiles:bundle` trusts Brewfile taps first via `dotfiles:trust-taps`
+- Do not enable `[bootstrap.mise_shell_activate]` — `.zshrc` already activates mise
+- macOS extras (pmset, gatekeeper, softwareupdate, battery %) live in `bootstrap/macos/extras.setup`, wired via `[tasks.bootstrap]`
+- One-time gatekeeper approval tracked in `bootstrap/.cache/` (git-ignored)
+- `$DOTFILES_PATH` is `~/workspace/self/dotfiles` — set in `mise.toml` `[env]`, `.zshrc`, and `[bootstrap.repos]`
+- Bootstrap hooks and tasks must be idempotent

@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+#MISE description="Run full mise bootstrap convergence"
+
+mise bootstrap --yes "$@"

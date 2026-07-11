@@ -1,4 +1,5 @@
-export DOTFILES_PATH="$(dirname $(readlink ${HOME}/.zshrc))"
+# Canonical clone path — keep in sync with mise.toml [env] DOTFILES_PATH
+export DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/workspace/self/dotfiles}"
 
 # This seems to break Claude, but at this point I don't really care to hack around it.
 # https://github.com/anthropics/claude-code/issues/2407
