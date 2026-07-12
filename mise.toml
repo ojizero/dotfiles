@@ -37,6 +37,10 @@ npm.package_manager = "bun"
 
 credential_command = "gh auth token"
 
+[hooks]
+
+cd = { task = "auto:git-auto-pull" }
+
 [dotfiles]
 
 "~/.local" = ".local"
