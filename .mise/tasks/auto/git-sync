@@ -27,6 +27,7 @@ local current_branch
 current_branch=$(git -C "$cwd" rev-parse --abbrev-ref HEAD 2>/dev/null)
 [[ "$current_branch" != "$default_branch" ]] && exit 0
 
+echo "↻  mise: fetching remote..."
 local gone_output
 gone_output=$(git -C "$cwd" gone 2>&1)
 [[ -n "$gone_output" ]] && print -r -- "$gone_output"
