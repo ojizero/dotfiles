@@ -27,10 +27,16 @@ local current_branch
 current_branch=$(git -C "$cwd" rev-parse --abbrev-ref HEAD 2>/dev/null)
 [[ "$current_branch" != "$default_branch" ]] && exit 0
 
-echo "↻  mise: fetching remote..."
+# ANSI colors — only when stdout is a terminal
+local c_fetch c_warn c_pull c_gone c_reset
+if [[ -t 1 ]]; then
+  c_fetch=$'\e[36m' c_warn=$'\e[33m' c_pull=$'\e[32m' c_gone=$'\e[31m' c_reset=$'\e[0m'
+fi
+
+print -r -- "${c_fetch}⟳ mise: fetching remote...${c_reset}"
 local gone_output
 gone_output=$(git -C "$cwd" gone 2>&1)
-[[ -n "$gone_output" ]] && print -r -- "$gone_output"
+[[ -n "$gone_output" ]] && print -r -- "${c_gone}${gone_output}${c_reset}"
 
 local dirty ahead behind pulled=0
 dirty=$(git -C "$cwd" status --porcelain 2>/dev/null)
@@ -38,12 +44,12 @@ ahead=$(git -C "$cwd" rev-list "@{u}..HEAD" --count 2>/dev/null)
 behind=$(git -C "$cwd" rev-list "HEAD..@{u}" --count 2>/dev/null)
 
 if [[ -n "$dirty" ]]; then
-  echo "⚠️  mise: unstaged changes — skipping sync"
+  print -r -- "${c_warn}‼ mise: unstaged changes — skipping sync${c_reset}"
   exit 0
 fi
 
 if (( ${ahead:-0} > 0 )); then
-  echo "⚠️  mise: ${ahead} local commit(s) ahead — skipping sync"
+  print -r -- "${c_warn}‼ mise: ${ahead} local commit(s) ahead — skipping sync${c_reset}"
   exit 0
 fi
 
@@ -51,9 +57,11 @@ if (( ${behind:-0} > 0 )); then
   if git -C "$cwd" pull --ff-only --quiet 2>/dev/null; then
     pulled=1
   else
-    echo "⚠️  mise: pull failed — repo may have diverged"
+    print -r -- "${c_warn}‼ mise: pull failed — repo may have diverged${c_reset}"
     exit 0
   fi
 fi
 
-(( pulled )) && echo "⬇️  mise: pulled latest changes"
+(( pulled )) && print -r -- "${c_pull}↓ mise: pulled latest changes${c_reset}"
+
+exit 0
