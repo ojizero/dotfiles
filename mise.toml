@@ -39,7 +39,11 @@ credential_command = "gh auth token"
 
 [hooks]
 
-cd = { task = "auto:git-auto-pull" }
+# Inline run (not `{ task = "auto:git-sync" }`) because:
+# 1. Task hooks execute via `mise run`, which does not forward MISE_ORIGINAL_CWD,
+#    so the script would check the wrong directory and silently skip.
+# 2. Inline run avoids the mise task wrapper line for quieter cd hooks.
+cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 
 [dotfiles]
 

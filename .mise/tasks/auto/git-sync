@@ -1,0 +1,58 @@
+#!/usr/bin/env zsh
+#MISE description="Sync default branch if repo is clean"
+#MISE raw=true
+
+local cwd="${MISE_ORIGINAL_CWD:-$PWD}"
+cwd=${cwd:A}
+
+git -C "$cwd" rev-parse --is-inside-work-tree > /dev/null 2>&1 || exit 0
+
+local git_dir git_common_dir
+git_dir=$(cd "$cwd" && cd "$(git rev-parse --git-dir)" && pwd -P 2>/dev/null) || exit 0
+git_common_dir=$(cd "$cwd" && cd "$(git rev-parse --git-common-dir)" && pwd -P 2>/dev/null) || exit 0
+[[ "$git_dir" != "$git_common_dir" ]] && exit 0
+
+local git_root
+git_root=$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null) || exit 0
+git_root=${git_root:A}
+[[ "$git_root" != "$cwd" ]] && exit 0
+
+git -C "$cwd" remote | grep -q . || exit 0
+
+local default_branch
+default_branch=$(git -C "$cwd" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||')
+[[ -z "$default_branch" ]] && exit 0
+
+local current_branch
+current_branch=$(git -C "$cwd" rev-parse --abbrev-ref HEAD 2>/dev/null)
+[[ "$current_branch" != "$default_branch" ]] && exit 0
+
+local gone_output
+gone_output=$(git -C "$cwd" gone 2>&1)
+[[ -n "$gone_output" ]] && print -r -- "$gone_output"
+
+local dirty ahead behind pulled=0
+dirty=$(git -C "$cwd" status --porcelain 2>/dev/null)
+ahead=$(git -C "$cwd" rev-list "@{u}..HEAD" --count 2>/dev/null)
+behind=$(git -C "$cwd" rev-list "HEAD..@{u}" --count 2>/dev/null)
+
+if [[ -n "$dirty" ]]; then
+  echo "⚠️  mise: unstaged changes — skipping sync"
+  exit 0
+fi
+
+if (( ${ahead:-0} > 0 )); then
+  echo "⚠️  mise: ${ahead} local commit(s) ahead — skipping sync"
+  exit 0
+fi
+
+if (( ${behind:-0} > 0 )); then
+  if git -C "$cwd" pull --ff-only --quiet 2>/dev/null; then
+    pulled=1
+  else
+    echo "⚠️  mise: pull failed — repo may have diverged"
+    exit 0
+  fi
+fi
+
+(( pulled )) && echo "⬇️  mise: pulled latest changes"
