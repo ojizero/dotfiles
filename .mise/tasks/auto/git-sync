@@ -33,25 +33,68 @@ if [[ -t 1 ]]; then
   c_fetch=$'\e[36m' c_warn=$'\e[33m' c_pull=$'\e[32m' c_gone=$'\e[31m' c_reset=$'\e[0m'
 fi
 
-print -r -- "${c_fetch}⟳ mise: fetching remote...${c_reset}"
-local gone_output
-gone_output=$(git -C "$cwd" gone 2>&1)
-[[ -n "$gone_output" ]] && print -r -- "${c_gone}${gone_output}${c_reset}"
-
-local dirty ahead behind pulled=0
+# Early bail: dirty or local-only commits (before any network calls)
+local dirty ahead
 dirty=$(git -C "$cwd" status --porcelain 2>/dev/null)
-ahead=$(git -C "$cwd" rev-list "@{u}..HEAD" --count 2>/dev/null)
-behind=$(git -C "$cwd" rev-list "HEAD..@{u}" --count 2>/dev/null)
-
 if [[ -n "$dirty" ]]; then
   print -r -- "${c_warn}‼ mise: unstaged changes — skipping sync${c_reset}"
   exit 0
 fi
 
+ahead=$(git -C "$cwd" rev-list "@{u}..HEAD" --count 2>/dev/null)
 if (( ${ahead:-0} > 0 )); then
   print -r -- "${c_warn}‼ mise: ${ahead} local commit(s) ahead — skipping sync${c_reset}"
   exit 0
 fi
+
+# Cooldown: skip if synced recently
+# Config: ~/.local/etc/git-sync.conf
+#   # lines starting with # are comments
+#   default=900          # cooldown in seconds for all repos (built-in: 900)
+#   ~/path/to/repo=60    # per-repo override (~ expanded, 0 = always sync)
+local config_file="${HOME}/.local/etc/git-sync.conf"
+local cache_dir="${HOME}/.cache/git-sync"
+local config_default="" config_repo=""
+
+if [[ -f "$config_file" ]]; then
+  local key val
+  while IFS='=' read -r key val; do
+    [[ "$key" == \#* || -z "$key" ]] && continue
+    key=${key%% }; val=${val## }
+    if [[ "$key" == "default" ]]; then
+      config_default=$val
+    else
+      local expanded=${key/#\~/$HOME}
+      expanded=${expanded:A}
+      [[ "$expanded" == "$git_root" ]] && config_repo=$val
+    fi
+  done < "$config_file"
+fi
+
+local cooldown=${config_repo:-${config_default:-900}}
+
+if (( cooldown > 0 )); then
+  mkdir -p "$cache_dir"
+  local repo_hash stamp_file now last_sync
+  repo_hash=$(print -r -- "$git_root" | md5)
+  stamp_file="${cache_dir}/${repo_hash}"
+  now=$(date +%s)
+
+  if [[ -f "$stamp_file" ]]; then
+    last_sync=$(<"$stamp_file")
+    if (( now - last_sync < cooldown )); then
+      exit 0
+    fi
+  fi
+fi
+
+print -r -- "${c_fetch}⟳ mise: fetching remote...${c_reset}"
+local gone_output
+gone_output=$(git -C "$cwd" gone 2>&1)
+[[ -n "$gone_output" ]] && print -r -- "${c_gone}${gone_output}${c_reset}"
+
+local behind pulled=0
+behind=$(git -C "$cwd" rev-list "HEAD..@{u}" --count 2>/dev/null)
 
 if (( ${behind:-0} > 0 )); then
   if git -C "$cwd" pull --ff-only --quiet 2>/dev/null; then
@@ -63,5 +106,10 @@ if (( ${behind:-0} > 0 )); then
 fi
 
 (( pulled )) && print -r -- "${c_pull}↓ mise: pulled latest changes${c_reset}"
+
+# Update sync timestamp
+if (( cooldown > 0 )); then
+  print -r -- "$now" > "$stamp_file"
+fi
 
 exit 0
