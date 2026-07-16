@@ -59,6 +59,8 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.config/mise/tasks" = ".mise/tasks"
 "~/.claude/settings.json" = ".claude/settings.json"
 "~/.claude/statusline-command.sh" = ".claude/statusline-command.sh"
+"~/.claude-x/settings.json" = ".claude-x/settings.json"
+"~/.claude-x/statusline-command.sh" = ".claude/statusline-command.sh"
 "~/.config/ghostty" = "ghostty"
 "~/.config/nvim" = "nvim"
 "~/.config/worktrunk" = "worktrunk"

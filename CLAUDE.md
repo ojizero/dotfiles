@@ -23,6 +23,7 @@ iTerm2/                    # iTerm2 settings plist
 .aws/                      # AWS profiles
 .brew-aliases/             # Homebrew alias shortcuts
 synology/docker/           # Docker Compose stacks for Synology NAS
+.claude-x/                 # Alternate Claude Code settings (linked into ~/.claude-x)
 mcp/                       # MCP catalog for Docker Desktop
 ```
 
@@ -32,7 +33,7 @@ mcp/                       # MCP catalog for Docker Desktop
 All dotfiles are symlinked from this repo to `$HOME` via `[dotfiles]` in `mise.toml` and applied with `mise bootstrap dotfiles apply`.
 Pattern: targets in `[dotfiles]` resolve sources relative to the repo root.
 
-Managed symlinks (15 total):
+Managed symlinks (17 total):
 
 | Target | Source |
 |--------|--------|
@@ -48,6 +49,8 @@ Managed symlinks (15 total):
 | `~/.config/mise/tasks` | `.mise/tasks` |
 | `~/.claude/settings.json` | `.claude/settings.json` |
 | `~/.claude/statusline-command.sh` | `.claude/statusline-command.sh` |
+| `~/.claude-x/settings.json` | `.claude-x/settings.json` |
+| `~/.claude-x/statusline-command.sh` | `.claude/statusline-command.sh` |
 | `~/.config/ghostty` | `ghostty` |
 | `~/.config/nvim` | `nvim` |
 | `~/.config/worktrunk` | `worktrunk` |
@@ -68,7 +71,7 @@ Machine setup is declared in `mise.toml` and converged with `mise bootstrap`:
 
 1. `[bootstrap.hooks.pre-packages]` — install Homebrew if missing
 2. `[bootstrap.repos]` — clone at `~/workspace/self/dotfiles` (new machines)
-3. `[dotfiles]` — apply 15 symlinks
+3. `[dotfiles]` — apply 17 symlinks
 4. `[bootstrap.hooks.post-dotfiles]` — mkdirs, seed `mise.local.toml`, `m dotfiles:bundle` (trusts Brewfile taps first)
 5. `[bootstrap.macos.*]` — Dock, Finder, trackpad, defaults
 6. `[bootstrap.hooks.post-defaults]` — `killall Dock`
