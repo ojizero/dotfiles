@@ -3,6 +3,7 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "DISABLE_AUTOUPDATER": "1",
     "ANTHROPIC_BASE_URL": "http://aperture.tn.ojizero.dev",
+    "ANTHROPIC_API_KEY": "aperture-no-auth",
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "openai/gpt-5.6-terra",
     "ANTHROPIC_DEFAULT_OPUS_MODEL_NAME": "GPT 5.6 Terra",
     "ANTHROPIC_DEFAULT_OPUS_MODEL_SUPPORTED_CAPABILITIES": "effort,thinking,adaptive_thinking",
