@@ -13,8 +13,6 @@ entryPoints:
   web-secure:
     address: ":443"
     http:
-      middlewares:
-        - error-pages@file
       tls:
         certResolver: letsencrypt
         domains:
