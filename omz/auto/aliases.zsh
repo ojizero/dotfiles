@@ -113,6 +113,19 @@ alias xcc='xclaude'
 
 alias m='mise run'
 
+# npx/uvx-style ephemeral tool runners, routed through mise instead
+# Usage: npx <package>[@version] [args] / uvx <package>[@version] [args]
+function npx {
+  local pkg="${1:?required input of package to run}"; shift
+  local bin="${pkg%@*}"; [[ -z "${bin}" ]] && bin="${pkg}" # scoped pkg without version
+  mise x "npm:${pkg}" -- "${bin##*/}" "$@"
+}
+
+function uvx {
+  local pkg="${1:?required input of package to run}"; shift
+  mise x "pipx:${pkg}" -- "${pkg%@*}" "$@"
+}
+
 alias v='nvim'
 alias nv='nvim'
 alias vm='nvim'
