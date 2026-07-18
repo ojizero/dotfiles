@@ -1,6 +1,6 @@
 # Dotfiles Repository
 
-Personal dotfiles for macOS and self-hosted Docker Compose service stacks running on a Synology NAS ("Atlas").
+Personal dotfiles for macOS.
 
 ## Repository Layout
 
@@ -22,10 +22,11 @@ zed/                       # Zed editor config
 iTerm2/                    # iTerm2 settings plist
 .aws/                      # AWS profiles
 .brew-aliases/             # Homebrew alias shortcuts
-synology/docker/           # Docker Compose stacks for Synology NAS
 .claude-x/                 # Alternate Claude Code settings (linked into ~/.claude-x)
 mcp/                       # MCP catalog for Docker Desktop
 ```
+
+Synology NAS Compose stacks and DSM tasks live in the separate `island` repository.
 
 ## Key Patterns
 
@@ -55,7 +56,7 @@ Managed symlinks (17 total):
 | `~/.config/nvim` | `nvim` |
 | `~/.config/worktrunk` | `worktrunk` |
 
-Reference-only paths (not symlinked): `omz/`, `omp.toml`, `glow/`, `zed/`, `iTerm2/`, `synology/`.
+Reference-only paths (not symlinked): `omz/`, `omp.toml`, `glow/`, `zed/`, `iTerm2/`.
 
 ### Local Override Pattern
 `.local/` is git-ignored. It provides per-machine customization:
@@ -113,47 +114,10 @@ Dotfiles tasks:
 ### Shell Auto-Loading
 Files in `omz/auto/*.zsh` are sourced via `cat` glob in `.zshrc`. Adding a file there makes it auto-loaded.
 
-## Synology NAS Conventions
-
-### Docker Compose Stacks
-Each stack is a directory under `synology/docker/<name>/` containing `compose.yml`.
-
-Services:
-- `gateway` — Traefik v3 reverse proxy
-- `admin` — Docker socket proxy
-- `cloudflare` — Cloudflared tunnel
-- `adguard` — AdGuard Home DNS
-- `media` — Jellyfin, Sonarr, Radarr, Lidarr, Bazarr, Prowlarr, Transmission, Flaresolverr, Watcharr, Cleanuparr
-- `archive` — Karakeep + Meilisearch + headless Chrome
-- `bayt-al-hikma` — Audiobookshelf
-- `youtube` — Invidious + PostgreSQL + Companion
-
-### Domain Routing
-- `*.tn.ojizero.dev` — Tailscale (tailnet)
-- `*.ln.ojizero.dev` — Local network
-- `*.ojizero.dev` — Public (via Cloudflare tunnel)
-
-Subdomain mnemonics: `m` (media/Jellyfin), `srr` (Sonarr), `rrr` (Radarr), `lrr` (Lidarr), `brr` (Bazarr), `prr` (Prowlarr), `q` (Transmission), `wrr` (Watcharr), `crr` (Cleanuparr), `keep` (Karakeep), `abs` (Audiobookshelf), `yt` (Invidious), `d` (DNS/AdGuard), `atlas` (DSM)
-
-### Network Architecture
-- `servicenet` — external bridge, all Traefik-routed services must join this
-- `admin-dockernet` — internal, Traefik + Docker socket proxy only
-- Service-specific internal networks use descriptive `-sphere` or `-net` suffixes
-
-### Compose File Conventions
-- Filename: `compose.yml` (not `docker-compose.yml`)
-- Images pinned to exact versions, never `latest`
-- `restart: unless-stopped` on all services
-- `.env` files git-ignored, `.env.sample` required alongside
-- YAML anchors (`x-*`) for shared config (e.g. `x-data-vault`, `x-environment`)
-
 ## Safety Rules
 
-1. NEVER commit `.env` files — they contain secrets
-2. NEVER use `latest` tags for Docker images
-3. NEVER modify `.local/` contents from git
-4. NEVER remove dotfile entries from `[dotfiles]` without removing the target symlink
-5. Always create `.env.sample` alongside any `.env` usage
-6. Bootstrap hooks and tasks must be idempotent
-7. Never hardcode paths — use `$DOTFILES_PATH`, `$HOME`, or relative paths
-8. Default branch is `master`
+1. NEVER modify `.local/` contents from git
+2. NEVER remove dotfile entries from `[dotfiles]` without removing the target symlink
+3. Bootstrap hooks and tasks must be idempotent
+4. Never hardcode paths — use `$DOTFILES_PATH`, `$HOME`, or relative paths
+5. Default branch is `master`
