@@ -34,8 +34,8 @@ copy-on-select = false
 unfocused-split-opacity = 0.5
 split-inherit-working-directory = true
 
-# Close without confirmation
-confirm-close-surface = false
+# Confirm close/quit only when a process is running (shell-integration detected)
+confirm-close-surface = true
 
 # Shell integration (no-cursor: keep block cursor at prompt instead of bar)
 shell-integration = detect
