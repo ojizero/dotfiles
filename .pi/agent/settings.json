@@ -1,0 +1,8 @@
+{
+  "lastChangelogVersion": "0.80.10",
+  "theme": "light/dark",
+  "terminal": {
+    "showTerminalProgress": true
+  },
+  "enableInstallTelemetry": false
+}

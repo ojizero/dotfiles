@@ -24,6 +24,7 @@ iTerm2/                    # iTerm2 settings plist
 .brew-aliases/             # Homebrew alias shortcuts
 .claude-x/                 # Alternate Claude Code settings (linked into ~/.claude-x)
 mcp/                       # MCP catalog for Docker Desktop
+.pi/agent/                 # Pi coding agent config (mirrors ~/.pi/agent: settings.json + extensions/)
 ```
 
 Synology NAS Compose stacks and DSM tasks live in the separate `island` repository.
@@ -34,7 +35,7 @@ Synology NAS Compose stacks and DSM tasks live in the separate `island` reposito
 All dotfiles are symlinked from this repo to `$HOME` via `[dotfiles]` in `mise.toml` and applied with `mise bootstrap dotfiles apply`.
 Pattern: targets in `[dotfiles]` resolve sources relative to the repo root.
 
-Managed symlinks (17 total):
+Managed symlinks (19 total):
 
 | Target | Source |
 |--------|--------|
@@ -55,6 +56,8 @@ Managed symlinks (17 total):
 | `~/.config/ghostty` | `ghostty` |
 | `~/.config/nvim` | `nvim` |
 | `~/.config/worktrunk` | `worktrunk` |
+| `~/.pi/agent/settings.json` | `.pi/agent/settings.json` |
+| `~/.pi/agent/extensions` | `.pi/agent/extensions` |
 
 Reference-only paths (not symlinked): `omz/`, `omp.toml`, `glow/`, `zed/`, `iTerm2/`.
 
@@ -72,7 +75,7 @@ Machine setup is declared in `mise.toml` and converged with `mise bootstrap`:
 
 1. `[bootstrap.hooks.pre-packages]` — install Homebrew if missing
 2. `[bootstrap.repos]` — clone at `~/workspace/self/dotfiles` (new machines)
-3. `[dotfiles]` — apply 17 symlinks
+3. `[dotfiles]` — apply 19 symlinks
 4. `[bootstrap.hooks.post-dotfiles]` — mkdirs, seed `mise.local.toml`, `m dotfiles:bundle` (trusts Brewfile taps first)
 5. `[bootstrap.macos.*]` — Dock, Finder, trackpad, defaults
 6. `[bootstrap.hooks.post-defaults]` — `killall Dock`
@@ -121,3 +124,4 @@ Files in `omz/auto/*.zsh` are sourced via `cat` glob in `.zshrc`. Adding a file 
 3. Bootstrap hooks and tasks must be idempotent
 4. Never hardcode paths — use `$DOTFILES_PATH`, `$HOME`, or relative paths
 5. Default branch is `master`
+6. Keep Pi config nested under `.pi/agent/` — `.pi/` is Pi's reserved project-config dir, so `pi` run in this repo auto-loads (and executes) anything at `.pi/extensions/`, `.pi/settings.json`, etc. The `agent/` nesting deliberately sidesteps that; do not flatten it.

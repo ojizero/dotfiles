@@ -65,6 +65,8 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.config/ghostty" = "ghostty"
 "~/.config/nvim" = "nvim"
 "~/.config/worktrunk" = "worktrunk"
+"~/.pi/agent/settings.json" = ".pi/agent/settings.json"
+"~/.pi/agent/extensions" = ".pi/agent/extensions"
 
 [bootstrap.repos]
 
@@ -111,7 +113,7 @@ fi
 [bootstrap.hooks.post-dotfiles]
 
 run = [
-  "mkdir -p ~/.config ~/.local/nvim",
+  "mkdir -p ~/.config ~/.local/nvim ~/.pi/agent",
   "test -f \"${DOTFILES_PATH}/mise.local.toml\" || cp \"${DOTFILES_PATH}/mise.local.toml.sample\" \"${DOTFILES_PATH}/mise.local.toml\"",
   "mise run dotfiles:bundle",
 ]
