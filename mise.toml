@@ -15,6 +15,7 @@ lua-language-server = "latest"
 # Required to get NPM based tools to be installable even if the tools
 # aren't reliant on Node. Main JS runtime is not Node is still Bun.
 node = "lts"
+"npm:@earendil-works/pi-coding-agent" = "latest"
 
 [env]
 
