@@ -3,7 +3,7 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import { pathToFileURL } from "node:url";
-import { defineTool, type ExtensionAPI, type ToolDefinition } from "@mariozechner/pi-coding-agent";
+import { defineTool, type ExtensionAPI, type ToolDefinition } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
 import { loadAgent, type AgentDefinition, type AgentStore, type LoadResult } from "./agent.js";
 import { registerExtra } from "./tools.js";

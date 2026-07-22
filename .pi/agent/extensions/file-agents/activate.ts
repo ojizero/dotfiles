@@ -1,4 +1,4 @@
-import type { ExtensionAPI, ExtensionCommandContext, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionCommandContext, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import type { AgentDefinition, AgentStore } from "./agent.js";
 import { clearRender, renderActive } from "./render.js";
 import { persistActive } from "./state.js";

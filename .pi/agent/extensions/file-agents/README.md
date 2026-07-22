@@ -2,7 +2,7 @@
 
 Mastra-style, file-based agent definitions for the [Pi coding agent](https://github.com/mariozechner/pi-coding-agent). Define named agents on disk and activate one at a time inside a Pi session with `/agents`.
 
-Zero external dependencies: the extension imports only Node builtins and Pi-provided modules (`@mariozechner/pi-coding-agent`, `@mariozechner/pi-tui`, `typebox`). Mastra is **not** installed or imported — only its on-disk conventions are mirrored.
+Zero external dependencies: the extension imports only Node builtins and Pi-provided modules (`@earendil-works/pi-coding-agent`, `@earendil-works/pi-tui`, `typebox`). Mastra is **not** installed or imported — only its on-disk conventions are mirrored.
 
 ## What activating an agent does
 
@@ -61,7 +61,7 @@ Tool files are Pi `ToolDefinition` modules with a default export:
 
 ```ts
 import { Type } from "typebox";
-import { defineTool } from "@mariozechner/pi-coding-agent";
+import { defineTool } from "@earendil-works/pi-coding-agent";
 
 export default defineTool({
   name: "echo",

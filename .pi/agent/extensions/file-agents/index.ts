@@ -1,4 +1,4 @@
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { type AgentDefinition, createStore, loadAgent } from "./agent.js";
 import { applyActive } from "./activate.js";
 import { registerAgentsCommand } from "./command.js";

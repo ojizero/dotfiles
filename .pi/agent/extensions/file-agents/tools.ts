@@ -1,6 +1,6 @@
 import * as path from "node:path";
 import { pathToFileURL } from "node:url";
-import type { ExtensionAPI, ToolDefinition } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ToolDefinition } from "@earendil-works/pi-coding-agent";
 import type { AgentDefinition, AgentStore } from "./agent.js";
 
 export function namespacedToolName(agentId: string, toolId: string): string {
