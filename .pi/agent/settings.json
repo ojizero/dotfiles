@@ -4,5 +4,7 @@
   "terminal": {
     "showTerminalProgress": true
   },
-  "enableInstallTelemetry": false
+  "enableInstallTelemetry": false,
+  "defaultProvider": "aperture",
+  "defaultModel": "kimi-k2.6"
 }
