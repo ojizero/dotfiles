@@ -55,8 +55,8 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.zprofile" = ".zprofile"
 "~/.gitconfig" = ".gitconfig"
 "~/.bunfig.toml" = "bunfig.toml"
-"~/.config/mise/config.toml" = "mise.toml"
-"~/.config/mise/config.local.toml" = "mise.local.toml"
+"~/.config/mise/config.toml" = ".mise.toml"
+"~/.config/mise/config.local.toml" = ".mise.local.toml"
 "~/.config/mise/tasks" = ".mise/tasks"
 "~/.claude/settings.json" = ".claude/settings.json"
 "~/.claude/statusline-command.sh" = ".claude/statusline-command.sh"
@@ -114,15 +114,15 @@ fi
 
 run = [
   "mkdir -p ~/.config ~/.local/nvim ~/.pi/agent",
-  "test -f \"${DOTFILES_PATH}/mise.local.toml\" || cp \"${DOTFILES_PATH}/mise.local.toml.sample\" \"${DOTFILES_PATH}/mise.local.toml\"",
+  "test -f \"${DOTFILES_PATH}/.mise.local.toml\" || cp \"${DOTFILES_PATH}/.mise.local.toml.sample\" \"${DOTFILES_PATH}/.mise.local.toml\"",
   "mise run dotfiles:bundle",
 ]
 
 [bootstrap.hooks.post-tools]
 
 run = [
-  "mise trust \"${DOTFILES_PATH}/mise.toml\"",
-  "mise trust \"${DOTFILES_PATH}/mise.local.toml\" 2>/dev/null || true",
+  "mise trust \"${DOTFILES_PATH}/.mise.toml\"",
+  "mise trust \"${DOTFILES_PATH}/.mise.local.toml\" 2>/dev/null || true",
 ]
 
 [bootstrap.hooks.post-defaults]

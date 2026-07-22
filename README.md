@@ -58,7 +58,7 @@ All personal repos live under `~/workspace/`. Dotfiles are cloned to:
 ~/workspace/self/dotfiles
 ```
 
-This path is declared in `mise.toml` as `[env].DOTFILES_PATH` and `[bootstrap.repos]`, exported in `.zshrc`, and used by `bootstrap/install.sh`.
+This path is declared in `.mise.toml` as `[env].DOTFILES_PATH` and `[bootstrap.repos]`, exported in `.zshrc`, and used by `bootstrap/install.sh`.
 
 ### Local configurations
 
@@ -70,8 +70,8 @@ are included as `~/.local/.gitconfig` in the main `.gitconfig` file. During boot
 a symlink is created pointing `~/.local` to `./.local`, and you can add
 `./.local/.gitconfig` with machine-specific Git settings.
 
-Per-machine mise overrides live in `mise.local.toml` (git-ignored). Copy from
-`mise.local.toml.sample` or let bootstrap seed it on first run.
+Per-machine mise overrides live in `.mise.local.toml` (git-ignored). Copy from
+`.mise.local.toml.sample` or let bootstrap seed it on first run.
 
 ### Dotfiles tasks
 

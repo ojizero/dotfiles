@@ -1,7 +1,7 @@
 #! /bin/bash
 
 GITHUB_SSH_KEY=${GITHUB_SSH_KEY:-~/.ssh/github.self}
-# Canonical paths — keep in sync with mise.toml [env] DOTFILES_PATH and [bootstrap.repos]
+# Canonical paths — keep in sync with .mise.toml [env] DOTFILES_PATH and [bootstrap.repos]
 DOTFILES_CLONE_PATH=${DOTFILES_CLONE_PATH:-~/workspace/self}
 DOTFILES_PATH=${DOTFILES_PATH:-${DOTFILES_CLONE_PATH}/dotfiles}
 
@@ -55,11 +55,11 @@ if ! command -v mise >/dev/null 2>&1; then
 fi
 
 # Point mise at repo config before symlinks exist
-export MISE_CONFIG_FILE="${DOTFILES_PATH}/mise.toml"
-mise trust "${DOTFILES_PATH}/mise.toml"
+export MISE_CONFIG_FILE="${DOTFILES_PATH}/.mise.toml"
+mise trust "${DOTFILES_PATH}/.mise.toml"
 
 # Seed local config if first run
-[[ -f mise.local.toml ]] || cp mise.local.toml.sample mise.local.toml
+[[ -f .mise.local.toml ]] || cp .mise.local.toml.sample .mise.local.toml
 
 # Single convergence command (symlinks, brew bundle, tools, macOS extras)
 mise bootstrap --yes --force-dotfiles

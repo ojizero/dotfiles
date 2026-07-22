@@ -7,8 +7,8 @@ Personal dotfiles for macOS.
 ```
 .zshrc, .zprofile          # Shell config (zsh + Oh-My-Zsh + oh-my-posh)
 .gitconfig                 # Git config (aliases, SSH URLs, delta)
-mise.toml                  # Mise version manager + bootstrap config
-mise.local.toml.sample     # Tracked stub for per-machine mise overrides
+.mise.toml                  # Mise version manager + bootstrap config
+.mise.local.toml.sample     # Tracked stub for per-machine mise overrides
 bunfig.toml                # Bun package manager config
 Brewfile                   # Homebrew packages
 omp.toml                   # Oh-My-Posh prompt config
@@ -32,7 +32,7 @@ Synology NAS Compose stacks and DSM tasks live in the separate `island` reposito
 ## Key Patterns
 
 ### Symlink Installation
-All dotfiles are symlinked from this repo to `$HOME` via `[dotfiles]` in `mise.toml` and applied with `mise bootstrap dotfiles apply`.
+All dotfiles are symlinked from this repo to `$HOME` via `[dotfiles]` in `.mise.toml` and applied with `mise bootstrap dotfiles apply`.
 Pattern: targets in `[dotfiles]` resolve sources relative to the repo root.
 
 Managed symlinks (19 total):
@@ -46,8 +46,8 @@ Managed symlinks (19 total):
 | `~/.zprofile` | `.zprofile` |
 | `~/.gitconfig` | `.gitconfig` |
 | `~/.bunfig.toml` | `bunfig.toml` |
-| `~/.config/mise/config.toml` | `mise.toml` |
-| `~/.config/mise/config.local.toml` | `mise.local.toml` |
+| `~/.config/mise/config.toml` | `.mise.toml` |
+| `~/.config/mise/config.local.toml` | `.mise.local.toml` |
 | `~/.config/mise/tasks` | `.mise/tasks` |
 | `~/.claude/settings.json` | `.claude/settings.json` |
 | `~/.claude/statusline-command.sh` | `.claude/statusline-command.sh` |
@@ -68,22 +68,22 @@ Reference-only paths (not symlinked): `omz/`, `omp.toml`, `glow/`, `zed/`, `iTer
 - `.local/Brewfile` — concatenated with main `Brewfile` during `mise run dotfiles:bundle`
 - `.local/bin/` — added to `$PATH`
 
-`mise.local.toml` is git-ignored per-machine tool/settings overrides. On first bootstrap, `mise.local.toml.sample` is copied if missing.
+`.mise.local.toml` is git-ignored per-machine tool/settings overrides. On first bootstrap, `.mise.local.toml.sample` is copied if missing.
 
 ### Bootstrap (Mise)
-Machine setup is declared in `mise.toml` and converged with `mise bootstrap`:
+Machine setup is declared in `.mise.toml` and converged with `mise bootstrap`:
 
 1. `[bootstrap.hooks.pre-packages]` — install Homebrew if missing
 2. `[bootstrap.repos]` — clone at `~/workspace/self/dotfiles` (new machines)
 3. `[dotfiles]` — apply 19 symlinks
-4. `[bootstrap.hooks.post-dotfiles]` — mkdirs, seed `mise.local.toml`, `m dotfiles:bundle` (trusts Brewfile taps first)
+4. `[bootstrap.hooks.post-dotfiles]` — mkdirs, seed `.mise.local.toml`, `m dotfiles:bundle` (trusts Brewfile taps first)
 5. `[bootstrap.macos.*]` — Dock, Finder, trackpad, defaults
 6. `[bootstrap.hooks.post-defaults]` — `killall Dock`
 7. `mise install` — tools from `[tools]`
 8. `[bootstrap.hooks.post-tools]` — `mise trust`
 9. `[tasks.bootstrap]` — `bootstrap/macos/extras.setup` (pmset, gatekeeper, updates, battery %)
 
-**Repo path:** `~/workspace/self/dotfiles` — declared in `mise.toml` `[env].DOTFILES_PATH` and `[bootstrap.repos]`.
+**Repo path:** `~/workspace/self/dotfiles` — declared in `.mise.toml` `[env].DOTFILES_PATH` and `[bootstrap.repos]`.
 
 **New device:** run `bootstrap/install.sh` (SSH key, clone, Homebrew, `brew install mise`, `mise bootstrap --yes --force-dotfiles`).
 

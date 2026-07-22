@@ -12,7 +12,7 @@ m dotfiles:status                          # bootstrap + dotfiles status
 
 ## Expected symlinks
 
-From `[dotfiles]` in `mise.toml`:
+From `[dotfiles]` in `.mise.toml`:
 
 | Target in $HOME | Source in repo |
 |-----------------|----------------|
@@ -23,8 +23,8 @@ From `[dotfiles]` in `mise.toml`:
 | `~/.zprofile` | `.zprofile` |
 | `~/.gitconfig` | `.gitconfig` |
 | `~/.bunfig.toml` | `bunfig.toml` |
-| `~/.config/mise/config.toml` | `mise.toml` |
-| `~/.config/mise/config.local.toml` | `mise.local.toml` |
+| `~/.config/mise/config.toml` | `.mise.toml` |
+| `~/.config/mise/config.local.toml` | `.mise.local.toml` |
 | `~/.config/mise/tasks` | `.mise/tasks` |
 | `~/.claude/settings.json` | `.claude/settings.json` |
 | `~/.claude/statusline-command.sh` | `.claude/statusline-command.sh` |
