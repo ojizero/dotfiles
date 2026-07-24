@@ -3,18 +3,6 @@
 bun = "1.3.14"
 erlang = "28"
 elixir = "1.19.5-otp-28"
-
-# Langauge servers
-elixir-ls = "latest"
-lua-language-server = "latest"
-"npm:bash-language-server" = "latest"
-"npm:yaml-language-server" = "latest"
-"npm:vscode-langservers-extracted" = "latest"
-"github:WhatsApp/erlang-language-platform" = "latest"
-
-# Runtime for the npm-based language servers above. Bun remains the primary JS
-# runtime and the package manager mise uses for npm tools.
-node = "lts"
 "github:earendil-works/pi" = "latest"
 
 [env]
