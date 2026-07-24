@@ -1,5 +1,6 @@
 [tools]
 
+uv = "latest"
 bun = "1.3.14"
 erlang = "28"
 elixir = "1.19.5-otp-28"
@@ -41,6 +42,10 @@ dotfiles.default_mode = "symlink"
 
 credential_command = "gh auth token"
 
+[settings.pipx]
+
+uvx = true
+
 [hooks]
 
 # Inline run (not `{ task = "auto:git-sync" }`) because:
@@ -65,6 +70,7 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.claude/statusline-command.sh" = ".claude/statusline-command.sh"
 "~/.claude-x/settings.json" = ".claude-x/settings.json"
 "~/.claude-x/statusline-command.sh" = ".claude/statusline-command.sh"
+"~/.config/uv" = "uv"
 "~/.config/ghostty" = "ghostty"
 "~/.config/nvim" = "nvim"
 "~/.config/worktrunk" = "worktrunk"

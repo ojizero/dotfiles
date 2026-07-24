@@ -1,0 +1,18 @@
+# Global uv configuration
+# Symlinked to ~/.config/uv/uv.toml via the [dotfiles] `~/.config/uv` entry.
+# In uv.toml settings are top-level (the [tool.uv] prefix is only for pyproject.toml).
+
+# Delay resolution to versions published at least 7 days ago. A relative
+# duration is a sliding window (recomputed on every resolve), mirroring Bun's
+# minimumReleaseAge and mise's minimum_release_age. Mitigates supply chain
+# attacks from compromised recent publishes.
+exclude-newer = "7 days"
+
+# Per-package exemptions from the exclude-newer window. Keep these aligned with
+# mise's pipx: tool exclusions. Duplication is intentional: mise forwards its
+# cutoff to uv for transitive resolution of pipx:/uvx: tools, but its exclusions
+# are not forwarded, so uv still applies exclude-newer to the requested package
+# and its dependencies unless listed here. Set a package to `false` to exempt it
+# entirely, or to a timestamp/duration for a different window.
+# Currently no exclusions.
+# exclude-newer-package = { some-package = false }
