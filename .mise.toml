@@ -12,10 +12,10 @@ lua-language-server = "latest"
 "npm:vscode-langservers-extracted" = "latest"
 "github:WhatsApp/erlang-language-platform" = "latest"
 
-# Required to get NPM based tools to be installable even if the tools
-# aren't reliant on Node. Main JS runtime is not Node is still Bun.
+# Runtime for the npm-based language servers above. Bun remains the primary JS
+# runtime and the package manager mise uses for npm tools.
 node = "lts"
-"npm:@earendil-works/pi-coding-agent" = "latest"
+"github:earendil-works/pi" = "latest"
 
 [env]
 
@@ -24,10 +24,6 @@ DOTFILES_PATH = "{{ env.HOME }}/workspace/self/dotfiles"
 
 MISE_ENV_FILE=".env"
 ERL_AFLAGS = "-kernel shell_history enabled"
-
-# Disable OMO's Posthog integration
-OMO_DISABLE_POSTHOG=1
-OMO_SEND_ANONYMOUS_TELEMETRY=0
 
 [settings]
 
@@ -40,14 +36,15 @@ npm.package_manager = "bun"
 # mise tool IDs and only disable mise's cutoff. They are not forwarded to Bun:
 # without a mise cutoff flag, Bun still applies minimumReleaseAge from bunfig
 # to the requested package and its dependencies. Keep matching top-level npm
-# exclusions in bunfig; Bun's list additionally includes relevant dependencies.
+# npm exclusions in bunfig; Bun's list additionally includes relevant
+# dependencies. GitHub release tools do not need a Bun exclusion.
 # Arrays are not appended across mise config layers: defining this setting in
 # config.local.toml replaces the full list, so repeat any shared entries there.
 minimum_release_age_excludes = [
   "npm:@agentclientprotocol/claude-agent-acp",
   "npm:@playwright/cli",
   "npm:@zed-industries/codex-acp",
-  "npm:@earendil-works/pi-coding-agent",
+  "github:earendil-works/pi",
 ]
 
 dotfiles.default_mode = "symlink"

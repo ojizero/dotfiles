@@ -17,7 +17,6 @@ minimumReleaseAgeExcludes = [
   "@playwright/cli",
   "@zed-industries/codex-acp",
   "@zed-industries/codex-acp-darwin-arm64",
-  "@earendil-works/pi-coding-agent",
 ]
 
 # NOTE: Bun blocks lifecycle scripts by default. Its built-in trusted list
