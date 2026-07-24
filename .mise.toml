@@ -1,6 +1,6 @@
 [tools]
 
-bun = "1.3.11"
+bun = "1.3.14"
 erlang = "28"
 elixir = "1.19.5-otp-28"
 
@@ -31,8 +31,26 @@ OMO_SEND_ANONYMOUS_TELEMETRY=0
 
 [settings]
 
-dotfiles.default_mode = "symlink"
+minimum_release_age = "7d"
 npm.package_manager = "bun"
+
+# mise applies its minimum release age while resolving fuzzy top-level tool
+# versions (such as "latest"). For npm: and pipx: tools it also forwards the
+# cutoff to Bun/uv for transitive dependency resolution. Exclusions here match
+# mise tool IDs and only disable mise's cutoff. They are not forwarded to Bun:
+# without a mise cutoff flag, Bun still applies minimumReleaseAge from bunfig
+# to the requested package and its dependencies. Keep matching top-level npm
+# exclusions in bunfig; Bun's list additionally includes relevant dependencies.
+# Arrays are not appended across mise config layers: defining this setting in
+# config.local.toml replaces the full list, so repeat any shared entries there.
+minimum_release_age_excludes = [
+  "npm:@agentclientprotocol/claude-agent-acp",
+  "npm:@playwright/cli",
+  "npm:@zed-industries/codex-acp",
+  "npm:@earendil-works/pi-coding-agent",
+]
+
+dotfiles.default_mode = "symlink"
 
 [settings.github]
 
