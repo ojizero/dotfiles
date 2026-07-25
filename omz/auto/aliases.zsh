@@ -111,6 +111,8 @@ alias cc='claude --dangerously-skip-permissions'
 alias xclaude='CLAUDE_CONFIG_DIR="$HOME/.claude-x" claude --dangerously-skip-permissions'
 alias xcc='xclaude'
 
+alias cx='codex'
+
 alias m='mise run'
 
 # npx/uvx-style ephemeral tool runners, routed through mise instead
@@ -130,3 +132,4 @@ alias v='nvim'
 alias nv='nvim'
 alias vm='nvim'
 alias vim='nvim'
+
