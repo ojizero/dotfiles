@@ -73,6 +73,10 @@ a symlink is created pointing `~/.local` to `./.local`, and you can add
 Per-machine mise overrides live in `.mise.local.toml` (git-ignored). Copy from
 `.mise.local.toml.sample` or let bootstrap seed it on first run.
 
+Codex execution-policy rules live under [`.codex/rules`](./.codex/rules).
+Mise links them into `~/.codex/rules` without replacing Codex's machine-local
+configuration, credentials, plugins, or runtime state.
+
 ### Dotfiles tasks
 
 | Task | Description |

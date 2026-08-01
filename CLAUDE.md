@@ -25,6 +25,7 @@ iTerm2/                    # iTerm2 settings plist
 .claude-x/                 # Alternate Claude Code settings (linked into ~/.claude-x)
 mcp/                       # MCP catalog for Docker Desktop
 .pi/agent/                 # Pi coding agent config (mirrors ~/.pi/agent: settings.json + extensions/)
+.codex/rules/              # Codex global execution-policy rules
 ```
 
 Synology NAS Compose stacks and DSM tasks live in the separate `island` repository.
@@ -35,7 +36,7 @@ Synology NAS Compose stacks and DSM tasks live in the separate `island` reposito
 All dotfiles are symlinked from this repo to `$HOME` via `[dotfiles]` in `.mise.toml` and applied with `mise bootstrap dotfiles apply`.
 Pattern: targets in `[dotfiles]` resolve sources relative to the repo root.
 
-Managed symlinks (19 total):
+Managed symlinks (20 total):
 
 | Target | Source |
 |--------|--------|
@@ -58,6 +59,7 @@ Managed symlinks (19 total):
 | `~/.config/worktrunk` | `worktrunk` |
 | `~/.pi/agent/settings.json` | `.pi/agent/settings.json` |
 | `~/.pi/agent/extensions` | `.pi/agent/extensions` |
+| `~/.codex/rules/host-tools.rules` | `.codex/rules/host-tools.rules` |
 
 Reference-only paths (not symlinked): `omz/`, `omp.toml`, `glow/`, `zed/`, `iTerm2/`.
 

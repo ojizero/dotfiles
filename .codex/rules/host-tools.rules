@@ -1,0 +1,37 @@
+# Allow these host-integrated CLIs to run outside the Codex sandbox without an
+# additional approval prompt.
+
+prefix_rule(
+    pattern = ["gh"],
+    decision = "allow",
+    justification = "GitHub CLI requires the host GitHub authentication context and unrestricted network access.",
+    match = [
+        "gh auth status",
+        "gh pr list",
+        "gh repo view",
+    ],
+    not_match = ["git status"],
+)
+
+prefix_rule(
+    pattern = ["fj"],
+    decision = "allow",
+    justification = "Forgejo CLI requires the host Forgejo authentication context and unrestricted network access.",
+    match = [
+        "fj --help",
+        "fj whoami",
+        "fj repo list",
+    ],
+    not_match = ["git status"],
+)
+
+prefix_rule(
+    pattern = ["obsidian"],
+    decision = "allow",
+    justification = "Obsidian CLI requires access to the host Obsidian application and its vaults.",
+    match = [
+        "obsidian vault=Cortex read file=AGENTS.md",
+        "obsidian vault=Cortex search query=Codex",
+    ],
+    not_match = ["git status"],
+)

@@ -78,6 +78,7 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.config/worktrunk" = "worktrunk"
 "~/.pi/agent/settings.json" = ".pi/agent/settings.json"
 "~/.pi/agent/extensions" = ".pi/agent/extensions"
+"~/.codex/rules/host-tools.rules" = ".codex/rules/host-tools.rules"
 
 [bootstrap.repos]
 
