@@ -17,11 +17,33 @@
     "dark": "Catppuccin Mocha",
   },
   "agent_servers": {
+    "claude-acp": {
+      "default_config_options": {
+        "mode": "auto"
+      },
+      "type": "registry"
+    },
+    "codex-acp": {
+      "type": "registry"
+    },
     "cursor": {
-      "type": "registry",
+      "default_config_options": {
+        "mode": "agent",
+        "model": "default"
+      },
+      "type": "custom",
+      "command": "cursor-agent",
+      "args": ["acp", "--yolo"],
     },
     "opencode": {
       "type": "registry",
+    },
+    "pi-acp": {
+      "default_config_options": {
+        "thought_level": "medium",
+        "model": "aperture/kimi-k3"
+      },
+      "type": "registry"
     },
   },
   "icon_theme": {
