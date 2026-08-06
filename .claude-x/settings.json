@@ -22,6 +22,7 @@
   },
   "model": "fable",
   "enabledPlugins": {},
+  "disableClaudeAiConnectors": true,
   "alwaysThinkingEnabled": true,
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
