@@ -37,9 +37,11 @@ split-inherit-working-directory = true
 # Confirm close/quit only when a process is running (shell-integration detected)
 confirm-close-surface = true
 
-# Shell integration (no-cursor: keep block cursor at prompt instead of bar)
+# Shell integration (no-cursor: keep block cursor at prompt instead of bar).
+# Prepare SSH sessions with Ghostty's environment and terminfo so remote shells
+# and terminal applications decode keys consistently.
 shell-integration = detect
-shell-integration-features = no-cursor
+shell-integration-features = no-cursor,ssh-env,ssh-terminfo
 
 # Bold text uses bright colors
 bold-color = bright
