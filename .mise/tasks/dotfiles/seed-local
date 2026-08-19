@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+#MISE description="Seed .mise.local.toml from the tracked sample if missing"
+
+# A task, not an inline bootstrap hook: hooks get neither `[env]` nor template
+# rendering, so `${DOTFILES_PATH}` is empty there.
+[[ -f "${DOTFILES_PATH}/.mise.local.toml" ]] ||
+  cp "${DOTFILES_PATH}/.mise.local.toml.sample" "${DOTFILES_PATH}/.mise.local.toml"

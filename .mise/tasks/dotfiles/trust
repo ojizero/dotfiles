@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+#MISE description="Trust the repo mise configs"
+
+# A task, not an inline bootstrap hook: hooks get neither `[env]` nor template
+# rendering, so `${DOTFILES_PATH}` was empty and `mise trust "/.mise.toml"`
+# silently trusted `/`.
+mise trust "${DOTFILES_PATH}/.mise.toml"
+mise trust "${DOTFILES_PATH}/.mise.local.toml" 2>/dev/null || true

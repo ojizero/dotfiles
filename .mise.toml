@@ -131,24 +131,26 @@ fi
 
 [bootstrap.hooks.pre-dotfiles]
 
-# `~/.claude-x/skills` sources this directory, and dotagents does not create it
-# until `dotfiles:agents` runs after `mise install`. Runs on the standalone
-# `mise bootstrap dotfiles apply` too, so the link self-heals on every sync.
-run = "mkdir -p ~/.agents/skills"
+# Both entries create a `[dotfiles]` source that is not repo content. A missing
+# source aborts the whole apply, so they must exist before it runs. This also
+# fires on the standalone `mise bootstrap dotfiles apply`, so both self-heal.
+# `seed-local` is a task because hooks get neither `[env]` nor templates.
+run = [
+  "mkdir -p ~/.agents/skills",
+  "mise run dotfiles:seed-local",
+]
 
 [bootstrap.hooks.post-dotfiles]
 
 run = [
   "mkdir -p ~/.config ~/.local/nvim ~/.pi/agent",
-  "test -f \"${DOTFILES_PATH}/.mise.local.toml\" || cp \"${DOTFILES_PATH}/.mise.local.toml.sample\" \"${DOTFILES_PATH}/.mise.local.toml\"",
   "mise run dotfiles:bundle",
 ]
 
 [bootstrap.hooks.post-tools]
 
 run = [
-  "mise trust \"${DOTFILES_PATH}/.mise.toml\"",
-  "mise trust \"${DOTFILES_PATH}/.mise.local.toml\" 2>/dev/null || true",
+  "mise run dotfiles:trust",
   "mise run dotfiles:agents",
 ]
 

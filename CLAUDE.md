@@ -82,13 +82,13 @@ Machine setup is declared in `.mise.toml` and converged with `mise bootstrap`:
 
 1. `[bootstrap.hooks.pre-packages]` — install Homebrew if missing
 2. `[bootstrap.repos]` — clone at `~/workspace/self/dotfiles` (new machines)
-3. `[bootstrap.hooks.pre-dotfiles]` — `mkdir -p ~/.agents/skills` (source of the `~/.claude-x/skills` link)
+3. `[bootstrap.hooks.pre-dotfiles]` — `mkdir -p ~/.agents/skills`, `m dotfiles:seed-local` (both create `[dotfiles]` sources that are not repo content)
 4. `[dotfiles]` — apply 23 symlinks
-5. `[bootstrap.hooks.post-dotfiles]` — mkdirs, seed `.mise.local.toml`, `m dotfiles:bundle` (trusts Brewfile taps first)
+5. `[bootstrap.hooks.post-dotfiles]` — mkdirs, `m dotfiles:bundle` (trusts Brewfile taps first)
 6. `[bootstrap.macos.*]` — Dock, Finder, trackpad, defaults
 7. `[bootstrap.hooks.post-defaults]` — `killall Dock`
 8. `mise install` — tools from `[tools]`
-9. `[bootstrap.hooks.post-tools]` — `mise trust`, `m dotfiles:agents`
+9. `[bootstrap.hooks.post-tools]` — `m dotfiles:trust`, `m dotfiles:agents`
 10. `[tasks.bootstrap]` — `bootstrap/macos/extras.setup` (pmset, gatekeeper, updates, battery %)
 
 **Repo path:** `~/workspace/self/dotfiles` — declared in `.mise.toml` `[env].DOTFILES_PATH` and `[bootstrap.repos]`.
@@ -121,6 +121,8 @@ Dotfiles tasks:
 - `m dotfiles:bootstrap` — full `mise bootstrap --yes`
 - `m dotfiles:bundle` — Homebrew bundle from Brewfile
 - `m dotfiles:agents` — install agent skills from `dotagent/agents.toml`
+- `m dotfiles:seed-local` — seed `.mise.local.toml` from the tracked sample
+- `m dotfiles:trust` — trust the repo mise configs
 - `m dotfiles:edit` — open repo in `$EDITOR`
 
 ### Shell Auto-Loading
@@ -134,4 +136,7 @@ Files in `omz/auto/*.zsh` are sourced via `cat` glob in `.zshrc`. Adding a file 
 4. Never hardcode paths — use `$DOTFILES_PATH`, `$HOME`, or relative paths
 5. Default branch is `master`
 6. Keep Pi config nested under `.pi/agent/` — `.pi/` is Pi's reserved project-config dir, so `pi` run in this repo auto-loads (and executes) anything at `.pi/extensions/`, `.pi/settings.json`, etc. The `agent/` nesting deliberately sidesteps that; do not flatten it.
-7. Keep the dotagents tracker in `dotagent/` (singular) — same trap as `.pi/`. `.agents/` is dotagents' project-config dir and is scanned for skills, and `agents/` is where it discovers portable subagents. Never run `dotagents init` here either: it writes `agents.toml` through the symlink and replaces the tracked file.
+7. Bootstrap hooks get neither `[env]` nor template rendering — `${DOTFILES_PATH}` is empty inside `[bootstrap.hooks.*]`. Anything needing it must be a `mise run` task, which does get `[env]`.
+8. Tasks calling `mise bootstrap [dotfiles] …` must pass `-C "${DOTFILES_PATH}"`. Otherwise mise loads the global config through the `~/.config/mise/config.toml` symlink and resolves every repo-relative `[dotfiles]` source against `~/.config/mise`, which reports them all missing and aborts an apply.
+9. Every `[dotfiles]` source must exist before the apply runs — one missing source aborts the whole apply, not just that entry. Sources that are generated rather than repo content need a `pre-dotfiles` hook to create them.
+10. Keep the dotagents tracker in `dotagent/` (singular) — same trap as `.pi/`. `.agents/` is dotagents' project-config dir and is scanned for skills, and `agents/` is where it discovers portable subagents. Never run `dotagents init` here either: it writes `agents.toml` through the symlink and replaces the tracked file.

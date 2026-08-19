@@ -1,7 +1,10 @@
 #!/usr/bin/env zsh
 #MISE description="Show bootstrap and dotfiles drift status"
 
-mise bootstrap status --missing
-mise bootstrap dotfiles status --missing
+# `-C` is required: run without it, mise loads the global config through the
+# `~/.config/mise/config.toml` symlink and resolves every repo-relative
+# `[dotfiles]` source against `~/.config/mise`, reporting them all as missing.
+mise bootstrap status --missing -C "${DOTFILES_PATH}"
+mise bootstrap dotfiles status --missing -C "${DOTFILES_PATH}"
 # `doctor` exits non-zero on any issue; keep this task's exit code at zero.
 mise x -- dotagents doctor || true
