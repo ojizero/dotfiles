@@ -10,3 +10,7 @@ mise install
 if git -C "${DOTFILES_PATH}" diff --name-only "${old_ref}" HEAD -- Brewfile .local/Brewfile | grep -q .; then
   mise run dotfiles:bundle
 fi
+
+if git -C "${DOTFILES_PATH}" diff --name-only "${old_ref}" HEAD -- dotagent/agents.toml | grep -q .; then
+  mise run dotfiles:agents
+fi

@@ -3,3 +3,5 @@
 
 mise bootstrap status --missing
 mise bootstrap dotfiles status --missing
+# `doctor` exits non-zero on any issue; keep this task's exit code at zero.
+mise x -- dotagents doctor || true

@@ -10,6 +10,7 @@ Personal dotfiles for macOS.
 .mise.toml                  # Mise version manager + bootstrap config
 .mise.local.toml.sample     # Tracked stub for per-machine mise overrides
 bunfig.toml                # Bun package manager config
+uv/uv.toml                  # uv (Python) package manager config
 Brewfile                   # Homebrew packages
 omp.toml                   # Oh-My-Posh prompt config
 omz/auto/*.zsh             # Auto-loaded shell modules (aliases, completions, history, keybindings, misc)
@@ -26,6 +27,7 @@ iTerm2/                    # iTerm2 settings plist
 mcp/                       # MCP catalog for Docker Desktop
 .pi/agent/                 # Pi coding agent config (mirrors ~/.pi/agent: settings.json + extensions/)
 .codex/rules/              # Codex global execution-policy rules
+dotagent/                  # dotagents skill tracker (agents.toml -> ~/.agents/agents.toml)
 ```
 
 Synology NAS Compose stacks and DSM tasks live in the separate `island` repository.
@@ -36,7 +38,7 @@ Synology NAS Compose stacks and DSM tasks live in the separate `island` reposito
 All dotfiles are symlinked from this repo to `$HOME` via `[dotfiles]` in `.mise.toml` and applied with `mise bootstrap dotfiles apply`.
 Pattern: targets in `[dotfiles]` resolve sources relative to the repo root.
 
-Managed symlinks (20 total):
+Managed symlinks (23 total):
 
 | Target | Source |
 |--------|--------|
@@ -50,6 +52,7 @@ Managed symlinks (20 total):
 | `~/.config/mise/config.toml` | `.mise.toml` |
 | `~/.config/mise/config.local.toml` | `.mise.local.toml` |
 | `~/.config/mise/tasks` | `.mise/tasks` |
+| `~/.config/uv` | `uv` |
 | `~/.claude/settings.json` | `.claude/settings.json` |
 | `~/.claude/statusline-command.sh` | `.claude/statusline-command.sh` |
 | `~/.claude-x/settings.json` | `.claude-x/settings.json` |
@@ -60,6 +63,8 @@ Managed symlinks (20 total):
 | `~/.pi/agent/settings.json` | `.pi/agent/settings.json` |
 | `~/.pi/agent/extensions` | `.pi/agent/extensions` |
 | `~/.codex/rules/host-tools.rules` | `.codex/rules/host-tools.rules` |
+| `~/.agents/agents.toml` | `dotagent/agents.toml` |
+| `~/.claude-x/skills` | `~/.agents/skills` (generated, not repo content) |
 
 Reference-only paths (not symlinked): `omz/`, `omp.toml`, `glow/`, `zed/`, `iTerm2/`.
 
@@ -77,13 +82,14 @@ Machine setup is declared in `.mise.toml` and converged with `mise bootstrap`:
 
 1. `[bootstrap.hooks.pre-packages]` — install Homebrew if missing
 2. `[bootstrap.repos]` — clone at `~/workspace/self/dotfiles` (new machines)
-3. `[dotfiles]` — apply 19 symlinks
-4. `[bootstrap.hooks.post-dotfiles]` — mkdirs, seed `.mise.local.toml`, `m dotfiles:bundle` (trusts Brewfile taps first)
-5. `[bootstrap.macos.*]` — Dock, Finder, trackpad, defaults
-6. `[bootstrap.hooks.post-defaults]` — `killall Dock`
-7. `mise install` — tools from `[tools]`
-8. `[bootstrap.hooks.post-tools]` — `mise trust`
-9. `[tasks.bootstrap]` — `bootstrap/macos/extras.setup` (pmset, gatekeeper, updates, battery %)
+3. `[bootstrap.hooks.pre-dotfiles]` — `mkdir -p ~/.agents/skills` (source of the `~/.claude-x/skills` link)
+4. `[dotfiles]` — apply 23 symlinks
+5. `[bootstrap.hooks.post-dotfiles]` — mkdirs, seed `.mise.local.toml`, `m dotfiles:bundle` (trusts Brewfile taps first)
+6. `[bootstrap.macos.*]` — Dock, Finder, trackpad, defaults
+7. `[bootstrap.hooks.post-defaults]` — `killall Dock`
+8. `mise install` — tools from `[tools]`
+9. `[bootstrap.hooks.post-tools]` — `mise trust`, `m dotfiles:agents`
+10. `[tasks.bootstrap]` — `bootstrap/macos/extras.setup` (pmset, gatekeeper, updates, battery %)
 
 **Repo path:** `~/workspace/self/dotfiles` — declared in `.mise.toml` `[env].DOTFILES_PATH` and `[bootstrap.repos]`.
 
@@ -110,10 +116,11 @@ Global mise tasks live in `.mise/tasks/` (symlinked to `~/.config/mise/tasks`). 
 
 Dotfiles tasks:
 - `m dotfiles:pull` — git pull
-- `m dotfiles:sync` — pull + dotfiles apply + tools + conditional bundle
+- `m dotfiles:sync` — pull + dotfiles apply + tools + conditional bundle/agents
 - `m dotfiles:status` — bootstrap drift + dotfiles status
 - `m dotfiles:bootstrap` — full `mise bootstrap --yes`
 - `m dotfiles:bundle` — Homebrew bundle from Brewfile
+- `m dotfiles:agents` — install agent skills from `dotagent/agents.toml`
 - `m dotfiles:edit` — open repo in `$EDITOR`
 
 ### Shell Auto-Loading
@@ -127,3 +134,4 @@ Files in `omz/auto/*.zsh` are sourced via `cat` glob in `.zshrc`. Adding a file 
 4. Never hardcode paths — use `$DOTFILES_PATH`, `$HOME`, or relative paths
 5. Default branch is `master`
 6. Keep Pi config nested under `.pi/agent/` — `.pi/` is Pi's reserved project-config dir, so `pi` run in this repo auto-loads (and executes) anything at `.pi/extensions/`, `.pi/settings.json`, etc. The `agent/` nesting deliberately sidesteps that; do not flatten it.
+7. Keep the dotagents tracker in `dotagent/` (singular) — same trap as `.pi/`. `.agents/` is dotagents' project-config dir and is scanned for skills, and `agents/` is where it discovers portable subagents. Never run `dotagents init` here either: it writes `agents.toml` through the symlink and replaces the tracked file.

@@ -1,0 +1,36 @@
+version = 1
+
+# Only `claude` and `cursor` produce a global skills symlink today, and both
+# resolve to `~/.claude/skills`. `codex`, `opencode` and `pi` are accepted but
+# inert at global scope; they are declared for intent.
+agents = ["claude", "cursor", "codex", "opencode", "pi"]
+
+# Minutes, matching the 7d cutoff `[settings].minimum_release_age` uses.
+minimum_release_age = 10080
+
+[trust]
+
+github_repos = ["mattpocock/skills", "cursor/plugins"]
+
+# `github_orgs` does not cover a self-hosted forge; non-GitHub sources are
+# matched on domain plus path prefix instead.
+git_domains = ["ssh-forge.ojizero.dev/ojizero"]
+
+# The forge is reached over SSH through a Cloudflare Access tunnel, declared as
+# the `ssh-forge.ojizero.dev` host in `~/.ssh/config`. Plain HTTPS needs a
+# sign-in and cannot clone anonymously. The `git:` prefix is required for any
+# non-GitHub source: a bare HTTPS URL is treated as a well-known skills index.
+[[skills]]
+name = "cortex"
+source = "git:git@ssh-forge.ojizero.dev:ojizero/cortex.git"
+
+[[skills]]
+name = "writing-for-agents"
+source = "mattpocock/skills"
+
+# `cursor/plugins` is plugin-shaped, so `dotagents add` would pull every skill
+# in it. A hand-written entry with an explicit `path` takes just this one.
+[[skills]]
+name = "unslop"
+source = "cursor/plugins"
+path = "pstack/skills/unslop"

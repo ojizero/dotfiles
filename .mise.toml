@@ -7,6 +7,7 @@ elixir = "1.19.5-otp-28"
 "github:earendil-works/pi" = "latest"
 "npm:@agentclientprotocol/codex-acp" = "latest"
 "npm:@agentclientprotocol/claude-agent-acp" = "latest"
+"npm:@sentry/dotagents" = "latest"
 
 [env]
 
@@ -79,6 +80,12 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.pi/agent/settings.json" = ".pi/agent/settings.json"
 "~/.pi/agent/extensions" = ".pi/agent/extensions"
 "~/.codex/rules/host-tools.rules" = ".codex/rules/host-tools.rules"
+"~/.agents/agents.toml" = "dotagent/agents.toml"
+
+# dotagents only links `~/.claude/skills`, so mirror it for the alternate
+# profile. The source is generated, not repo content, so the pre-dotfiles hook
+# below guarantees it exists — a missing source aborts the whole apply.
+"~/.claude-x/skills" = "~/.agents/skills"
 
 [bootstrap.repos]
 
@@ -122,6 +129,13 @@ if ! command -v brew >/dev/null 2>&1; then
 fi
 '''
 
+[bootstrap.hooks.pre-dotfiles]
+
+# `~/.claude-x/skills` sources this directory, and dotagents does not create it
+# until `dotfiles:agents` runs after `mise install`. Runs on the standalone
+# `mise bootstrap dotfiles apply` too, so the link self-heals on every sync.
+run = "mkdir -p ~/.agents/skills"
+
 [bootstrap.hooks.post-dotfiles]
 
 run = [
@@ -135,6 +149,7 @@ run = [
 run = [
   "mise trust \"${DOTFILES_PATH}/.mise.toml\"",
   "mise trust \"${DOTFILES_PATH}/.mise.local.toml\" 2>/dev/null || true",
+  "mise run dotfiles:agents",
 ]
 
 [bootstrap.hooks.post-defaults]
