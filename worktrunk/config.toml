@@ -5,6 +5,16 @@ skip-commit-generation-prompt = true
 squash = false
 
 [pre-start]
-mise-trust = "if mise trust --show -C {{ primary_worktree_path }} 2>/dev/null | grep -q ': trusted'; then mise trust -C {{ worktree_path }}; fi"
+mise-trust = """
+if mise trust --show -C {{ primary_worktree_path }} 2>/dev/null | grep -q ': trusted'; then
+  if mise trust -C {{ worktree_path }}; then
+    if [ -f {{ primary_worktree_path }}/.mise.local.toml ]; then
+      cp {{ primary_worktree_path }}/.mise.local.toml {{ worktree_path }}/.mise.local.toml
+    elif [ -f {{ primary_worktree_path }}/mise.local.toml ]; then
+      cp {{ primary_worktree_path }}/mise.local.toml {{ worktree_path }}/mise.local.toml
+    fi
+  fi
+fi
+"""
 
 [projects]
