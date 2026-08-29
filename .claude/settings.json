@@ -4,20 +4,21 @@
     "DISABLE_AUTOUPDATER": "1"
   },
   "permissions": {
-    "defaultMode": "default"
+    "defaultMode": "auto"
   },
-  "model": "claude-opus-5[1m]",
+  "model": "opus",
+  "disableClaudeAiConnectors": true,
   "statusLine": {
     "type": "command",
     "command": "zsh ~/.claude/statusline-command.sh"
   },
   "enabledPlugins": {},
-  "disableClaudeAiConnectors": true,
   "alwaysThinkingEnabled": true,
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
   "autoCompactEnabled": false,
+  "autoMemoryEnabled": false,
   "teammateMode": "auto",
   "agentPushNotifEnabled": true
 }

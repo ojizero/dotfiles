@@ -28,5 +28,6 @@
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
   "autoCompactEnabled": false,
+  "autoMemoryEnabled": false,
   "teammateMode": "auto"
 }
