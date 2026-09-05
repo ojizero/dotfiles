@@ -115,7 +115,8 @@ alias cx='codex'
 
 alias m='mise run'
 
-# npx/uvx-style ephemeral tool runners, routed through mise instead
+# npx/uvx-style ephemeral tool runners, routed through mise instead. npm:
+# installs use mise's embedded Aube as selected in the global mise config.
 # Usage: npx <package>[@version] [args] / uvx <package>[@version] [args]
 function npx {
   local pkg="${1:?required input of package to run}"; shift
@@ -132,4 +133,3 @@ alias v='nvim'
 alias nv='nvim'
 alias vm='nvim'
 alias vim='nvim'
-

@@ -1,0 +1,41 @@
+#!/usr/bin/env zsh
+#MISE description="Reinstall legacy Bun-managed npm tools with embedded Aube"
+
+if [[ "$(mise settings get npm.package_manager)" != "aube" ]]; then
+  echo "Expected mise npm.package_manager to be aube." >&2
+  exit 1
+fi
+
+npm_tool_rows=("${(@f)$(mise ls --current --json | jq -r 'to_entries[] | select(.key | startswith("npm:")) | [.key, .value[0].version] | @tsv')}")
+legacy_tools=()
+legacy_specs=()
+
+for row in "${npm_tool_rows[@]}"; do
+  [[ -n "${row}" ]] || continue
+  tool="${row%%$'\t'*}"
+  version="${row#*$'\t'}"
+  install_path="$(mise where "${tool}" 2>/dev/null)" || continue
+  if [[ -f "${install_path}/bun.lock" || -f "${install_path}/bun.lockb" ]]; then
+    legacy_tools+=("${tool}")
+    legacy_specs+=("${tool}@${version}")
+  fi
+done
+
+if (( ${#legacy_tools[@]} == 0 )); then
+  echo "No Bun-managed npm tools need migration."
+  exit 0
+fi
+
+echo "Reinstalling npm tools with mise's embedded Aube:"
+printf '  %s\n' "${legacy_tools[@]}"
+# Preserve the active versions so this migration does not also upgrade tools.
+mise install --force "${legacy_specs[@]}"
+mise reshim
+
+for tool in "${legacy_tools[@]}"; do
+  install_path="$(mise where "${tool}")"
+  if [[ -f "${install_path}/bun.lock" || -f "${install_path}/bun.lockb" ]]; then
+    echo "Bun lockfile remains after reinstalling ${tool}." >&2
+    exit 1
+  fi
+done

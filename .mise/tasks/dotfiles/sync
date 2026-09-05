@@ -8,6 +8,9 @@ git -C "${DOTFILES_PATH}" pull -p
 # `~/.config/mise` and the apply aborts with "sources do not exist".
 mise bootstrap dotfiles apply --yes -C "${DOTFILES_PATH}"
 mise install
+# `mise install` does not replace an installed version when only its npm
+# package manager changed. Migrate legacy Bun installs, then no-op on later runs.
+mise run dotfiles:migrate-aube
 
 if git -C "${DOTFILES_PATH}" diff --name-only "${old_ref}" HEAD -- Brewfile .local/Brewfile | grep -q .; then
   mise run dotfiles:bundle

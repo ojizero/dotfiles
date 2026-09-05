@@ -1,3 +1,5 @@
+min_version = "2026.7.14"
+
 [tools]
 
 uv = "latest"
@@ -14,24 +16,22 @@ elixir = "1.19.5-otp-28"
 # Canonical dotfiles clone path (all repos live under ~/workspace/...)
 DOTFILES_PATH = "{{ env.HOME }}/workspace/self/dotfiles"
 
-MISE_ENV_FILE=".env"
+MISE_ENV_FILE = ".env"
 ERL_AFLAGS = "-kernel shell_history enabled"
 
 [settings]
 
 minimum_release_age = "7d"
-npm.package_manager = "bun"
+
+# Install npm: tools with the Aube package manager embedded in mise. This does
+# not install or require the standalone Aube CLI.
+npm.package_manager = "aube"
 
 # mise applies its minimum release age while resolving fuzzy top-level tool
 # versions (such as "latest"). For npm: and pipx: tools it also forwards the
-# cutoff to Bun/uv for transitive dependency resolution. Exclusions here match
-# mise tool IDs and only disable mise's cutoff. They are not forwarded to Bun:
-# without a mise cutoff flag, Bun still applies minimumReleaseAge from bunfig
-# to the requested package and its dependencies. Keep matching top-level npm
-# npm exclusions in bunfig; Bun's list additionally includes relevant
-# dependencies. GitHub release tools do not need a Bun exclusion.
-# Arrays are not appended across mise config layers: defining this setting in
-# config.local.toml replaces the full list, so repeat any shared entries there.
+# cutoff to Aube/uv for transitive dependency resolution. Exclusions here match
+# mise tool IDs and disable mise's cutoff for those tools. GitHub release tools
+# do not need an Aube exclusion.
 minimum_release_age_excludes = [
   "npm:@agentclientprotocol/claude-agent-acp",
   "npm:@playwright/cli",
@@ -135,10 +135,7 @@ fi
 # source aborts the whole apply, so they must exist before it runs. This also
 # fires on the standalone `mise bootstrap dotfiles apply`, so both self-heal.
 # `seed-local` is a task because hooks get neither `[env]` nor templates.
-run = [
-  "mkdir -p ~/.agents/skills",
-  "mise run dotfiles:seed-local",
-]
+run = ["mkdir -p ~/.agents/skills", "mise run dotfiles:seed-local"]
 
 [bootstrap.hooks.post-dotfiles]
 
@@ -149,10 +146,7 @@ run = [
 
 [bootstrap.hooks.post-tools]
 
-run = [
-  "mise run dotfiles:trust",
-  "mise run dotfiles:agents",
-]
+run = ["mise run dotfiles:trust", "mise run dotfiles:agents"]
 
 [bootstrap.hooks.post-defaults]
 
