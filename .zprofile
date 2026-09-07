@@ -2,17 +2,17 @@
 #
 # This differs between Apple Silicon and Intel based
 # Macs so we check the machine architecture before
-case "$(machine)" in
-  arm*)
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  case "$(machine)" in
+    arm*)
+      eval "$(/opt/homebrew/bin/brew shellenv)"
+      ;;
 
-    ;;
-
-  x86_64*)
-    eval "$(/usr/local/bin/brew shellenv)"
-
-    ;;
-esac
+    x86_64*)
+      eval "$(/usr/local/bin/brew shellenv)"
+      ;;
+  esac
+fi
 
 if [[ -d "${HOME}/.local/bin" ]]; then
   export PATH="${HOME}/.local/bin:${PATH}"

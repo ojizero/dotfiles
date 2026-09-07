@@ -55,7 +55,7 @@ find-up() {
 
 function glow {
   local style="${DOTFILES_PATH}/glow/themes/catppuccin-mocha.json"
-  if [[ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" != "Dark" ]]; then
+  if [[ "$OSTYPE" == darwin* && "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" != "Dark" ]]; then
     style="${DOTFILES_PATH}/glow/themes/catppuccin-latte.json"
   fi
 

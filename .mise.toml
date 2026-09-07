@@ -95,7 +95,7 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 
 [bootstrap.repos]
 
-"~/workspace/self/dotfiles" = { url = "git@github.com:ojizero/dotfiles.git", ref = "master" }
+"~/workspace/self/dotfiles" = { url = "ssh://git@ssh-forge.ojizero.dev/ojizero/dotfiles.git", ref = "master" }
 
 [bootstrap.macos.dock]
 
@@ -121,6 +121,10 @@ tap_to_click = true
 [bootstrap.hooks.pre-packages]
 
 run = '''
+if [ "$(uname -s)" != "Darwin" ]; then
+  exit 0
+fi
+
 export NONINTERACTIVE=1
 if ! command -v brew >/dev/null 2>&1; then
   /usr/bin/env bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"

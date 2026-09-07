@@ -1,6 +1,8 @@
 #!/usr/bin/env zsh
 #MISE description="Install Homebrew packages from Brewfile"
 
+[[ "$(uname -s)" == "Darwin" ]] || exit 0
+
 if [[ ! -z "$1" ]] && [[ "$1" = '--reset' ]]; then
   opts=(--cleanup --zap --force)
 elif [[ ! -z "$1" ]]; then

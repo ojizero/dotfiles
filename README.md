@@ -2,9 +2,9 @@
 
 > Here be dragons 🐉
 
-My personal dotfiles, those include my system setup along with a bunch of recipes,
-scripts, and aliases I use day to day. Those were made and are only used with
-Zsh on macOS, so no compatibility outside that environment is actively made.
+My personal dotfiles, including my system setup and the recipes and aliases I
+use day to day. macOS is the primary workstation target. Ubuntu containers can
+use the same Zsh, Git, agent, and mise setup without installing Homebrew.
 
 ## Setup
 
@@ -12,7 +12,7 @@ Zsh on macOS, so no compatibility outside that environment is actively made.
 
 Run [`bootstrap/install.sh`](./bootstrap/install.sh). It will:
 
-1. Generate an SSH key and clone this repo to `~/workspace/self/dotfiles`
+1. Clone this repo from Forgejo to `~/workspace/self/dotfiles` using the existing SSH setup
 2. Install Homebrew (if missing) and `brew install mise`
 3. Run `mise bootstrap --yes --force-dotfiles` (symlinks, Brewfile, tools, macOS defaults, extras)
 
@@ -41,7 +41,7 @@ Do not use `--force-dotfiles` on existing machines unless `mise bootstrap dotfil
 On a clean macOS VM:
 
 1. Install Xcode CLI tools: `xcode-select --install`
-2. Copy or curl `bootstrap/install.sh` and run it interactively (SSH key + GitHub setup)
+2. Verify SSH access to Forgejo and GitHub, then run `bootstrap/install.sh`
 3. Open a new shell and verify:
    - `echo $DOTFILES_PATH` → `~/workspace/self/dotfiles`
    - `m dotfiles:status` exits 0

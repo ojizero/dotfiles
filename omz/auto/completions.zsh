@@ -1,5 +1,7 @@
 # Append additional custom completions paths
-fpath+=("$(brew --prefix)/share/zsh/site-functions")
+if command -v brew >/dev/null 2>&1; then
+  fpath+=("$(brew --prefix)/share/zsh/site-functions")
+fi
 fpath+=("${DOTFILES_PATH}/omz/completions")
 autoload -U compinit && compinit
 autoload -U +X bashcompinit && bashcompinit

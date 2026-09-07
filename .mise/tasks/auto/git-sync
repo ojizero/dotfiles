@@ -76,7 +76,7 @@ local cooldown=${config_repo:-${config_default:-900}}
 if (( cooldown > 0 )); then
   mkdir -p "$cache_dir"
   local repo_hash stamp_file now last_sync
-  repo_hash=$(print -r -- "$git_root" | md5)
+  repo_hash=$(print -rn -- "$git_root" | git hash-object --stdin)
   stamp_file="${cache_dir}/${repo_hash}"
   now=$(date +%s)
 
