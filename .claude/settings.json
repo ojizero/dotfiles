@@ -6,19 +6,23 @@
   "permissions": {
     "defaultMode": "auto"
   },
-  "model": "opus",
   "disableClaudeAiConnectors": true,
   "statusLine": {
     "type": "command",
     "command": "zsh ~/.claude/statusline-command.sh"
   },
   "enabledPlugins": {},
+  "extraKnownMarketplaces": {},
   "alwaysThinkingEnabled": true,
   "tui": "fullscreen",
+  "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
   "autoCompactEnabled": false,
-  "autoMemoryEnabled": false,
   "teammateMode": "auto",
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "attribution": {
+    "commit": false,
+    "pr": false
+  }
 }

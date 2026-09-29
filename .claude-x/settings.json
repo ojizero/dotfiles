@@ -29,5 +29,9 @@
   "theme": "auto",
   "autoCompactEnabled": false,
   "autoMemoryEnabled": false,
-  "teammateMode": "auto"
+  "teammateMode": "auto",
+  "attribution": {
+    "commit": false,
+    "pr": false
+  }
 }
