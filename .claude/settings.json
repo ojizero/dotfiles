@@ -18,9 +18,9 @@
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "skipAutoPermissionPrompt": true,
-  "skipWorkflowUsageWarning": true,
+  "disableWorkflows": true,
   "theme": "auto",
-  "autoCompactEnabled": false,
+  "autoCompactEnabled": true,
   "teammateMode": "auto",
   "agentPushNotifEnabled": true,
   "attribution": {

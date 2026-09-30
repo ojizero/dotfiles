@@ -27,9 +27,9 @@
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "skipAutoPermissionPrompt": true,
-  "skipWorkflowUsageWarning": true,
+  "disableWorkflows": true,
   "theme": "auto",
-  "autoCompactEnabled": false,
+  "autoCompactEnabled": true,
   "autoMemoryEnabled": false,
   "teammateMode": "auto",
   "attribution": {
