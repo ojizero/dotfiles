@@ -26,6 +26,8 @@
   "alwaysThinkingEnabled": true,
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
+  "skipAutoPermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
   "theme": "auto",
   "autoCompactEnabled": false,
   "autoMemoryEnabled": false,
