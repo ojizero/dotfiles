@@ -22,7 +22,7 @@
   "teammateMode": "auto",
   "agentPushNotifEnabled": true,
   "attribution": {
-    "commit": false,
-    "pr": false
+    "commit": "",
+    "pr": ""
   }
 }

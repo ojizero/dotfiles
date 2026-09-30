@@ -18,7 +18,7 @@
     "ANTHROPIC_DEFAULT_FABLE_MODEL_SUPPORTED_CAPABILITIES": "effort,thinking,adaptive_thinking"
   },
   "permissions": {
-    "defaultMode": "default"
+    "defaultMode": "auto"
   },
   "model": "fable",
   "enabledPlugins": {},
@@ -31,7 +31,7 @@
   "autoMemoryEnabled": false,
   "teammateMode": "auto",
   "attribution": {
-    "commit": false,
-    "pr": false
+    "commit": "",
+    "pr": ""
   }
 }
