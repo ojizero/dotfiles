@@ -1,0 +1,4 @@
+interface:
+  display_name: "Housekeeping"
+  short_description: "Check macOS headroom and storage trends"
+  default_prompt: "Use $housekeeping to check this Mac and report any storage decisions."
