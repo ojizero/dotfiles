@@ -1,8 +1,7 @@
 {
-  "host": "REPLACE_WITH_HOSTNAME",
-  "disk_root": "/System/Volumes/Data",
   "warning_percent": 15,
   "urgent_gib": 25,
-  "roots": [],
-  "repositories": []
+  "repositories": [],
+  "disposable": [],
+  "skip": []
 }

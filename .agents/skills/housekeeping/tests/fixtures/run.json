@@ -1,0 +1,264 @@
+{
+ "date": "2026-10-16T10:28:00+00:00",
+ "host": "amirs-mbp",
+ "dry_run": false,
+ "deep": true,
+ "capacity": 494382948024,
+ "free_before": 9234179686,
+ "free_after": 104389180124,
+ "status_before": "urgent",
+ "status_after": "healthy",
+ "thresholds": {
+  "warning_percent": 15,
+  "urgent_gib": 25
+ },
+ "freed": {
+  "caches": 29442000811,
+  "xcode": 4509715660,
+  "docker": 44775034060,
+  "worktrees": 20723217203
+ },
+ "freed_bytes": 99449967734,
+ "seconds": 412,
+ "counts": {
+  "done": 10,
+  "kept": 7,
+  "skipped": 2,
+  "failed": 1,
+  "planned": 0
+ },
+ "memory": {
+  "pressure": "normal",
+  "swap_bytes": 1245540515,
+  "top_processes": [
+   {
+    "pid": 1,
+    "rss_bytes": 5798205849,
+    "name": "com.apple.Virtualization.VirtualMachine"
+   },
+   {
+    "pid": 2,
+    "rss_bytes": 2147483648,
+    "name": "com.docker.backend"
+   },
+   {
+    "pid": 3,
+    "rss_bytes": 472446402,
+    "name": "WindowServer"
+   },
+   {
+    "pid": 4,
+    "rss_bytes": 268435456,
+    "name": "T3 Code (Nightly)"
+   }
+  ]
+ },
+ "results": [
+  {
+   "category": "caches",
+   "label": "Homebrew old versions and downloads",
+   "outcome": "done",
+   "reason": "brew cleanup --prune=all",
+   "bytes": 7537667604
+  },
+  {
+   "category": "caches",
+   "label": "uv unused cache entries",
+   "outcome": "done",
+   "reason": "uv cache prune",
+   "bytes": 2576980377
+  },
+  {
+   "category": "caches",
+   "label": "pnpm unreferenced store packages",
+   "outcome": "skipped",
+   "reason": "pnpm not installed",
+   "bytes": null
+  },
+  {
+   "category": "xcode",
+   "label": "Unavailable iOS simulators",
+   "outcome": "done",
+   "reason": "xcrun simctl delete unavailable",
+   "bytes": 644245094
+  },
+  {
+   "category": "docker",
+   "label": "Docker images and build cache unused for 7+ days",
+   "outcome": "done",
+   "reason": "Docker reported 44.8 GB; the host gets it back as the VM disk shrinks",
+   "bytes": 44775034060
+  },
+  {
+   "category": "docker",
+   "label": "Docker volumes (10)",
+   "outcome": "kept",
+   "reason": "hold databases and app data",
+   "bytes": 6090000000
+  },
+  {
+   "category": "docker",
+   "label": "Stopped Docker containers (2)",
+   "outcome": "kept",
+   "reason": "their writable layers may hold data",
+   "bytes": 300000000
+  },
+  {
+   "category": "xcode",
+   "label": "Xcode DerivedData untouched for 14+ days",
+   "outcome": "done",
+   "reason": "3 folders",
+   "bytes": 3865470566
+  },
+  {
+   "category": "worktrees",
+   "label": "Finished worktrees (6)",
+   "outcome": "done",
+   "reason": "removed with ADW or wt",
+   "bytes": 20723217203,
+   "items": [
+    {
+     "path": "~/.adw/projects/void-230ace60/trees/10a362af",
+     "bytes": 4402341478,
+     "note": "adw, merged into origin/main"
+    },
+    {
+     "path": "~/.adw/projects/pace_api-507dfa9b/trees/3735d1ec",
+     "bytes": 8912057139,
+     "note": "adw, PR #1931 merged"
+    },
+    {
+     "path": "~/.adw/projects/pace_api-507dfa9b/trees/32014925",
+     "bytes": 322122547,
+     "note": "adw, all commits on the remote, idle 18 days"
+    },
+    {
+     "path": "~/workspace/fts/void.chore-clean-agents-md",
+     "bytes": 966367641,
+     "note": "wt, merged into origin/main"
+    },
+    {
+     "path": "~/.adw/projects/void-230ace60/trees/abf527e9",
+     "bytes": 1073741824,
+     "note": "adw, merged into origin/main"
+    },
+    {
+     "path": "~/workspace/fts/prescribe-fit/pace_api.t3code-fix-worktree-aware-mise",
+     "bytes": 5046586572,
+     "note": "wt, all commits on the remote, idle 16 days"
+    }
+   ]
+  },
+  {
+   "category": "worktrees",
+   "label": "Worktree ~/.adw/projects/pace_api-507dfa9b/trees/9a6a0d97",
+   "outcome": "failed",
+   "reason": "adw purge: worktree is locked by another process",
+   "bytes": null,
+   "items": []
+  },
+  {
+   "category": "worktrees",
+   "label": "Worktrees (10)",
+   "outcome": "kept",
+   "reason": "uncommitted changes",
+   "bytes": 7301444403,
+   "items": [
+    {
+     "path": "~/.adw/projects/pace_api-507dfa9b/trees/47b1666c",
+     "bytes": 2684354560,
+     "note": ""
+    },
+    {
+     "path": "~/.adw/projects/pace_api-507dfa9b/trees/cd1b41dd",
+     "bytes": 536870912,
+     "note": ""
+    }
+   ]
+  },
+  {
+   "category": "worktrees",
+   "label": "Worktrees (4)",
+   "outcome": "kept",
+   "reason": "has commits that are not on the remote",
+   "bytes": 1932735283,
+   "items": [
+    {
+     "path": "~/.adw/projects/pace_api-507dfa9b/trees/8c1e2723",
+     "bytes": 214748364,
+     "note": ""
+    }
+   ]
+  },
+  {
+   "category": "worktrees",
+   "label": "Worktrees (1)",
+   "outcome": "kept",
+   "reason": "ignored files that may be yours: .env, e2e/.acceptance-phxcascade.env",
+   "bytes": 536870912,
+   "items": [
+    {
+     "path": "~/workspace/fts/prescribe-fit/pace_api.chore-phoenix-cascade-security-upgrade",
+     "bytes": 536870912,
+     "note": ""
+    }
+   ]
+  },
+  {
+   "category": "worktrees",
+   "label": "Worktrees (12)",
+   "outcome": "kept",
+   "reason": "T3 Code worktree (T3 manages it)",
+   "bytes": null,
+   "items": [
+    {
+     "path": "~/.t3/worktrees/pace_api/t3-0d9f9af1",
+     "bytes": null,
+     "note": "t3/autonomous-review-handoff"
+    }
+   ]
+  },
+  {
+   "category": "caches",
+   "label": "uv entire cache",
+   "outcome": "done",
+   "reason": "uv cache clean",
+   "bytes": 10522669875
+  },
+  {
+   "category": "caches",
+   "label": "Bun package cache",
+   "outcome": "done",
+   "reason": "bun pm cache rm",
+   "bytes": 6549825126
+  },
+  {
+   "category": "caches",
+   "label": "npm package cache",
+   "outcome": "done",
+   "reason": "npm cache clean --force",
+   "bytes": 1288490188
+  },
+  {
+   "category": "caches",
+   "label": "NuGet local caches",
+   "outcome": "skipped",
+   "reason": "dotnet not installed",
+   "bytes": null
+  },
+  {
+   "category": "caches",
+   "label": "Go build cache",
+   "outcome": "done",
+   "reason": "go clean -cache",
+   "bytes": 966367641
+  },
+  {
+   "category": "caches",
+   "label": "Playwright browsers",
+   "outcome": "kept",
+   "reason": "installed browsers that tests need",
+   "bytes": 5529770393
+  }
+ ]
+}

@@ -1,0 +1,276 @@
+import json
+import os
+import re
+import subprocess
+import sys
+import tempfile
+import time
+import unittest
+from pathlib import Path
+from unittest import mock
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / 'scripts'))
+
+import clean  # noqa: E402
+import housekeeping  # noqa: E402
+import measure  # noqa: E402
+import report  # noqa: E402
+import worktrees  # noqa: E402
+
+GIB = 1024 ** 3
+FIXTURES = HERE / 'fixtures'
+
+
+def fixture():
+    run = json.loads((FIXTURES / 'run.json').read_text())
+    history = [json.loads(line) for line in (FIXTURES / 'history.jsonl').read_text().splitlines()]
+    return run, history
+
+
+class Measure(unittest.TestCase):
+    def test_status_thresholds(self):
+        self.assertEqual(measure.status(20 * GIB, 400 * GIB, 15, 25), 'urgent')
+        self.assertEqual(measure.status(50 * GIB, 400 * GIB, 15, 25), 'warning')
+        self.assertEqual(measure.status(80 * GIB, 400 * GIB, 15, 25), 'healthy')
+
+    def test_run_bounds_time_and_reports_missing_tools(self):
+        started = time.monotonic()
+        r = measure.run([sys.executable, '-c', 'import time; time.sleep(5)'], timeout=0.5)
+        self.assertIsNone(r['code'])
+        self.assertLess(time.monotonic() - started, 3)
+        self.assertIn('unavailable', measure.run(['/nonexistent/tool'])['error'])
+
+    def test_run_keeps_only_the_tail_of_long_output(self):
+        r = measure.run([sys.executable, '-c', 'print("x" * 5000 + "END")'], limit=100)
+        self.assertEqual(r['code'], 0)
+        self.assertLessEqual(len(r['out']), 100)
+        self.assertIn('END', r['out'])
+
+
+class Clean(unittest.TestCase):
+    def test_reclaimed_sums_docker_totals(self):
+        text = 'Deleted Images:\nx\n\nTotal reclaimed space: 1.5GB\nID\nTotal:\t500MB\n'
+        self.assertEqual(clean.reclaimed(text), 2_000_000_000)
+        self.assertEqual(clean.docker_size('6.093GB'), 6_093_000_000)
+        self.assertIsNone(clean.docker_size(None))
+
+    def test_tool_action_outcomes(self):
+        spec = ('t', 'caches', 'Tool', [sys.executable, '-c', 'pass'], None, 10)
+        self.assertEqual(clean.tool_action(spec, '/', True)['outcome'], 'planned')
+        done = clean.tool_action(spec, '/', False)
+        self.assertEqual(done['outcome'], 'done')
+        self.assertGreaterEqual(done['bytes'], 0)
+        failing = ('t', 'caches', 'Tool', [sys.executable, '-c', 'raise SystemExit("boom")'], None, 10)
+        self.assertEqual(clean.tool_action(failing, '/', False)['reason'], 'boom')
+        missing = ('t', 'caches', 'Tool', ['no-such-tool-xyz'], None, 10)
+        self.assertEqual(clean.tool_action(missing, '/', False)['outcome'], 'skipped')
+
+    def test_tool_action_waits_for_busy_tools(self):
+        spec = ('t', 'caches', 'Tool', [sys.executable, '-c', 'pass'], 'pattern', 10)
+        with mock.patch.object(clean, 'busy', return_value=True):
+            self.assertIn('right now', clean.tool_action(spec, '/', False)['reason'])
+
+    def test_disposable_folders_need_age_idleness_and_home(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp).resolve()
+            old, new, busy_dir = home / 'old', home / 'new', home / 'busy'
+            for d in (old, new, busy_dir):
+                (d / 'sub').mkdir(parents=True)
+            stamp = time.time() - 30 * clean.DAY
+            for d in (old, busy_dir):
+                os.utime(d / 'sub', (stamp, stamp))
+                os.utime(d, (stamp, stamp))
+            out = clean.disposable(home, [str(old), str(new), str(busy_dir), '/tmp'], {str(busy_dir / 'sub')}, '/', False)
+            by_label = {r['label']: r for r in out}
+            self.assertEqual(by_label['~/old']['outcome'], 'done')
+            self.assertFalse(old.exists())
+            self.assertIn('14 days', by_label['~/new']['reason'])
+            self.assertIn('running process', by_label['~/busy']['reason'])
+            self.assertIn('under your home', by_label['/tmp']['reason'])
+
+
+def git(cwd, *args):
+    subprocess.run(['git', '-C', str(cwd), *args], check=True, capture_output=True)
+
+
+class Worktrees(unittest.TestCase):
+    """Real repositories exercise every gate. ADW is absent because the fake home has no ADW config."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.env = mock.patch.dict(os.environ, {
+            'GIT_CONFIG_GLOBAL': os.devnull, 'GIT_CONFIG_NOSYSTEM': '1', 'GIT_AUTHOR_NAME': 't',
+            'GIT_AUTHOR_EMAIL': 't@t', 'GIT_COMMITTER_NAME': 't', 'GIT_COMMITTER_EMAIL': 't@t'})
+        cls.env.start()
+        cls.tmp = tempfile.TemporaryDirectory()
+        root = Path(cls.tmp.name).resolve()
+        cls.home = root / 'home'
+        origin, main = root / 'origin.git', root / 'main'
+        subprocess.run(['git', 'init', '-q', '--bare', '-b', 'main', str(origin)], check=True)
+        subprocess.run(['git', 'clone', '-q', str(origin), str(main)], check=True, capture_output=True)
+        (main / '.gitignore').write_text('.env\nnode_modules/\nnotes/\n')
+        (main / '.env').write_text('SECRET=1\n')
+        git(main, 'add', '.gitignore')
+        git(main, 'commit', '-qm', 'init')
+        git(main, 'push', '-q', 'origin', 'main')
+        cls.main = main
+
+        def worktree(name, base=root):
+            path = base / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            git(main, 'worktree', 'add', '-q', '-b', name, str(path))
+            (path / f'{name}.txt').write_text(name)
+            git(path, 'add', '.')
+            git(path, 'commit', '-qm', name)
+            return path
+
+        cls.paths = {}
+        for name in ('merged', 'env-copy', 'env-differs', 'notes'):
+            cls.paths[name] = worktree(name)
+            git(main, 'merge', '-q', name)
+        (cls.paths['merged'] / 'node_modules').mkdir()
+        (cls.paths['merged'] / 'node_modules' / 'x.js').write_text('x')
+        (cls.paths['env-copy'] / '.env').write_text('SECRET=1\n')
+        (cls.paths['env-differs'] / '.env').write_text('SECRET=2\n')
+        (cls.paths['notes'] / 'notes').mkdir()
+        (cls.paths['notes'] / 'notes' / 'review.md').write_text('only copy')
+        git(main, 'push', '-q', 'origin', 'main')
+        cls.paths['dirty'] = worktree('dirty')
+        (cls.paths['dirty'] / 'wip.txt').write_text('wip')
+        cls.paths['unpushed'] = worktree('unpushed')
+        cls.paths['recent'] = worktree('recent')
+        git(main, 'push', '-q', 'origin', 'recent')
+        cls.paths['busy'] = worktree('busy')
+        git(main, 'merge', '-q', 'busy')
+        git(main, 'push', '-q', 'origin', 'main')
+        cls.paths['t3'] = worktree('t3', cls.home / '.t3' / 'worktrees')
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+        cls.env.stop()
+
+    def plan(self):
+        cwds = {str(self.paths['busy'] / 'sub')}
+        return {Path(w['path']).name: w for w in worktrees.plan(self.home, [str(self.main)], cwds)}
+
+    def test_every_gate(self):
+        plan = self.plan()
+        self.assertEqual(plan['merged']['decision'], 'remove')
+        self.assertEqual(plan['merged']['merged'], 'merged into origin/main')
+        self.assertEqual(plan['env-copy']['decision'], 'remove')
+        expected = {
+            'env-differs': 'ignored files that may be yours: .env',
+            'notes': 'ignored files that may be yours: notes/',
+            'dirty': 'uncommitted changes',
+            'unpushed': 'has commits that are not on the remote',
+            'recent': 'not merged and used in the last 14 days',
+            'busy': 'a running process is inside it',
+            't3': 'T3 Code worktree (T3 manages it)',
+        }
+        for name, reason in expected.items():
+            self.assertEqual((plan[name]['decision'], plan[name]['reason']), ('keep', reason), name)
+
+    def test_idle_pushed_worktree_is_removable(self):
+        with mock.patch.object(worktrees, 'idle_days', return_value=30):
+            plan = self.plan()
+        self.assertEqual(plan['recent']['decision'], 'remove')
+        self.assertIn('idle 30 days', plan['recent']['merged'])
+        self.assertEqual(plan['unpushed']['decision'], 'keep')
+
+    def test_unknown_process_list_keeps_everything(self):
+        plan = worktrees.plan(self.home, [str(self.main)], None)
+        self.assertTrue(all(w['decision'] == 'keep' for w in plan))
+
+    def test_env_overlay_counts_as_copy(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            a, b = Path(tmp, 'a'), Path(tmp, 'b')
+            a.write_text('KEY=1\nPORT=4000\n')
+            b.write_text('KEY=1\nOTHER=2\n')
+            self.assertTrue(worktrees.env_is_copy(a, b, ['PORT=4000']))
+            self.assertFalse(worktrees.env_is_copy(a, b, []))
+
+
+class Housekeeping(unittest.TestCase):
+    def test_config_defaults_and_validation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp, 'c.json')
+            self.assertEqual(housekeeping.load_config(path)['warning_percent'], 15)
+            for bad in ({'nope': 1}, {'urgent_gib': 0}, {'skip': ['everything']}, {'repositories': 'x'}):
+                path.write_text(json.dumps(bad))
+                path.chmod(0o600)
+                with self.assertRaises(ValueError):
+                    housekeeping.load_config(path)
+            path.write_text(json.dumps({'skip': ['docker'], 'warning_percent': 20}))
+            path.chmod(0o666)
+            with self.assertRaises(ValueError):
+                housekeeping.load_config(path)
+            path.chmod(0o600)
+            self.assertEqual(housekeeping.load_config(path)['skip'], ['docker'])
+
+    def test_history_is_capped_and_skips_bad_lines(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp, 'h.jsonl')
+            path.write_text(''.join(json.dumps({'n': i}) + '\n' for i in range(600)) + 'not json\n')
+            history = housekeeping.read_history(path)
+            self.assertEqual(len(history), housekeeping.HISTORY_LINES - 1)
+            housekeeping.append_history(path, {'n': 'new'}, history)
+            lines = path.read_text().splitlines()
+            self.assertEqual(len(lines), housekeeping.HISTORY_LINES)
+            self.assertEqual(json.loads(lines[-1]), {'n': 'new'})
+            self.assertEqual(path.stat().st_mode & 0o777, 0o600)
+
+    def test_summary_lists_failures_and_report_path(self):
+        run, _ = fixture()
+        text = housekeeping.summary(run, Path('/x/report.html'))
+        self.assertIn('Freed 92.6 GiB', text)
+        self.assertIn('FAILED: Worktree ~/.adw/projects/pace_api-507dfa9b/trees/9a6a0d97', text)
+        self.assertTrue(text.endswith('Report: /x/report.html'))
+
+    def test_skipped_and_out_of_budget_steps_are_reported(self):
+        config = {**housekeeping.OPTIONS, 'skip': ['docker']}
+        with mock.patch.object(clean, 'DEADLINE', time.monotonic() - 1), \
+                mock.patch.object(measure, 'process_cwds', return_value=set()), \
+                mock.patch.object(clean, 'playwright_kept', return_value=[]):
+            results, low = housekeeping.cleanup(Path('/nonexistent'), config, '/', True, (1, 1))
+        reasons = {r['label']: r['reason'] for r in results}
+        self.assertEqual(reasons['Docker'], 'turned off in config')
+        self.assertIn('budget', reasons['Homebrew old versions and downloads'])
+        self.assertFalse(low)
+
+
+class Report(unittest.TestCase):
+    def test_renders_every_section_offline(self):
+        run, history = fixture()
+        page = report.render(run, history)
+        for text in ('92.6 GiB', 'Freed by category', 'Free space over time', 'What it did', 'What it left alone',
+                     'locked by another process', 'Memory right now', 'hist-data'):
+            self.assertIn(text, page)
+        self.assertIsNone(re.search(r'(src|href)="https?:', page))
+        self.assertNotIn('url(http', page)
+
+    def test_escapes_tool_text(self):
+        run, history = fixture()
+        run['results'][0]['label'] = '<script>alert(1)</script>'
+        run['results'][0]['reason'] = '"><img src=x onerror=alert(1)>'
+        page = report.render(run, history + [{'date': '</script><script>alert(2)//', 'capacity': 1}])
+        self.assertNotIn('<script>alert', page)
+        self.assertNotIn('<img src=x', page)
+
+    def test_dry_run_and_first_run_states(self):
+        run, _ = fixture()
+        run.update(dry_run=True, freed={}, freed_bytes=0)
+        for r in run['results']:
+            if r['outcome'] == 'done':
+                r['outcome'] = 'planned'
+        run['counts']['planned'], run['counts']['done'] = run['counts']['done'], 0
+        page = report.render(run, [])
+        self.assertIn('actions planned', page)
+        self.assertIn('Dry run: nothing was removed.', page)
+        self.assertIn('What it would do', page)
+        self.assertIn('History starts with the first real run.', page)
+
+
+if __name__ == '__main__':
+    unittest.main()

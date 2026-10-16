@@ -1,11 +1,52 @@
-# Configuration and decisions
+# What housekeeping cleans, and why
 
-Copy config.example.json to a private user-owned file outside Git, and substitute `hostname` output and real absolute paths. Python 3 and native macOS tools suffice. The script never creates configuration, installs anything or writes files. Required keys are host and disk_root. Optional roots and repositories accept at most eight canonical, user-owned directories each. Choose narrow cache roots and repository roots, never all of home. Symlink paths and overlapping scan roots are rejected. An optional docker_socket names an existing local Unix socket; omit it to skip Docker. Docker remains stopped if unavailable.
+The rules below are enforced in `scripts/`; this file explains them. Change behaviour in the code, then here.
 
-The quick check reads free bytes, native pressure level and swap. Review adds bounded process metadata, allocated storage under roots, local Git worktree registrations, and Docker logical inventory when configured. No file contents, process arguments, Git fetch/maintenance, or Docker lifecycle commands run. Measurements can be partial. An entry or time limit yields unknown, never a complete size estimate. Docker logical inventory is separate from physical host free space. Swap usage alone does not establish pressure.
+## Every run (routine)
 
-Defaults warn below 15% free and become urgent below 25 GiB or at native critical pressure. Unknown pressure or swap yields `unknown` even with healthy disk space. There is no host cleanup mode, and `--apply` is unsupported.
+| Area | Action | Guard |
+|---|---|---|
+| Docker | `image prune -af`, `builder prune -af`, `network prune -f`, each `--filter until=168h` | Only when the daemon is already running; it is never started. Volumes and containers are never pruned. |
+| Worktrees | Remove through ADW (`adw purge`) for ADW runs, `wt remove` otherwise | All worktree gates below |
+| Homebrew | `brew cleanup --prune=all` | Skipped while `brew` runs |
+| uv | `uv cache prune` | Skipped while uv installs or syncs |
+| pnpm | `pnpm store prune` | Skipped while pnpm installs |
+| Simulators | `xcrun simctl delete unavailable` | |
+| Xcode | Delete DerivedData folders untouched for 14 days | Skipped while Xcode or `xcodebuild` runs |
 
-Caches, worktrees and Docker objects always need a user decision. Large protected roots remain in the report, with their size or an explicit unknown. Inventory is not eligibility proof. Retain candidates with unknown ownership, activity, dependencies, or merge proof; past cleanup permission grants no standing authority. Worktree removal in a separately authorized task must use ADW for ADW-managed trees and wt otherwise. Preserve dirty/staged/untracked/ignored files, local-only refs/stashes, open review work, current roots, active workloads and every shared object source. Finished runs and branch names do not prove a merge. Squash merges need current repository-matched evidence covering the present HEAD and landing commit.
+## Only while free space is low
 
-Preserve provider/T3/ADW histories and databases including WAL/SHM, credentials, recordings, models, recovery evidence, installed browsers/runtimes, active build caches, Docker volumes and stopped writable layers. Never remove swap or a Docker VM image, blanket prune, restart services, or repair Git. A future executor would need per-candidate activity and dependency proof, immediate rechecks and adopted category authorization. Do not improvise an executor during a check.
+When free space is still below the warning line after the routine steps, it also runs `uv cache clean`, `bun pm cache rm`, `npm cache clean --force`, `dotnet nuget locals all --clear`, `go clean -cache`, all Docker build cache, all DerivedData, and the configured `disposable` folders (those untouched for 14 days that no process is inside). These cost re-downloads and rebuilds, so a healthy disk skips them.
+
+## Worktree gates
+
+A worktree is removed only when every gate passes. Any unknown keeps it, and the report says which gate kept it.
+
+- It is a linked worktree of an ADW-registered project or a configured repository: not a main checkout, not a registered ADW project root, not under `~/.t3` (T3 Code owns those), not locked.
+- No ADW run for it is pending or running, and no process has its working directory inside it.
+- `git status` is clean: no modified, staged, or untracked files.
+- Its commits are safe. Either HEAD is in the default branch (after `git fetch --prune origin`), or a merged GitHub PR into the default branch has exactly this HEAD and its landing commit is in the default branch. Otherwise, every commit must be on an origin branch and the worktree must have been idle for 14 days.
+- Ignored files hold no user data. Regenerable names (`node_modules`, `_build`, `deps`, `.venv`, …) pass. A `.env`-style file passes only when each line is in the main checkout's copy or in ADW's `.ports.env`. Databases, keys, media, and models fail, as does any other ignored directory with files in it.
+
+At most 25 worktrees go per run. The first failed removal stops further removals, and after each removal the main checkout must still resolve `HEAD`.
+
+## Always left alone
+
+Docker volumes and stopped containers, Playwright browsers, T3/ADW/agent histories and databases, credentials, APFS snapshots, swap, and running processes. The report lists the large ones under "What it left alone", with their sizes.
+
+## Limits and files
+
+- A run stops starting new steps after 9 minutes and reports the rest as skipped, so it finishes inside a 10-minute shell timeout.
+- A second run while one is in progress exits immediately.
+- State lives in `~/Library/Application Support/housekeeping/`: `report.html` (the latest report), `last-run.json` (full detail), `history.jsonl` (one line per run, last 500 kept, which feeds the history chart), and `dry-run.*` for dry runs, which add no history.
+- Freed space is the host's free-space gain around each action. For Docker it is the larger of that gain and Docker's own figure, because the VM disk returns space to the host gradually.
+
+## Settings
+
+The optional `~/.config/housekeeping.json` takes the keys in [config.example.json](config.example.json); a missing file means defaults. Pass `--config PATH` to use another file. An invalid file stops the run with an error rather than falling back.
+
+- `warning_percent` (default 15) and `urgent_gib` (default 25): the low-space lines.
+- `repositories`: extra repositories whose worktrees `wt` manages. ADW projects are found automatically.
+- `disposable`: build-output folders that may be deleted while space is low.
+- `skip`: steps to turn off: `brew`, `uv`, `pnpm`, `simulators`, `docker`, `xcode`, `worktrees`, `deep`.
+- `state_dir`: where state is written.
