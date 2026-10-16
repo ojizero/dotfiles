@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = []
+# ///
 """Autonomous macOS housekeeping: measure, clean what is provably safe, record history, write an HTML report."""
 import argparse
 import fcntl
@@ -84,8 +88,8 @@ def worktree_results(home, config, cwds, root, dry_run):
             kept.setdefault(reason, []).append({'path': w['path'], 'short': short, 'note': w.get('branch') or ''})
     out = []
     if removed:
-        out.append({**clean.result('worktrees', f'Finished worktrees ({len(removed)})', 'planned' if dry_run else 'done',
-                                   'removed with ADW or wt', None if dry_run else sum(x['bytes'] for x in removed)),
+        out.append({**clean.result('worktrees', f'Merged worktrees ({len(removed)})', 'planned' if dry_run else 'done',
+                                   'removed with ADW or wt; branches kept', None if dry_run else sum(x['bytes'] for x in removed)),
                     'items': removed})
     for item in failed:
         out.append({**clean.result('worktrees', 'Worktree ' + item['path'], 'failed', item['note']), 'items': []})

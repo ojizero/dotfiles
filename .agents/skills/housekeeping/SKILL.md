@@ -10,7 +10,7 @@ One script does all measuring, cleaning, and reporting. Your job is to run it on
 1. From the dotfiles repository root, run:
 
    ```sh
-   python3 .agents/skills/housekeeping/scripts/housekeeping.py
+   uv run --script .agents/skills/housekeeping/scripts/housekeeping.py
    ```
 
    It takes up to 10 minutes. Use your shell tool's longest timeout (Claude Code: `600000` ms) and wait for it to exit. Run it exactly once per request. Add `--dry-run` only when the user asks what it *would* clean; a dry run removes nothing.

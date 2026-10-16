@@ -112,7 +112,7 @@
   },
   {
    "category": "worktrees",
-   "label": "Finished worktrees (6)",
+   "label": "Merged worktrees (6)",
    "outcome": "done",
    "reason": "removed with ADW or wt",
    "bytes": 20723217203,
@@ -130,7 +130,7 @@
     {
      "path": "~/.adw/projects/pace_api-507dfa9b/trees/32014925",
      "bytes": 322122547,
-     "note": "adw, all commits on the remote, idle 18 days"
+     "note": "adw, PR #1906 merged"
     },
     {
      "path": "~/workspace/fts/void.chore-clean-agents-md",
@@ -145,7 +145,7 @@
     {
      "path": "~/workspace/fts/prescribe-fit/pace_api.t3code-fix-worktree-aware-mise",
      "bytes": 5046586572,
-     "note": "wt, all commits on the remote, idle 16 days"
+     "note": "wt, merged into origin/main"
     }
    ]
   },

@@ -1,17 +1,15 @@
-"""Find Git worktrees whose removal loses nothing, and remove them through ADW or wt.
+"""Find merged, clean, idle Git worktrees and remove them through ADW or wt only.
 
-Removable: clean, no running process inside, no ignored user data, and either merged into the default
-branch or idle for IDLE_DAYS with every commit on origin. Any unknown keeps the worktree.
+Removable: a linked worktree that is clean, has no running process inside, holds no ignored user data, and
+whose HEAD is incorporated in the default branch. Any unknown keeps the worktree.
 """
 import hashlib
 import json
 import os
 import re
-import time
-from datetime import datetime
 from pathlib import Path
 
-from measure import newest_mtime, run
+from measure import run
 
 # Ignored names that tools regenerate. Anything else ignored is checked for user data.
 GENERATED = {
@@ -27,7 +25,6 @@ USER_DATA = re.compile(r'(^|/)(\.env[^/]*|[^/]*\.env)$|\.(db|sqlite3?|sqlite-wal
                        r'mp4|mov|m4a|wav|mp3|gguf|safetensors|onnx|pt|ckpt)$', re.I)
 MAX_WALK = 3000
 MAX_REMOVALS = 25
-IDLE_DAYS = 14
 
 
 def git(path, *args, timeout=20):
@@ -160,50 +157,39 @@ def default_ref(main):
     return None
 
 
+def on_github(main):
+    return 'github.com' in git(main, 'remote', 'get-url', 'origin')['out']
+
+
 def merged(w, ref):
-    """Return how HEAD reached the default branch, or None when unproven."""
+    """Return how HEAD is incorporated in the default branch, or None when unproven.
+
+    Direct ancestry is enough. For squash and rebase merges, a GitHub PR merged into the default branch must
+    contain HEAD (equal to or behind its final head) and its landing commit must be in the default branch.
+    """
     if git(w['path'], 'merge-base', '--is-ancestor', w['head'], ref)['code'] == 0:
         return 'merged into ' + ref
-    remote = git(w['main'], 'remote', 'get-url', 'origin')['out']
-    if 'github.com' not in remote:
+    if not on_github(w['main']):
         return None
     base = ref.split('/', 1)[1]
-    r = run(['gh', 'pr', 'list', '--state', 'merged', '--search', w['head'], '--limit', '5',
+    r = run(['gh', 'pr', 'list', '--state', 'merged', '--base', base, '--search', w['head'], '--limit', '5',
              '--json', 'number,headRefOid,baseRefName,mergeCommit'], cwd=w['main'], timeout=30)
     try:
         prs = json.loads(r['out']) if r['code'] == 0 else []
     except ValueError:
         return None
     for pr in prs:
-        landing = (pr.get('mergeCommit') or {}).get('oid')
-        if (pr.get('headRefOid') == w['head'] and pr.get('baseRefName') == base and landing
-                and git(w['main'], 'merge-base', '--is-ancestor', landing, ref)['code'] == 0):
+        landing, final = (pr.get('mergeCommit') or {}).get('oid'), pr.get('headRefOid')
+        if pr.get('baseRefName') != base or not landing or not final:
+            continue
+        if final != w['head']:
+            git(w['main'], '-c', 'gc.auto=0', 'fetch', '--quiet', '--no-tags', '--no-write-fetch-head', 'origin',
+                f'pull/{pr["number"]}/head', timeout=60)
+            if git(w['main'], 'merge-base', '--is-ancestor', w['head'], final)['code'] != 0:
+                continue
+        if git(w['main'], 'merge-base', '--is-ancestor', landing, ref)['code'] == 0:
             return f'PR #{pr["number"]} merged'
     return None
-
-
-def pushed(w):
-    """True when HEAD is contained in a branch on origin, so removing the worktree loses no commits."""
-    r = git(w['path'], 'branch', '-r', '--contains', w['head'], timeout=30)
-    return r['code'] == 0 and any(b.strip() and '->' not in b for b in r['out'].splitlines())
-
-
-def idle_days(w):
-    """Days since anything touched the worktree: its files, index, HEAD, or its ADW run."""
-    times = [newest_mtime(Path(w['path']))]
-    gitdir = git(w['path'], 'rev-parse', '--absolute-git-dir')['out'].strip()
-    for name in ('index', 'HEAD', 'logs/HEAD'):
-        try:
-            times.append((Path(gitdir) / name).stat().st_mtime)
-        except OSError:
-            pass
-    stamp = (w['run'] or {}).get('updated_at')
-    if stamp:
-        try:
-            times.append(datetime.fromisoformat(stamp.replace('Z', '+00:00')).timestamp())
-        except ValueError:
-            pass
-    return (time.time() - max(times)) / 86400
 
 
 def inside(path, others):
@@ -215,19 +201,25 @@ def plan(home, extra_repositories, cwds):
     """Classify every linked worktree. Returns list of dicts with decision 'remove' or 'keep' and a reason."""
     runs, roots = adw_state(home)
     mains = {m for m in (main_checkout(p) for p in sorted(roots | set(extra_repositories)) if Path(p).is_dir()) if m}
-    t3_root = str(home / '.t3') + '/'
+    t3_root, adw_root = str(home / '.t3') + '/', str(home / '.adw' / 'projects') + '/'
     fetched, out = set(), []
     for main in sorted(mains):
         for w in linked_worktrees(main):
             path = w['path']
             adw = [x for x in runs.get(path, []) if path not in roots]
             w['manager'] = 'adw' if adw else 'wt'
-            w['run'] = adw[0] if adw else None
+            w['runs'] = adw
             w['decision'], w['reason'] = 'keep', None
             if path.startswith(t3_root):
                 w['reason'] = 'T3 Code worktree (T3 manages it)'
             elif path in roots:
                 w['reason'] = 'registered ADW project'
+            elif path.startswith(adw_root) and not adw:
+                w['reason'] = 'ADW worktree without a run record'
+            elif len({x.get('project') for x in adw}) > 1:
+                w['reason'] = 'claimed by runs in several ADW projects'
+            elif not (Path(path) / '.git').is_file():
+                w['reason'] = 'not a linked worktree (.git is not a file)'
             elif w['locked'] or w['prunable'] or not Path(path).is_dir():
                 w['reason'] = 'locked or missing on disk'
             elif any(x.get('status') in ('pending', 'running') for x in adw):
@@ -259,12 +251,7 @@ def gates(w, main, fetched):
             'origin', timeout=120)
     how = merged(w, ref)
     if not how:
-        if not pushed(w):
-            return 'has commits that are not on the remote'
-        days = idle_days(w)
-        if days < IDLE_DAYS:
-            return f'not merged and used in the last {IDLE_DAYS} days'
-        how = f'all commits on the remote, idle {days:.0f} days'
+        return f'not merged into {ref}'
     risky = ignored_risk(w['path'], main)
     if risky:
         return 'ignored files that may be yours: ' + ', '.join(risky)
@@ -273,15 +260,29 @@ def gates(w, main, fetched):
 
 
 def remove(w):
-    """Remove one planned worktree with its manager. Returns an error string or None."""
+    """Remove one planned worktree with its manager, keeping branch refs and run records.
+
+    ADW runs go through `adw purge` with their exact run IDs after a dry run of the same IDs; everything else
+    goes through `wt remove`. There is no other removal path. Returns an error string or None.
+    """
     if w['manager'] == 'adw':
-        r = run(['adw', 'purge', '--project', w['run']['project'], '--yes', w['run']['adw_id']], timeout=300)
+        base = ['adw', 'purge', '--project', w['runs'][0]['project']]
+        ids = [x['adw_id'] for x in w['runs']]
+        check = run(base + ['--dry-run'] + ids, timeout=120)
+        if check['code'] != 0:
+            return 'adw purge --dry-run refused: ' + last_line(check)
+        r = run(base + ['--yes'] + ids, timeout=300)
     else:
-        r = run(['wt', '-C', w['main'], 'remove', '--yes', '--foreground', w['path']], timeout=300)
+        r = run(['wt', '-C', w['main'], 'remove', '--yes', '--foreground', '--no-delete-branch', w['path']], timeout=300)
     if r['code'] != 0:
-        return (r.get('error') or r['out'].strip().splitlines()[-1:] or ['failed'])[0][:160]
+        return last_line(r)
     if Path(w['path']).exists():
         return 'still on disk after removal'
     if git(w['main'], 'rev-parse', '--verify', 'HEAD')['code'] != 0:
         return 'main checkout failed its check after removal'
     return None
+
+
+def last_line(r):
+    lines = [x for x in r['out'].strip().splitlines() if x.strip()]
+    return (r.get('error') or (lines[-1] if lines else 'failed'))[:160]

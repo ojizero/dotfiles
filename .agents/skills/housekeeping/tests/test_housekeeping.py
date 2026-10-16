@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -89,6 +90,18 @@ class Clean(unittest.TestCase):
             self.assertIn('running process', by_label['~/busy']['reason'])
             self.assertIn('under your home', by_label['/tmp']['reason'])
 
+    def test_disposable_never_deletes_git_checkouts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp).resolve()
+            build = home / 'repo' / 'build'
+            build.mkdir(parents=True)
+            (home / 'repo' / '.git').write_text('gitdir: elsewhere')
+            stamp = time.time() - 30 * clean.DAY
+            os.utime(build, (stamp, stamp))
+            out = clean.disposable(home, [str(build), str(home / 'repo')], set(), '/', False)
+            self.assertTrue(all('ADW or wt' in r['reason'] for r in out))
+            self.assertTrue(build.exists())
+
 
 def git(cwd, *args):
     subprocess.run(['git', '-C', str(cwd), *args], check=True, capture_output=True)
@@ -145,15 +158,37 @@ class Worktrees(unittest.TestCase):
         git(main, 'merge', '-q', 'busy')
         git(main, 'push', '-q', 'origin', 'main')
         cls.paths['t3'] = worktree('t3', cls.home / '.t3' / 'worktrees')
+        cls.paths['orphan'] = worktree('orphan', cls.home / '.adw' / 'projects' / 'p' / 'trees')
+        git(main, 'merge', '-q', 'orphan')
+        # Squash merge: the worktree sits one commit behind the PR's final head, which landed as one commit.
+        cls.paths['squashed'] = worktree('squashed')
+        git(cls.paths['squashed'], 'commit', '-q', '--allow-empty', '-m', 'after review')
+        cls.pr_head = subprocess.run(['git', '-C', str(cls.paths['squashed']), 'rev-parse', 'HEAD'],
+                                     capture_output=True, text=True, check=True).stdout.strip()
+        git(cls.paths['squashed'], 'push', '-q', 'origin', f'{cls.pr_head}:refs/pull/7/head')
+        git(cls.paths['squashed'], 'reset', '-q', '--hard', 'HEAD~1')
+        git(main, 'merge', '-q', '--squash', cls.pr_head)
+        git(main, 'commit', '-qm', 'squashed (#7)')
+        cls.landing = subprocess.run(['git', '-C', str(main), 'rev-parse', 'HEAD'],
+                                     capture_output=True, text=True, check=True).stdout.strip()
+        git(main, 'push', '-q', 'origin', 'main')
 
     @classmethod
     def tearDownClass(cls):
         cls.tmp.cleanup()
         cls.env.stop()
 
-    def plan(self):
+    def plan(self, prs=()):
+        """Plan with ADW absent and GitHub answering `gh pr list` with prs."""
+        real = worktrees.run
+
+        def fake(args, **kw):
+            if args[0] == 'gh':
+                return {'code': 0, 'out': json.dumps(list(prs))}
+            return real(args, **kw)
         cwds = {str(self.paths['busy'] / 'sub')}
-        return {Path(w['path']).name: w for w in worktrees.plan(self.home, [str(self.main)], cwds)}
+        with mock.patch.object(worktrees, 'on_github', return_value=True), mock.patch.object(worktrees, 'run', fake):
+            return {Path(w['path']).name: w for w in worktrees.plan(self.home, [str(self.main)], cwds)}
 
     def test_every_gate(self):
         plan = self.plan()
@@ -164,24 +199,50 @@ class Worktrees(unittest.TestCase):
             'env-differs': 'ignored files that may be yours: .env',
             'notes': 'ignored files that may be yours: notes/',
             'dirty': 'uncommitted changes',
-            'unpushed': 'has commits that are not on the remote',
-            'recent': 'not merged and used in the last 14 days',
+            'unpushed': 'not merged into origin/main',
+            'recent': 'not merged into origin/main',
             'busy': 'a running process is inside it',
             't3': 'T3 Code worktree (T3 manages it)',
+            'orphan': 'ADW worktree without a run record',
+            'squashed': 'not merged into origin/main',
         }
         for name, reason in expected.items():
             self.assertEqual((plan[name]['decision'], plan[name]['reason']), ('keep', reason), name)
 
-    def test_idle_pushed_worktree_is_removable(self):
-        with mock.patch.object(worktrees, 'idle_days', return_value=30):
-            plan = self.plan()
-        self.assertEqual(plan['recent']['decision'], 'remove')
-        self.assertIn('idle 30 days', plan['recent']['merged'])
+    def pr(self, **overrides):
+        return {'number': 7, 'headRefOid': self.pr_head, 'baseRefName': 'main',
+                'mergeCommit': {'oid': self.landing}, **overrides}
+
+    def test_squash_merged_pr_containing_head_is_removable(self):
+        plan = self.plan([self.pr()])
+        self.assertEqual((plan['squashed']['decision'], plan['squashed']['merged']), ('remove', 'PR #7 merged'))
         self.assertEqual(plan['unpushed']['decision'], 'keep')
+
+    def test_squash_proof_rejects_other_bases_and_missing_landing(self):
+        for pr in (self.pr(baseRefName='feature'), self.pr(mergeCommit=None), self.pr(headRefOid='0' * 40)):
+            self.assertEqual(self.plan([pr])['squashed']['decision'], 'keep', pr)
 
     def test_unknown_process_list_keeps_everything(self):
         plan = worktrees.plan(self.home, [str(self.main)], None)
         self.assertTrue(all(w['decision'] == 'keep' for w in plan))
+
+    @unittest.skipUnless(shutil.which('wt'), 'wt not installed')
+    def test_wt_removal_keeps_the_branch(self):
+        w = self.plan()['merged']
+        self.assertIsNone(worktrees.remove(w))
+        self.assertFalse(Path(w['path']).exists())
+        git(self.main, 'rev-parse', '--verify', 'refs/heads/merged')
+
+    def test_adw_removal_stops_when_dry_run_refuses(self):
+        w = {'manager': 'adw', 'runs': [{'project': 'p', 'adw_id': 'a1'}], 'path': '/x', 'main': '/y'}
+        calls = []
+
+        def fake(args, **kw):
+            calls.append(args)
+            return {'code': 1, 'out': 'no such run'}
+        with mock.patch.object(worktrees, 'run', fake):
+            self.assertIn('refused', worktrees.remove(w))
+        self.assertEqual(calls, [['adw', 'purge', '--project', 'p', '--dry-run', 'a1']])
 
     def test_env_overlay_counts_as_copy(self):
         with tempfile.TemporaryDirectory() as tmp:

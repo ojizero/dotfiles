@@ -188,6 +188,8 @@ def disposable(home, paths, cwds, root, dry_run):
             continue
         if p.is_symlink() or not p.is_dir() or home not in p.parents:
             out.append(result('other', label, 'skipped', 'not a real folder under your home'))
+        elif in_git_checkout(p):
+            out.append(result('other', label, 'skipped', 'inside a Git checkout; worktrees go through ADW or wt'))
         elif cwds is None or any((c + '/').startswith(str(p) + '/') for c in cwds):
             out.append(result('other', label, 'skipped', 'in use by a running process'))
         elif newest_mtime(p) > time.time() - 14 * DAY:
@@ -200,6 +202,13 @@ def disposable(home, paths, cwds, root, dry_run):
             except OSError as exc:
                 out.append(result('other', label, 'failed', exc.strerror or 'removal failed'))
     return out
+
+
+def in_git_checkout(path):
+    """True when path is, contains, or sits inside a Git checkout. Such folders are never deleted directly."""
+    if any((p / '.git').exists() for p in (path, *path.parents)):
+        return True
+    return run(['find', str(path), '-maxdepth', '4', '-name', '.git', '-print', '-quit'], timeout=20)['out'].strip() != ''
 
 
 def playwright_kept(home):

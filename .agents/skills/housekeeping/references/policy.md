@@ -7,7 +7,7 @@ The rules below are enforced in `scripts/`; this file explains them. Change beha
 | Area | Action | Guard |
 |---|---|---|
 | Docker | `image prune -af`, `builder prune -af`, `network prune -f`, each `--filter until=168h` | Only when the daemon is already running; it is never started. Volumes and containers are never pruned. |
-| Worktrees | Remove through ADW (`adw purge`) for ADW runs, `wt remove` otherwise | All worktree gates below |
+| Worktrees | `adw purge` with exact run IDs for ADW runs, `wt remove --no-delete-branch` otherwise | All worktree gates below |
 | Homebrew | `brew cleanup --prune=all` | Skipped while `brew` runs |
 | uv | `uv cache prune` | Skipped while uv installs or syncs |
 | pnpm | `pnpm store prune` | Skipped while pnpm installs |
@@ -20,15 +20,15 @@ When free space is still below the warning line after the routine steps, it also
 
 ## Worktree gates
 
-A worktree is removed only when every gate passes. Any unknown keeps it, and the report says which gate kept it.
+These follow the Oct 16 retrospective. A worktree is removed only when every gate passes. Any unknown keeps it, and the report says which gate kept it.
 
-- It is a linked worktree of an ADW-registered project or a configured repository: not a main checkout, not a registered ADW project root, not under `~/.t3` (T3 Code owns those), not locked.
+- It is a linked worktree (`.git` is a file) of an ADW-registered project or a configured repository. Main checkouts, registered ADW project roots, `~/.t3` worktrees (T3 Code owns those), locked trees, and ADW trees without a run record are kept.
 - No ADW run for it is pending or running, and no process has its working directory inside it.
 - `git status` is clean: no modified, staged, or untracked files.
-- Its commits are safe. Either HEAD is in the default branch (after `git fetch --prune origin`), or a merged GitHub PR into the default branch has exactly this HEAD and its landing commit is in the default branch. Otherwise, every commit must be on an origin branch and the worktree must have been idle for 14 days.
+- HEAD is incorporated in the default branch after `git fetch --prune origin`. Either it is an ancestor of the default branch, or it was squash or rebase merged: a GitHub PR merged into the default branch has HEAD at or behind its final head, and its landing commit is in the default branch. Branch names, finished runs, closed or unmerged PRs, and PRs merged into another branch are not proof. A commit beyond the PR's final head keeps the worktree.
 - Ignored files hold no user data. Regenerable names (`node_modules`, `_build`, `deps`, `.venv`, …) pass. A `.env`-style file passes only when each line is in the main checkout's copy or in ADW's `.ports.env`. Databases, keys, media, and models fail, as does any other ignored directory with files in it.
 
-At most 25 worktrees go per run. The first failed removal stops further removals, and after each removal the main checkout must still resolve `HEAD`.
+Removal goes only through the managers, and there is no direct-delete fallback. ADW trees get `adw purge --dry-run` and then `adw purge --yes` with the same run IDs. Records are kept. Other trees use `wt remove --no-delete-branch`. Branch refs stay in both cases. At most 25 worktrees go per run, the first failed removal stops the rest, and after each removal the main checkout must still resolve `HEAD`. Configured `disposable` folders that are or contain a Git checkout are never deleted.
 
 ## Always left alone
 
