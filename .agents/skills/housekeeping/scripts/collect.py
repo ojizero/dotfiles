@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-"""Bounded, read-only macOS inspection with private routine telemetry."""
+"""Bounded, read-only macOS inspection of current state. Writes nothing."""
 import argparse
-import errno
-import fcntl
 import json
 import os
 from pathlib import Path
@@ -20,10 +18,6 @@ GIB = 1024 ** 3
 MAX_OUTPUT = 32768
 MAX_PS_OUTPUT = 1024 ** 2
 MAX_ENTRIES = 10000
-MAX_REPORTS = 12
-MAX_STATE_BYTES = 1024 ** 2
-REPORT_NAME = re.compile(r"report-\d{20}\.json\Z")
-REPO = Path(__file__).resolve().parents[4]
 
 
 def canonical(value):
@@ -45,11 +39,6 @@ def load_config(path):
     c = json.loads(p.read_text())
     if c['host'] != socket.gethostname():
         raise ValueError("host mismatch; set host to hostname output")
-    state = canonical(c['state_dir'])
-    s = state.stat()
-    if (not state.is_dir() or s.st_uid != os.getuid() or s.st_mode & 0o077
-            or contains(REPO, state) or any((p / '.git').exists() for p in (state, *state.parents))):
-        raise ValueError("state_dir must be private, user-owned and outside this repository")
     canonical(c['disk_root'])
     if not Path(c['disk_root']).is_dir():
         raise ValueError("disk_root must be a directory on the measured volume")
@@ -62,8 +51,6 @@ def load_config(path):
             root = canonical(value)
             if not root.is_dir() or root.stat().st_uid != os.getuid() or contains(root, Path.home()) or len(root.parts) < 4:
                 raise ValueError("roots must be narrow user-owned directories")
-            if contains(root, state) or contains(state, root):
-                raise ValueError("state_dir and inventory roots must be separate")
             if any(contains(root, other) or contains(other, root) for other in all_roots):
                 raise ValueError("inventory roots must not overlap")
             all_roots.append(root)
@@ -132,8 +119,7 @@ def allocated(root, deadline, seen):
                         if count + len(pending) >= MAX_ENTRIES or time.monotonic() >= deadline:
                             return {'unknown': 'scan limit', 'partial_allocated_bytes': total}
                         pending.append(Path(entry.path))
-        return {'allocated_bytes': total, 'entries': count, 'device': device,
-                'root_inode': root.stat().st_ino}
+        return {'allocated_bytes': total, 'entries': count}
     except OSError:
         return {'unknown': 'scan inaccessible or changed', 'partial_allocated_bytes': total}
 
@@ -162,12 +148,11 @@ def collect(c, review, deadline):
     v = os.statvfs(c['disk_root'])
     pressure = number(command(['/usr/sbin/sysctl', '-n', 'kern.memorystatus_vm_pressure_level'], deadline))
     swap = swap_bytes(command(['/usr/sbin/sysctl', '-n', 'vm.swapusage'], deadline))
-    boot = command(['/usr/sbin/sysctl', '-n', 'kern.boottime'], deadline).get('text')
     r = {'timestamp': datetime.now(timezone.utc).isoformat(), 'host': c['host'],
-         'disk_root': c['disk_root'], 'device': os.stat(c['disk_root']).st_dev,
+         'disk_root': c['disk_root'],
          'capacity_bytes': v.f_blocks * v.f_frsize, 'free_bytes': v.f_bavail * v.f_frsize,
-         'pressure_level': pressure, 'swap_bytes': swap, 'boot': boot,
-         'notices': [], 'mode': 'review' if review else 'daily'}
+         'pressure_level': pressure, 'swap_bytes': swap,
+         'notices': [], 'mode': 'review' if review else 'quick'}
     r['status'] = status(r['free_bytes'], r['capacity_bytes'], pressure, c)
     if pressure not in (1, 2, 4):
         r['notices'].append('Current pressure unknown; used swap is not current pressure.')
@@ -193,7 +178,6 @@ def collect(c, review, deadline):
         for value in c['roots']:
             r['roots'][value] = {**allocated(Path(value), deadline, seen),
                                  'decision': 'needs-user-decision; inventory only'}
-        r['scan_budget'] = MAX_ENTRIES
         r['worktrees'] = {value: command(['/usr/bin/git', '-c', 'core.fsmonitor=false', '-C', value,
                              'worktree', 'list', '--porcelain'], deadline) for value in c['repositories']}
         r['docker_logical'] = command(['docker', '--host', 'unix://' + c['docker_socket'],
@@ -203,72 +187,6 @@ def collect(c, review, deadline):
     return r
 
 
-def routine_files(state):
-    files = []
-    for index, p in enumerate(state.iterdir()):
-        if index > MAX_REPORTS:
-            raise ValueError('unexpected state entries; retain and inspect state_dir')
-        s = p.lstat()
-        if (not stat.S_ISREG(s.st_mode) or s.st_uid != os.getuid() or s.st_nlink != 1
-                or s.st_mode & 0o077):
-            raise ValueError('unsafe state entry; retain and inspect state_dir')
-        if p.name == 'lock':
-            continue
-        if not REPORT_NAME.fullmatch(p.name) or s.st_size > MAX_OUTPUT:
-            raise ValueError('unknown or oversized state entry; retain and inspect state_dir')
-        files.append(p)
-    return sorted(files)
-
-
-def compare(r, previous):
-    base = ('host', 'disk_root', 'device', 'capacity_bytes')
-    if not all(previous.get(k) == r[k] for k in base):
-        return
-    seconds = (datetime.fromisoformat(r['timestamp']) - datetime.fromisoformat(previous['timestamp'])).total_seconds()
-    if seconds <= 0:
-        return
-    r['comparison_seconds'] = seconds
-    r['free_delta_bytes'] = r['free_bytes'] - previous['free_bytes']
-    if r['boot'] and r['boot'] == previous.get('boot') and r['swap_bytes'] is not None and previous.get('swap_bytes') is not None:
-        r['swap_delta_bytes'] = r['swap_bytes'] - previous['swap_bytes']
-    if r.get('scan_budget') == previous.get('scan_budget') and list(r.get('roots', {})) == list(previous.get('roots', {})):
-        r['root_delta_bytes'] = {p: s['allocated_bytes'] - previous['roots'][p]['allocated_bytes']
-            for p, s in r.get('roots', {}).items()
-            if 'allocated_bytes' in s and 'allocated_bytes' in previous['roots'][p]
-            and all(s.get(k) == previous['roots'][p].get(k) for k in ('device', 'root_inode'))}
-
-
-def save(state, files, report):
-    data = json.dumps(report).encode()
-    if len(data) > MAX_OUTPUT:
-        return False
-    # Only this private, locked directory is eligible for retention cleanup.
-    while files and (len(files) >= MAX_REPORTS or sum(p.stat().st_size for p in files) + len(data) > MAX_STATE_BYTES):
-        # Keep the latest review across daily runs so fortnightly deltas survive.
-        latest_review = None
-        for p in files:
-            try:
-                if json.loads(p.read_text()).get('mode') == 'review':
-                    latest_review = p
-            except (ValueError, AttributeError):
-                pass
-        oldest = next((p for p in files if p != latest_review), files[0])
-        files.remove(oldest)
-        s = oldest.lstat()
-        if not stat.S_ISREG(s.st_mode) or s.st_uid != os.getuid() or s.st_nlink != 1:
-            raise ValueError('state changed; retention stopped')
-        oldest.unlink()
-    target = state / ('report-' + str(time.time_ns()).zfill(20) + '.json')
-    fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
-    try:
-        with os.fdopen(fd, 'wb') as stream:
-            stream.write(data)
-    except BaseException:
-        target.unlink()
-        raise
-    return True
-
-
 def run(config, review=False):
     if platform.system() != 'Darwin':
         return {'status': 'unsupported', 'notices': ['housekeeping supports macOS only']}
@@ -276,43 +194,11 @@ def run(config, review=False):
         c = load_config(config)
     except (OSError, ValueError, KeyError, TypeError, RuntimeError) as exc:
         return {'status': 'unconfigured', 'notices': [str(exc)[:160],
-                'Provide valid host, disk_root and private state_dir; see references/policy.md.']}
-    state = Path(c['state_dir'])
-    r = None
+                'Provide valid host and disk_root; see references/policy.md.']}
     try:
-        fd = os.open(state / 'lock', os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW | os.O_NONBLOCK, 0o600)
-        with os.fdopen(fd, 'rb') as lock:
-            s = os.fstat(lock.fileno())
-            if not stat.S_ISREG(s.st_mode) or s.st_uid != os.getuid() or s.st_mode & 0o077 or s.st_nlink != 1:
-                raise ValueError('unsafe lock')
-            try:
-                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except BlockingIOError:
-                return {'status': 'overlap', 'notices': ['Another housekeeping run owns the lock.']}
-            files = routine_files(state)
-            r = collect(c, review, time.monotonic() + 15)
-            # Keep daily and review comparisons separate.
-            for p in reversed(files):
-                try:
-                    previous = json.loads(p.read_text())
-                    if previous.get('mode') == r['mode']:
-                        compare(r, previous)
-                        break
-                except (ValueError, KeyError, TypeError, AttributeError):
-                    r['notices'].append('Prior routine telemetry invalid; trend unknown.')
-                    break
-            if 'comparison_seconds' not in r:
-                r['notices'].append('Comparable history unavailable; trend unknown.')
-            if not save(state, files, r):
-                r['notices'].append('Report exceeds telemetry limit; not saved, so no future trend from this run.')
-            return r
+        return collect(c, review, time.monotonic() + 15)
     except OSError as exc:
-        result = r if r is not None else {'notices': []}
-        result['status'] = 'urgent' if exc.errno == errno.ENOSPC else 'unknown'
-        result['notices'].append('Collection or telemetry failed: ' + errno.errorcode.get(exc.errno, 'OS error'))
-        return result
-    except (ValueError, KeyError, TypeError):
-        return {'status': 'unknown', 'notices': ['Unsafe or invalid routine telemetry; retain and inspect state_dir.']}
+        return {'status': 'unknown', 'notices': ['Collection failed: ' + (exc.strerror or 'OS error')]}
 
 
 def main():

@@ -1,14 +1,18 @@
 ---
 name: housekeeping
-description: Check macOS disk headroom and review configured development storage trends during routine housekeeping or low-space triage.
+description: Check current macOS disk headroom and memory pressure, for a quick verification or low-space triage.
 ---
 
 # Housekeeping
 
-Run from dotfiles with Python 3. Default to report-only.
+A quick, report-only check of current state. Run from the dotfiles repository root.
 
-1. Run `python3 .agents/skills/housekeeping/scripts/collect.py --config "$HOME/.config/housekeeping.json"`. For a broader review, add `--review`.
-2. Return the JSON status and notices in T3. A healthy daily check ends with a short no-op. For warning, urgent, or unknown results, run one broader review and explain the missing evidence or next decision. Urgency never expands authority.
-3. On setup or a storage decision, read [policy.md](references/policy.md). On scheduling requests, read [prompts.md](references/prompts.md). No schedule is installed by this skill.
+1. Run `python3 .agents/skills/housekeeping/scripts/collect.py --config "$HOME/.config/housekeeping.json"`. It prints one JSON object and writes nothing.
+2. Read `status` and act on it:
+   - `healthy`: reply in one line that free space and memory pressure are within thresholds. Stop.
+   - `warning`, `urgent` or `unknown`: run the same command once with `--review` added. Report the `status`, every line in `notices`, and the largest entries in `processes` and `roots`. Name each decision the user needs to make.
+   - `unconfigured`: report the notices and stop. Use no guessed paths.
+   - `unsupported`: report that this skill runs on macOS only and stop.
+3. Read [policy.md](references/policy.md) when the user asks to set up the config, or before you recommend any storage change.
 
-Missing configuration means unconfigured, not permission to guess scan paths. The collector writes only its private routine telemetry outside the repository. It rotates that telemetry under fixed bounds. All host storage is inventory-only; there is no host cleanup/apply mode. Retain candidates with unknown ownership, activity, dependencies, or merge proof. Historical cleanup permission grants no standing authority.
+Stay report-only at every status, including `urgent`: every item in the report waits for a user decision.

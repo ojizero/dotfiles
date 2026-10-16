@@ -1,6 +1,5 @@
 {
   "host": "REPLACE_WITH_HOSTNAME",
-  "state_dir": "/Users/REPLACE/Library/Application Support/housekeeping",
   "disk_root": "/System/Volumes/Data",
   "warning_percent": 15,
   "urgent_gib": 25,

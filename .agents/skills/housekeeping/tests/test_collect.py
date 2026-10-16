@@ -22,11 +22,9 @@ class HousekeepingTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name).resolve()
-        self.state = self.root / 'state'
-        self.state.mkdir(mode=0o700)
         self.config = self.root / 'config.json'
-        self.c = {'host': socket.gethostname(), 'state_dir': str(self.state),
-                  'disk_root': str(self.root), 'roots': [], 'repositories': []}
+        self.c = {'host': socket.gethostname(), 'disk_root': str(self.root),
+                  'roots': [], 'repositories': []}
         self.write_config()
 
     def write_config(self):
@@ -38,8 +36,6 @@ class HousekeepingTests(unittest.TestCase):
             return {'text': '1'}
         if args[-1] == 'vm.swapusage':
             return {'text': 'total = 1024.00M used = 12.00M free = 1012.00M'}
-        if args[-1] == 'kern.boottime':
-            return {'text': '{ sec = 100, usec = 0 }'}
         if args[0] == '/bin/ps':
             return {'text': '42 1 Fri Oct 16 12:00:00 2026 500 /bin/test'}
         return {'text': 'worktree /example\nHEAD abc\nbranch refs/heads/main\n'}
@@ -49,16 +45,22 @@ class HousekeepingTests(unittest.TestCase):
         with patch.object(h.platform, 'system', return_value='Darwin'), patch.object(h, 'command', side_effect=self.fake_command), patch.object(h.os, 'statvfs', return_value=disk):
             return h.run(str(self.config), review)
 
-    def test_platform_and_missing_config_do_not_write(self):
+    def test_platform_and_missing_config(self):
         with patch.object(h.platform, 'system', return_value='Linux'):
             self.assertEqual(h.run(str(self.config))['status'], 'unsupported')
         with patch.object(h.platform, 'system', return_value='Darwin'):
             self.assertEqual(h.run(str(self.root / 'missing'))['status'], 'unconfigured')
-        self.assertEqual(list(self.state.iterdir()), [])
+
+    def test_runs_write_nothing_and_ignore_state_dir(self):
+        self.c['state_dir'] = str(self.root / 'absent')
+        self.write_config()
+        before = sorted(self.root.rglob('*'))
+        self.assertEqual(self.run_fake()['status'], 'healthy')
+        self.assertEqual(self.run_fake(True)['status'], 'healthy')
+        self.assertEqual(sorted(self.root.rglob('*')), before)
 
     def test_reject_bad_host_roots_and_permissions(self):
         for change in [{'host': 'wrong'}, {'roots': [str(Path.home())]},
-                       {'roots': [str(self.root)], 'state_dir': str(self.state)},
                        {'warning_percent': float('nan')}]:
             with self.subTest(change=change):
                 original = self.c.copy()
@@ -68,7 +70,7 @@ class HousekeepingTests(unittest.TestCase):
                     h.load_config(str(self.config))
                 self.c = original
         self.write_config()
-        self.state.chmod(0o755)
+        self.config.chmod(0o666)
         with self.assertRaises(ValueError):
             h.load_config(str(self.config))
 
@@ -80,16 +82,14 @@ class HousekeepingTests(unittest.TestCase):
         self.assertEqual(h.status(80*h.GIB, 100*h.GIB, 4, config), 'urgent')
         self.assertEqual(h.status(80*h.GIB, 100*h.GIB, 2, config), 'warning')
 
-    def test_daily_noop_and_comparable_swap(self):
-        first = self.run_fake()
-        self.assertEqual(first['status'], 'healthy')
-        self.assertEqual(first['pressure_level'], 1)
-        self.assertEqual(first['swap_bytes'], 12*1024**2)
-        self.assertNotIn('roots', first)
-        second = self.run_fake()
-        self.assertEqual(second['swap_delta_bytes'], 0)
-        self.assertGreater(second['comparison_seconds'], 0)
-        self.assertEqual(len(list(self.state.glob('report-*.json'))), 2)
+    def test_quick_check_reports_current_state(self):
+        report = self.run_fake()
+        self.assertEqual(report['status'], 'healthy')
+        self.assertEqual(report['mode'], 'quick')
+        self.assertEqual(report['pressure_level'], 1)
+        self.assertEqual(report['swap_bytes'], 12*1024**2)
+        self.assertEqual(report['notices'], [])
+        self.assertNotIn('roots', report)
 
     def test_allocated_deduplicates_and_bounds(self):
         cache = self.root / 'cache'
@@ -123,68 +123,6 @@ class HousekeepingTests(unittest.TestCase):
         self.assertIn('unknown', h.command(['/missing/tool'], time.monotonic()+1))
         self.assertEqual(h.command([sys.executable, '-c', 'print(42)'], time.monotonic()+1), {'text': '42\n'})
 
-    def test_lock_overlap_and_crash_release(self):
-        lock_path = self.state / 'lock'
-        code = 'import fcntl,sys,time; f=open(sys.argv[1],"w"); fcntl.flock(f,fcntl.LOCK_EX); print("locked",flush=True); time.sleep(30)'
-        old_mask = os.umask(0o077)
-        try:
-            proc = subprocess.Popen([sys.executable, '-c', code, str(lock_path)], stdout=subprocess.PIPE, text=True)
-        finally:
-            os.umask(old_mask)
-        try:
-            self.assertEqual(proc.stdout.readline().strip(), 'locked')
-            self.assertEqual(self.run_fake()['status'], 'overlap')
-        finally:
-            proc.kill()
-            proc.wait()
-            proc.stdout.close()
-        self.assertNotEqual(self.run_fake()['status'], 'overlap')
-
-    def test_retention_and_unknown_entries(self):
-        for _ in range(15):
-            self.run_fake()
-        files = list(self.state.glob('report-*.json'))
-        self.assertEqual(len(files), 12)
-        self.assertLessEqual(sum(p.stat().st_size for p in files), h.MAX_STATE_BYTES)
-        evidence = self.state / 'incident.txt'
-        evidence.write_text('retain')
-        evidence.chmod(0o600)
-        self.assertEqual(self.run_fake()['status'], 'unknown')
-        self.assertEqual(evidence.read_text(), 'retain')
-        self.assertEqual(len(list(self.state.glob('report-*.json'))), 12)
-
-    def test_symlink_lock_and_hardlink_reports_retained(self):
-        target = self.root / 'target'
-        target.write_text('preserve')
-        (self.state / 'lock').symlink_to(target)
-        self.assertEqual(self.run_fake()['status'], 'unknown')
-        self.assertEqual(target.read_text(), 'preserve')
-        (self.state / 'lock').unlink()
-        self.run_fake()
-        report = next(self.state.glob('report-*.json'))
-        os.link(report, self.root / 'link')
-        self.assertEqual(self.run_fake()['status'], 'unknown')
-        self.assertTrue(report.exists())
-
-    def test_comparisons_reject_reboot_and_changed_volume(self):
-        r = self.run_fake()
-        previous = dict(r, boot='older boot', swap_bytes=0, timestamp='2026-01-01T00:00:00+00:00')
-        h.compare(r, previous)
-        self.assertIn('comparison_seconds', r)
-        self.assertNotIn('swap_delta_bytes', r)
-        r.pop('comparison_seconds', None)
-        previous['device'] = -1
-        h.compare(r, previous)
-        self.assertNotIn('comparison_seconds', r)
-
-    def test_review_survives_daily_retention(self):
-        self.run_fake(True)
-        for _ in range(15):
-            self.run_fake()
-        review = self.run_fake(True)
-        self.assertIn('comparison_seconds', review)
-        self.assertEqual(len(list(self.state.glob('report-*.json'))), 12)
-
     def test_pressure_unknown_does_not_claim_healthy(self):
         original = self.fake_command
         with patch.object(self, 'fake_command', side_effect=lambda args, deadline, limit=None:
@@ -194,7 +132,7 @@ class HousekeepingTests(unittest.TestCase):
         self.assertEqual(report['status'], 'unknown')
         self.assertIsNone(report['pressure_level'])
 
-    def test_symlink_root_and_tracked_state_rejected(self):
+    def test_symlink_root_rejected(self):
         cache = self.root / 'cache'
         cache.mkdir()
         alias = self.root / 'alias'
@@ -203,42 +141,8 @@ class HousekeepingTests(unittest.TestCase):
         self.write_config()
         with self.assertRaises(ValueError):
             h.load_config(str(self.config))
-        self.c['roots'] = []
-        (self.root / '.git').mkdir()
-        self.write_config()
-        with self.assertRaises(ValueError):
-            h.load_config(str(self.config))
 
-    def test_root_deltas_require_same_identity_and_complete_scan(self):
-        cache = self.root / 'cache'
-        cache.mkdir()
-        self.c['roots'] = [str(cache)]
-        self.write_config()
-        r = self.run_fake(True)
-        previous = json.loads(json.dumps(r))
-        previous['timestamp'] = '2026-01-01T00:00:00+00:00'
-        h.compare(r, previous)
-        self.assertEqual(r['root_delta_bytes'][str(cache)], 0)
-        previous['roots'][str(cache)]['root_inode'] = -1
-        h.compare(r, previous)
-        self.assertEqual(r['root_delta_bytes'], {})
-
-    def test_oversized_report_returned_but_not_saved(self):
-        repo = self.root / 'repo'
-        repo.mkdir()
-        self.c['repositories'] = [str(repo)]
-        self.write_config()
-        original = self.fake_command
-        with patch.object(self, 'fake_command', side_effect=lambda args, deadline, limit=None:
-                          {'text': 'x' * h.MAX_OUTPUT} if 'worktree' in args else original(args, deadline)):
-            report = self.run_fake(True)
-        self.assertEqual(report['status'], 'healthy')
-        self.assertTrue(any('not saved' in n for n in report['notices']))
-        self.assertEqual(list(self.state.glob('report-*.json')), [])
-
-    def test_enospc_and_apply_rejection(self):
-        with patch.object(h, 'save', side_effect=OSError(28, 'disk full')):
-            self.assertEqual(self.run_fake()['status'], 'urgent')
+    def test_apply_rejected(self):
         proc = subprocess.run([sys.executable, str(SCRIPT), '--config', str(self.config), '--apply'], capture_output=True)
         self.assertEqual(proc.returncode, 2)
 
