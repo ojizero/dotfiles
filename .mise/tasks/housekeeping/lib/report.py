@@ -10,6 +10,7 @@ from html import escape
 
 GIB = 1024 ** 3
 MAX_ITEMS = 30
+HISTORY_BARS = 26
 CATEGORIES = {'docker': 'Docker', 'caches': 'Package caches', 'worktrees': 'Worktrees', 'xcode': 'Xcode', 'other': 'Other'}
 STATUS = {'healthy': ('Healthy', 'ok'), 'warning': ('Low space', 'warn'), 'urgent': ('Urgent', 'bad')}
 OUTCOMES = {'done': 'Done', 'planned': 'Would do', 'failed': 'Failed', 'kept': 'Kept', 'skipped': 'Skipped'}
@@ -27,7 +28,8 @@ STYLE = """
 --c-docker:var(--chart-1,#2a78d6);--c-caches:var(--chart-2,#eb6834);--c-worktrees:var(--chart-3,#6250d6);
 --c-xcode:var(--chart-4,#eda100);--c-other:var(--chart-5,#e87ba4);
 --hk-r:var(--radius,10px);--hk-sans:var(--font-sans,ui-sans-serif,-apple-system,"SF Pro Text",system-ui,sans-serif);
---hk-mono:var(--font-mono,ui-monospace,"SF Mono",Menlo,monospace)}
+--hk-mono:var(--font-mono,ui-monospace,"SF Mono",Menlo,monospace);
+--hist-base:color-mix(in srgb,var(--hk-ok) 40%,transparent)}
 @media (prefers-color-scheme:dark){:root{
 --hk-fg:var(--foreground,#ededee);--hk-muted:var(--muted-foreground,#a1a1a6);--hk-line:var(--border,#2c2c30);
 --hk-card:var(--card,#1c1c1f);--hk-bg:var(--background,#121214);
@@ -68,12 +70,17 @@ display:flex;justify-content:space-between;gap:8px}h2 em{font-style:normal;text-
 .num{font-family:var(--hk-mono);font-size:12px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 .dim{color:var(--hk-muted)}
 .empty{color:var(--hk-muted);font-size:13px;padding:24px 0;text-align:center}
-#hist{position:relative;height:170px}#hist svg{display:block;overflow:visible}
+#hist{position:relative;height:180px}#hist svg{display:block;overflow:visible}
 #hist text{fill:var(--hk-muted);font-size:11px;font-variant-numeric:tabular-nums}
+#hist .col{transition:opacity .1s}#hist.on .col:not(.hot){opacity:.45}
 .tip{position:absolute;pointer-events:none;background:var(--popover,var(--hk-card));color:var(--popover-foreground,var(--hk-fg));
-border:1px solid var(--hk-line);border-radius:8px;padding:6px 9px;font-size:12px;white-space:nowrap;
-box-shadow:0 4px 16px rgb(0 0 0/.12);transform:translate(-50%,-100%);opacity:0;transition:opacity .1s}
-.caption{margin-top:8px;font-size:12.5px;color:var(--hk-muted)}.caption b{color:var(--hk-fg);font-weight:600}
+border:1px solid var(--hk-line);border-radius:8px;padding:6px 9px;font-size:12px;white-space:nowrap;line-height:1.45;
+box-shadow:0 4px 16px rgb(0 0 0/.12);transform:translate(-50%,-100%);opacity:0;transition:opacity .1s;font-variant-numeric:tabular-nums}
+.tip i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;background:var(--c)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.stats div{font-size:11.5px;color:var(--hk-muted);line-height:1.3}
+.stats b{display:block;font-size:17px;font-weight:650;color:var(--hk-fg);font-variant-numeric:tabular-nums;margin-bottom:2px}
+.hist-keys{margin-top:10px}.sw.dash{width:12px;height:0;border-radius:0;background:none;border-top:2px dashed var(--tone)}
 .rows{display:grid}.row{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:2px 10px;padding:9px 0;
 border-top:1px solid var(--hk-line);align-items:start}.row:first-child{border-top:0;padding-top:0}
 .row svg{margin-top:2px;fill:none;stroke:var(--tone);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -99,29 +106,36 @@ var runs=JSON.parse(document.getElementById('hist-data').textContent),G=10737418
 function gib(n){return (n/G).toFixed(n<10*G?1:0)+' GiB'}
 function day(t){return new Date(t).toLocaleDateString(undefined,{day:'numeric',month:'short'})}
 function draw(){
-  var W=box.clientWidth,H=170,L=40,R=10,T=12,B=22,w=W-L-R,h=H-T-B;
-  var t0=runs[0].t,t1=runs[runs.length-1].t,span=Math.max(t1-t0,864e5*7);
-  if(t1===t0)t0=t1-span;
-  var top=Math.max.apply(null,runs.map(function(r){return Math.max(r.a,r.b)}).concat([runs[0].warn]))*1.15;
-  var x=function(t){return L+(t-t0)/(t1-t0||1)*w},y=function(v){return T+h-v/top*h};
-  var s='',step=Math.pow(10,Math.floor(Math.log10(top/G/3))),k=Math.ceil(top/G/3/step)*step;
-  for(var v=0;v<=top/G;v+=k){s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(v*G)+'" y2="'+y(v*G)+'" stroke="var(--hk-line)"/>'+
-    '<text x="'+(L-6)+'" y="'+(y(v*G)+4)+'" text-anchor="end">'+v+'</text>'}
-  s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(runs[0].warn)+'" y2="'+y(runs[0].warn)+'" stroke="var(--hk-warn)" stroke-width="1.5" stroke-dasharray="4 4"/>';
-  var d='',up='';
-  runs.forEach(function(r,i){var X=x(r.t);d+=(i?'L':'M')+X+' '+y(r.b)+'L'+X+' '+y(r.a);
-    if(r.a>r.b)up+='<line x1="'+X+'" x2="'+X+'" y1="'+y(r.b)+'" y2="'+y(r.a)+'" stroke="var(--hk-ok)" stroke-width="3" stroke-linecap="round"/>'});
-  s+='<path d="'+d+'" fill="none" stroke="var(--hk-fg)" stroke-opacity=".55" stroke-width="2" stroke-linejoin="round"/>'+up;
-  runs.forEach(function(r){s+='<circle cx="'+x(r.t)+'" cy="'+y(r.a)+'" r="4" fill="var(--hk-ok)" stroke="var(--hk-card)" stroke-width="2"/>'});
-  s+='<text x="'+L+'" y="'+(H-4)+'">'+day(t0)+'</text><text x="'+(W-R)+'" y="'+(H-4)+'" text-anchor="end">'+day(t1)+'</text>';
+  var W=box.clientWidth,H=180,L=34,R=4,T=18,B=22,w=W-L-R,h=H-T-B,n=runs.length,warn=runs[n-1].warn;
+  var top=Math.max.apply(null,runs.map(function(r){return Math.max(r.a,r.b)}).concat([warn]))*1.08;
+  var step=[5,10,20,25,50,100,200,250,500].filter(function(k){return top/G/k<=4})[0]||1000;
+  top=Math.ceil(top/G/step)*step*G;
+  var y=function(v){return T+h-v/top*h},slot=w/n,bw=Math.max(3,Math.min(28,slot*.62)),cx=function(i){return L+slot*(i+.5)};
+  var s='';
+  for(var v=0;v<=top/G;v+=step)s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(v*G)+'" y2="'+y(v*G)+'" stroke="var(--hk-line)"/>'+
+    '<text x="'+(L-8)+'" y="'+(y(v*G)+4)+'" text-anchor="end">'+v+'</text>';
+  function bar(x,y0,y1,r){var hh=y0-y1;if(hh<=0)return '';r=Math.min(r,hh,bw/2);
+    return '<path d="M'+x+' '+y0+'V'+(y1+r)+'q0 '+(-r)+' '+r+' '+(-r)+'H'+(x+bw-r)+'q'+r+' 0 '+r+' '+r+'V'+y0+'Z"/>'}
+  runs.forEach(function(r,i){
+    var x=cx(i)-bw/2,gain=Math.max(0,r.a-r.b),base=Math.min(r.a,r.b),split=y(base);
+    s+='<g class="col" data-i="'+i+'"><g fill="var(--hist-base)">'+(gain?
+      '<rect x="'+x+'" y="'+split+'" width="'+bw+'" height="'+Math.max(0,y(0)-split)+'"/>':bar(x,y(0),split,3))+'</g>';
+    if(gain)s+='<g fill="var(--hk-ok)">'+bar(x,split-(y(base)-y(r.a)>4?2:0),y(r.a),3)+'</g>';
+    s+='</g>'});
+  var wy=y(warn);
+  s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+wy+'" y2="'+wy+'" stroke="var(--hk-warn)" stroke-width="1.5" stroke-dasharray="4 3"/>';
+  var every=Math.ceil(n/Math.max(1,Math.floor(w/56)));
+  runs.forEach(function(r,i){if((n-1-i)%every===0)s+='<text x="'+cx(i)+'" y="'+(H-5)+'" text-anchor="middle">'+day(r.t)+'</text>'});
   s+='<rect x="'+L+'" y="0" width="'+w+'" height="'+(H-B)+'" fill="transparent" id="hit"/>';
-  box.innerHTML='<svg width="'+W+'" height="'+H+'">'+s+'</svg><div class="tip"></div>';
-  var tip=box.querySelector('.tip');
-  box.querySelector('#hit').addEventListener('mousemove',function(e){
-    var mx=e.offsetX,best=runs[0];runs.forEach(function(r){if(Math.abs(x(r.t)-mx)<Math.abs(x(best.t)-mx))best=r});
-    tip.innerHTML='<b>'+day(best.t)+'</b> &middot; freed '+gib(best.f)+'<br>'+gib(best.b)+' &rarr; '+gib(best.a)+' free';
-    tip.style.left=Math.min(Math.max(x(best.t),70),W-70)+'px';tip.style.top=(y(best.a)-10)+'px';tip.style.opacity=1});
-  box.querySelector('#hit').addEventListener('mouseleave',function(){tip.style.opacity=0});
+  box.innerHTML='<svg width="'+W+'" height="'+H+'" role="img" aria-label="Free space before and after each run">'+s+'</svg><div class="tip"></div>';
+  var tip=box.querySelector('.tip'),hit=box.querySelector('#hit'),cols=box.querySelectorAll('.col');
+  hit.addEventListener('mousemove',function(e){
+    var i=Math.max(0,Math.min(n-1,Math.floor((e.offsetX-L)/slot))),r=runs[i];
+    cols.forEach(function(c,j){c.classList.toggle('hot',j===i)});box.classList.add('on');
+    tip.innerHTML='<b>'+day(r.t)+'</b><br><i style="--c:var(--hist-base)"></i>'+gib(r.b)+' free before<br>'+
+      '<i style="--c:var(--hk-ok)"></i>'+gib(Math.max(0,r.a-r.b))+' freed &rarr; '+gib(r.a)+' free';
+    tip.style.left=Math.min(Math.max(cx(i),80),W-80)+'px';tip.style.top=(y(Math.max(r.a,r.b))-8)+'px';tip.style.opacity=1});
+  hit.addEventListener('mouseleave',function(){tip.style.opacity=0;box.classList.remove('on')});
 }
 draw();var last=box.clientWidth;new ResizeObserver(function(){if(box.clientWidth!==last){last=box.clientWidth;draw()}}).observe(box);
 })();
@@ -231,35 +245,30 @@ def donut(r):
 
 
 def history(r, runs):
-    head = '<h2>Free space over time<em>GiB</em></h2>'
+    head = '<h2>Free space per run<em>GiB</em></h2>'
     points = []
-    for x in runs[-52:]:
+    for x in runs[-HISTORY_BARS:]:
         try:
             t = datetime.fromisoformat(x['date']).timestamp() * 1000
             points.append({'t': t, 'b': int(x['free_before']), 'a': int(x['free_after']),
-                           'f': int(sum(x.get('freed', {}).values())),
                            'warn': int(x['capacity'] * r['thresholds']['warning_percent'] / 100)})
         except (KeyError, TypeError, ValueError):
             continue
     if not points:
         return f'<div class="card">{head}<div class="empty">History starts with the first real run.</div></div>'
-    total = sum(p['f'] for p in points)
-    previous = [p for p in points[:-1] if p['f'] > 0]
-    if r['dry_run'] or len(points) < 2:
-        since = 'History starts with this run.' if len(points) < 2 else ''
-    else:
+    freed = [max(0, p['a'] - p['b']) for p in points]
+    stats = [(size(freed[-1]), 'freed last run'), (size(sum(freed)), f'freed in {len(points)} run{"s" * (len(points) != 1)}')]
+    if len(points) > 1:
         days = (points[-1]['t'] - points[-2]['t']) / 864e5
-        growth = points[-2]['a'] - points[-1]['b']
-        since = (f'Since the previous run {days:.0f} days ago, <b>{size(abs(growth))}</b> was '
-                 f'{"used" if growth >= 0 else "freed"} outside housekeeping. ')
-    last = f' Last run that freed space: {when(datetime.fromtimestamp(previous[-1]["t"] / 1000).isoformat())}.' \
-        if previous and not since.startswith('History') else ''
+        used = points[-2]['a'] - points[-1]['b']
+        stats.insert(1, (size(abs(used)), f'{"used" if used >= 0 else "freed"} by other things in the {days:.0f} days before'))
+    stats = ''.join(f'<div><b>{v}</b>{escape(k)}</div>' for v, k in stats)
     data = json.dumps(points).replace('</', '<\\/')
-    caption = (f'{since}<b>{size(total)}</b> freed across {len(points)} run{"s" if len(points) != 1 else ""}.{last} '
-               '<span class="keys" style="display:inline-flex;margin-left:4px"><span class="warn"><i class="sw line"></i>'
-               'low-space line</span><span class="ok"><i class="sw line"></i>cleanup</span></span>')
-    return (f'<div class="card">{head}<div id="hist"></div><script type="application/json" id="hist-data">{data}</script>'
-            f'<div class="caption">{caption}</div></div>')
+    keys = ('<div class="keys hist-keys"><span><i class="sw" style="--c:var(--hist-base)"></i>Free before the run</span>'
+            '<span><i class="sw" style="--c:var(--hk-ok)"></i>Freed by the run</span>'
+            f'<span class="warn"><i class="sw dash"></i>Low space below {size(points[-1]["warn"])}</span></div>')
+    return (f'<div class="card">{head}<div class="stats">{stats}</div><div id="hist"></div>'
+            f'<script type="application/json" id="hist-data">{data}</script>{keys}</div>')
 
 
 def row(x):

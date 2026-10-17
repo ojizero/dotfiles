@@ -347,7 +347,7 @@ class Report(unittest.TestCase):
     def test_renders_every_section_offline(self):
         run, history = fixture()
         page = report.render(run, history)
-        for text in ('92.6 GiB', 'Freed by category', 'Free space over time', 'What it did', 'What it left alone',
+        for text in ('92.6 GiB', 'Freed by category', 'Free space per run', 'What it did', 'What it left alone',
                      'locked by another process', 'Memory right now', 'hist-data'):
             self.assertIn(text, page)
         self.assertIsNone(re.search(r'(src|href)="https?:', page))
