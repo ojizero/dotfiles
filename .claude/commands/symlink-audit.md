@@ -26,6 +26,7 @@ From `[dotfiles]` in `.mise.toml`:
 | `~/.config/mise/config.toml` | `.mise.toml` |
 | `~/.config/mise/config.local.toml` | `.mise.local.toml` |
 | `~/.config/mise/tasks` | `.mise/tasks` |
+| `~/.agents/skills/housekeeping` | `.mise/tasks/housekeeping/skill` |
 | `~/.claude/settings.json` | `.claude/settings.json` |
 | `~/.claude/statusline-command.sh` | `.claude/statusline-command.sh` |
 | `~/.config/ghostty` | `ghostty` |

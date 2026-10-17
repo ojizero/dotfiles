@@ -11,10 +11,11 @@ GIB = 1024 ** 3
 PRESSURE = {1: 'normal', 2: 'warning', 4: 'critical'}
 
 
-def run(args, timeout=10, cwd=None, limit=1024 ** 2):
+def run(args, timeout=10, cwd=None, limit=1024 ** 2, stop=None):
     """Run a command with a wall-time and output bound. Kills its whole process group afterwards.
 
-    Returns {'code': int, 'out': str} or {'code': None, 'out': partial, 'error': reason}.
+    Returns {'code': int, 'out': str} or {'code': None, 'out': partial, 'error': reason}. When output matches
+    the regex `stop` (a tool announcing it will wait), the command is killed and 'stopped' is set.
     """
     env = {**os.environ, 'LC_ALL': 'C', 'GIT_OPTIONAL_LOCKS': '0', 'GIT_TERMINAL_PROMPT': '0',
            'HOMEBREW_NO_AUTO_UPDATE': '1', 'HOMEBREW_NO_INSTALL_CLEANUP': '1', 'NO_COLOR': '1'}
@@ -37,6 +38,8 @@ def run(args, timeout=10, cwd=None, limit=1024 ** 2):
                 out.extend(chunk)
                 if len(out) > limit:
                     del out[:len(out) - limit]
+                if stop and re.search(stop, out.decode('utf-8', 'replace')):
+                    return {'code': None, 'out': out.decode('utf-8', 'replace'), 'error': 'stopped', 'stopped': True}
         code = proc.wait(timeout=max(0.1, end - time.monotonic()))
         return {'code': code, 'out': out.decode('utf-8', 'replace')}
     except subprocess.TimeoutExpired:

@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+#MISE description="Show disk and memory health and where the space goes"
+
+PYTHONDONTWRITEBYTECODE=1 exec uv run --no-cache --script "${0:A:h}/lib/disk.py" "$@"

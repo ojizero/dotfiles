@@ -11,12 +11,13 @@ from pathlib import Path
 from unittest import mock
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parent / 'scripts'))
+sys.path.insert(0, str(HERE.parent))
 
 import clean  # noqa: E402
 import housekeeping  # noqa: E402
 import measure  # noqa: E402
 import report  # noqa: E402
+import status  # noqa: E402
 import worktrees  # noqa: E402
 
 GIB = 1024 ** 3
@@ -48,6 +49,13 @@ class Measure(unittest.TestCase):
         self.assertLessEqual(len(r['out']), 100)
         self.assertIn('END', r['out'])
 
+    def test_run_stops_when_a_tool_announces_it_will_wait(self):
+        started = time.monotonic()
+        waits = 'import sys, time; print("Cache is currently in-use, waiting", flush=True); time.sleep(10)'
+        r = measure.run([sys.executable, '-c', waits], timeout=8, stop='in-use')
+        self.assertTrue(r['stopped'])
+        self.assertLess(time.monotonic() - started, 3)
+
 
 class Clean(unittest.TestCase):
     def test_reclaimed_sums_docker_totals(self):
@@ -66,6 +74,15 @@ class Clean(unittest.TestCase):
         self.assertEqual(clean.tool_action(failing, '/', False)['reason'], 'boom')
         missing = ('t', 'caches', 'Tool', ['no-such-tool-xyz'], None, 10)
         self.assertEqual(clean.tool_action(missing, '/', False)['outcome'], 'skipped')
+
+    def test_tool_action_skips_uv_when_its_cache_is_in_use(self):
+        spec = ('uv', 'caches', 'uv', ['uv', 'cache', 'prune'], None, 10)
+        stopped = {'code': None, 'out': '', 'error': 'stopped', 'stopped': True}
+        with mock.patch.object(clean, 'available', return_value=True), \
+                mock.patch.object(clean, 'run', return_value=stopped) as run:
+            r = clean.tool_action(spec, '/', False)
+        self.assertEqual((r['outcome'], r['reason']), ('skipped', 'another uv process is using its cache'))
+        self.assertEqual(run.call_args.kwargs['stop'], clean.IN_USE['uv'])
 
     def test_tool_action_waits_for_busy_tools(self):
         spec = ('t', 'caches', 'Tool', [sys.executable, '-c', 'pass'], 'pattern', 10)
@@ -269,6 +286,31 @@ class Housekeeping(unittest.TestCase):
                 housekeeping.load_config(path)
             path.chmod(0o600)
             self.assertEqual(housekeeping.load_config(path)['skip'], ['docker'])
+
+    def test_state_lives_in_xdg_state_unless_configured(self):
+        with mock.patch.dict(os.environ, {'XDG_STATE_HOME': '/x/state'}):
+            self.assertEqual(housekeeping.state_dir(housekeeping.OPTIONS), Path('/x/state/housekeeping'))
+            self.assertEqual(housekeeping.state_dir({**housekeeping.OPTIONS, 'state_dir': '/y'}), Path('/y'))
+
+    def test_status_reports_progress_and_unfinished_runs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state = Path(tmp)
+            self.assertEqual(status.in_progress(state), 'Now: idle.')
+            with mock.patch.object(housekeeping, 'PROGRESS', (state / 'progress.json', '2026-10-17T10:00:00+00:00')):
+                housekeeping.progress('Docker')
+            self.assertIn('on "Docker"', status.in_progress(state))
+            info = json.loads((state / 'progress.json').read_text())
+            (state / 'progress.json').write_text(json.dumps({**info, 'pid': 2 ** 22 + 7}))
+            self.assertIn('did not finish; it stopped during "Docker"', status.in_progress(state))
+
+    def test_status_summarises_the_last_run(self):
+        run, _ = fixture()
+        with tempfile.TemporaryDirectory() as tmp:
+            Path(tmp, 'last-run.json').write_text(json.dumps(run))
+            text = status.last_run(Path(tmp), 'last-run', 2)
+        self.assertIn('Freed 92.6 GiB', text)
+        self.assertIn('FAILED:', text)
+        self.assertEqual(text.count('\n  '), 2)
 
     def test_history_is_capped_and_skips_bad_lines(self):
         with tempfile.TemporaryDirectory() as tmp:

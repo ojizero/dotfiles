@@ -202,7 +202,7 @@ def plan(home, extra_repositories, cwds):
     runs, roots = adw_state(home)
     mains = {m for m in (main_checkout(p) for p in sorted(roots | set(extra_repositories)) if Path(p).is_dir()) if m}
     t3_root, adw_root = str(home / '.t3') + '/', str(home / '.adw' / 'projects') + '/'
-    fetched, out = set(), []
+    fetched, out = {}, []
     for main in sorted(mains):
         for w in linked_worktrees(main):
             path = w['path']
@@ -246,12 +246,11 @@ def gates(w, main, fetched):
     if not ref:
         return 'no default branch to compare with'
     if main not in fetched:
-        fetched.add(main)
-        git(main, '-c', 'gc.auto=0', '-c', 'maintenance.auto=false', 'fetch', '--quiet', '--prune', '--no-tags',
-            'origin', timeout=120)
+        fetched[main] = git(main, '-c', 'gc.auto=0', '-c', 'maintenance.auto=false', 'fetch', '--quiet', '--prune',
+                            '--no-tags', 'origin', timeout=120)['code'] == 0
     how = merged(w, ref)
     if not how:
-        return f'not merged into {ref}'
+        return f'not merged into {ref}' + ('' if fetched[main] else ' (fetch failed; checked local refs)')
     risky = ignored_risk(w['path'], main)
     if risky:
         return 'ignored files that may be yours: ' + ', '.join(risky)

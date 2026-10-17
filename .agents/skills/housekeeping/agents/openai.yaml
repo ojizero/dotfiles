@@ -1,4 +1,0 @@
-interface:
-  display_name: "Housekeeping"
-  short_description: "Clean up this Mac's disk and report what was done"
-  default_prompt: "Use $housekeeping to clean up this Mac and show the report."

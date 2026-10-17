@@ -1,4 +1,4 @@
-#!/usr/bin/env -S uv run --script
+#!/usr/bin/env -S uv run --no-cache --script
 # /// script
 # requires-python = ">=3.11"
 # dependencies = []
@@ -10,6 +10,7 @@ import json
 import os
 import platform
 import stat
+import subprocess
 import sys
 import time
 from datetime import datetime, timezone
@@ -25,6 +26,8 @@ HISTORY_LINES = 500
 SIZE_BUDGET = 60
 OPTIONS = {'warning_percent': 15, 'urgent_gib': 25, 'repositories': [], 'disposable': [], 'skip': [], 'state_dir': None}
 SKIPPABLE = {'brew', 'uv', 'pnpm', 'simulators', 'docker', 'xcode', 'worktrees', 'deep'}
+CONFIG = Path.home() / '.config' / 'housekeeping.json'
+PROGRESS = None  # (progress.json path, run start) while a run is going
 
 
 def load_config(path):
@@ -49,6 +52,31 @@ def load_config(path):
     if set(c['skip']) - SKIPPABLE:
         raise ValueError('skip accepts: ' + ', '.join(sorted(SKIPPABLE)))
     return c
+
+
+def state_dir(config):
+    """Where reports, history and progress live: `state_dir` from config, else $XDG_STATE_HOME/housekeeping."""
+    if config['state_dir']:
+        return Path(config['state_dir']).expanduser()
+    return Path(os.environ.get('XDG_STATE_HOME') or Path.home() / '.local' / 'state') / 'housekeeping'
+
+
+def progress(step):
+    """Record the step a run is on, so `housekeeping:status` can show a run in progress."""
+    if PROGRESS:
+        path, started = PROGRESS
+        write_private(path, json.dumps({'pid': os.getpid(), 'started': started, 'step': step}))
+
+
+def notify(record):
+    """macOS notification for scheduled runs, only when something needs a look."""
+    failed = record['counts']['failed']
+    if not failed and record['status_after'] == 'healthy':
+        return
+    text = f'{failed} step(s) failed. ' if failed else ''
+    text += f'Disk is {record["status_after"]}. Run: mise run housekeeping:status'
+    script = f'display notification {json.dumps(text)} with title "Housekeeping"'
+    subprocess.run(['/usr/bin/osascript', '-e', script], capture_output=True, timeout=20)
 
 
 def tool_path(home):
@@ -119,6 +147,7 @@ def cleanup(home, config, root, dry_run, thresholds):
         elif time.monotonic() > clean.DEADLINE:
             results.append(clean.result(category, label, 'skipped', 'run time budget used up; the next run continues'))
         else:
+            progress(label)
             value = fn()
             results.extend(value if isinstance(value, list) else [value])
 
@@ -194,7 +223,8 @@ def summary(record, html_path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--dry-run', action='store_true', help='plan only; remove nothing and record no history')
-    parser.add_argument('--config', type=Path, default=Path.home() / '.config' / 'housekeeping.json')
+    parser.add_argument('--config', type=Path, default=CONFIG)
+    parser.add_argument('--notify', action='store_true', help='post a macOS notification on failures or low disk')
     args = parser.parse_args()
     if platform.system() != 'Darwin':
         print('Housekeeping supports macOS only. Nothing was done.')
@@ -206,8 +236,7 @@ def main():
         print(f'Housekeeping did not run: invalid config. {exc}')
         return 2
     tool_path(home)
-    state = Path(config['state_dir']).expanduser() if config['state_dir'] else \
-        home / 'Library' / 'Application Support' / 'housekeeping'
+    state = state_dir(config)
     state.mkdir(mode=0o700, parents=True, exist_ok=True)
     lock = open(state / 'lock', 'w')
     try:
@@ -216,9 +245,12 @@ def main():
         print('Housekeeping did not run: another run is in progress.')
         return 2
 
+    global PROGRESS
     thresholds = (config['warning_percent'], config['urgent_gib'])
     clean.DEADLINE = time.monotonic() + clean.BUDGET
     started = datetime.now(timezone.utc)
+    PROGRESS = (state / 'progress.json', started.isoformat(timespec='seconds'))
+    progress('Measuring disk')
     before = measure.disk(DISK_ROOT)
     results, deep = cleanup(home, config, DISK_ROOT, args.dry_run, thresholds)
     after = measure.disk(DISK_ROOT)
@@ -247,7 +279,10 @@ def main():
     html_path = state / ('dry-run.html' if args.dry_run else 'report.html')
     write_private(html_path, report.render(record, history))
     write_private(state / ('dry-run.json' if args.dry_run else 'last-run.json'), json.dumps(record, indent=1))
+    PROGRESS[0].unlink(missing_ok=True)
     print(summary(record, html_path))
+    if args.notify:
+        notify(record)
     return 1 if record['counts']['failed'] else 0
 
 

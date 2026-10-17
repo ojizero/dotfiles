@@ -1,6 +1,6 @@
 # What housekeeping cleans, and why
 
-The rules below are enforced in `scripts/`; this file explains them. Change behaviour in the code, then here.
+The rules below are enforced in the mise tasks under [`.mise/tasks/housekeeping/`](../../); this file explains them. Change behaviour in the code, then here.
 
 ## Every run (routine)
 
@@ -9,7 +9,7 @@ The rules below are enforced in `scripts/`; this file explains them. Change beha
 | Docker | `image prune -af`, `builder prune -af`, `network prune -f`, each `--filter until=168h` | Only when the daemon is already running; it is never started. Volumes and containers are never pruned. |
 | Worktrees | `adw purge` with exact run IDs for ADW runs, `wt remove --no-delete-branch` otherwise | All worktree gates below |
 | Homebrew | `brew cleanup --prune=all` | Skipped while `brew` runs |
-| uv | `uv cache prune` | Skipped while uv installs or syncs |
+| uv | `uv cache prune` | Skipped while uv installs or syncs, or while another uv process holds the cache |
 | pnpm | `pnpm store prune` | Skipped while pnpm installs |
 | Simulators | `xcrun simctl delete unavailable` | |
 | Xcode | Delete DerivedData folders untouched for 14 days | Skipped while Xcode or `xcodebuild` runs |
@@ -36,14 +36,16 @@ Docker volumes and stopped containers, Playwright browsers, T3/ADW/agent histori
 
 ## Limits and files
 
+- `mise run housekeeping:periodic` schedules a weekly run as a launchd agent, Saturdays at 03:00 unless given `--day` and `--at` (for example `--day sunday --at 22:30`); launchd runs a missed slot on wake. Scheduled runs post a macOS notification when a step fails or the disk is not healthy. `--remove` unschedules it.
 - A run stops starting new steps after 9 minutes and reports the rest as skipped, so it finishes inside a 10-minute shell timeout.
-- A second run while one is in progress exits immediately.
-- State lives in `~/Library/Application Support/housekeeping/`: `report.html` (the latest report), `last-run.json` (full detail), `history.jsonl` (one line per run, last 500 kept, which feeds the history chart), and `dry-run.*` for dry runs, which add no history.
+- A second run while one is in progress exits immediately; scheduled and manual runs share this lock.
+- A failed `git fetch` does not stop a run. Merge checks then use the local refs, which can only keep more worktrees, and the keep reason says the fetch failed.
+- State lives in `~/.local/state/housekeeping/` (`$XDG_STATE_HOME`; Git ignores it in the dotfiles repo): `report.html` (the latest report), `last-run.json` (full detail), `history.jsonl` (one line per run, last 500 kept, which feeds the history chart), `progress.json` (only while a run is going), `scheduled.log` (output of scheduled runs), and `dry-run.*` for dry runs, which add no history.
 - Freed space is the host's free-space gain around each action. For Docker it is the larger of that gain and Docker's own figure, because the VM disk returns space to the host gradually.
 
 ## Settings
 
-The optional `~/.config/housekeeping.json` takes the keys in [config.example.json](config.example.json); a missing file means defaults. Pass `--config PATH` to use another file. An invalid file stops the run with an error rather than falling back.
+The optional `~/.config/housekeeping.json` takes the keys in [config.example.json](../../lib/config.example.json); a missing file means defaults. Pass `--config PATH` to use another file. An invalid file stops the run with an error rather than falling back.
 
 - `warning_percent` (default 15) and `urgent_gib` (default 25): the low-space lines.
 - `repositories`: extra repositories whose worktrees `wt` manages. ADW projects are found automatically.

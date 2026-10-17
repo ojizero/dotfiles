@@ -1,0 +1,4 @@
+interface:
+  display_name: "Housekeeping"
+  short_description: "Check on this Mac's disk cleanup and see where space goes"
+  default_prompt: "Use $housekeeping to show when housekeeping last ran and what it did."

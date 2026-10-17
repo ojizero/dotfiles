@@ -28,6 +28,8 @@ DEEP = [
     ('nuget', 'caches', 'NuGet local caches', ['dotnet', 'nuget', 'locals', 'all', '--clear'], r'dotnet (restore|build|test)', 600),
     ('go', 'caches', 'Go build cache', ['go', 'clean', '-cache'], r'go (build|test|run)( |$)', 600),
 ]
+# uv waits indefinitely while another uv process holds its cache; stop at its notice instead.
+IN_USE = {'uv': r'Cache is currently in-use'}
 VERSION = {'xcrun': ['xcrun', '--find', 'simctl'], 'go': ['go', 'version']}
 XCODE_BUSY = r'xcodebuild|Xcode\.app/Contents/MacOS/Xcode'
 
@@ -62,7 +64,9 @@ def tool_action(spec, root, dry_run):
         return result(category, label, 'skipped', f'{argv[0]} is installing something right now')
     if dry_run:
         return result(category, label, 'planned', ' '.join(argv))
-    r, gained = freed(root, lambda: run(argv, timeout=remaining(timeout)))
+    r, gained = freed(root, lambda: run(argv, timeout=remaining(timeout), stop=IN_USE.get(argv[0])))
+    if r.get('stopped'):
+        return result(category, label, 'skipped', f'another {argv[0]} process is using its cache')
     if r['code'] != 0:
         return result(category, label, 'failed', r.get('error') or last_line(r['out']))
     return result(category, label, 'done', ' '.join(argv), gained)

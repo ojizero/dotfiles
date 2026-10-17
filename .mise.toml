@@ -87,6 +87,8 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.pi/agent/extensions" = ".pi/agent/extensions"
 "~/.codex/rules/host-tools.rules" = ".codex/rules/host-tools.rules"
 "~/.agents/agents.toml" = "dotagent/agents.toml"
+# dotagents refuses local skills outside `~/.agents`, so link this one directly.
+"~/.agents/skills/housekeeping" = ".mise/tasks/housekeeping/skill"
 
 # dotagents only links `~/.claude/skills`, so mirror it for the alternate
 # profile. The source is generated, not repo content, so the pre-dotfiles hook

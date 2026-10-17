@@ -1,0 +1,71 @@
+#!/usr/bin/env zsh
+#MISE description="Schedule housekeeping weekly with launchd (--day, --at; --remove to unschedule)"
+#MISE raw=true
+
+# Keep the label in sync with `lib/status.py`.
+local label="local.dotfiles.housekeeping"
+local plist="${HOME}/Library/LaunchAgents/${label}.plist"
+local domain="gui/$(id -u)"
+local usage="usage: mise run housekeeping:periodic [--day saturday] [--at 03:00] | --remove"
+local -a day=(--day saturday) at=(--at 03:00) remove
+zparseopts -D -F -K -- -day:=day -at:=at -remove=remove || { print -r -- "$usage" >&2; exit 1 }
+(( $# )) && { print -r -- "$usage" >&2; exit 1 }
+
+# launchd counts weekdays from Sunday = 0. A laptop asleep at this time runs the missed slot on wake.
+local -a days=(sunday monday tuesday wednesday thursday friday saturday)
+local weekday=$(( ${days[(i)${(L)day[-1]}*]} - 1 ))
+local hour=${at[-1]%%:*} minute=${at[-1]#*:}
+[[ "$at[-1]" == *:* ]] || minute=0
+if (( weekday > 6 )) || [[ -z "${day[-1]}" || "$hour" != <0-23> || "$minute" != <0-59> ]]; then
+  print -r -- "$usage" >&2
+  exit 1
+fi
+
+launchctl bootout "${domain}/${label}" 2>/dev/null
+
+if (( $#remove )); then
+  rm -f "$plist"
+  print -r -- "Housekeeping is no longer scheduled."
+  exit 0
+fi
+
+local state="${XDG_STATE_HOME:-${HOME}/.local/state}/housekeeping"
+# launchd starts jobs with a bare PATH; the mise shims provide `uv`.
+local mise_shims="${MISE_DATA_DIR:-${HOME}/.local/share/mise}/shims"
+local brew_bin=""
+(( $+commands[brew] )) && brew_bin="$(brew --prefix)/bin:"
+mkdir -p -m 700 "$state" "${plist:h}"
+
+cat > "$plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>${label}</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>${0:A:h}/_default</string>
+    <string>--notify</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key><string>${mise_shims}:${brew_bin}/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>XDG_STATE_HOME</key><string>${state:h}</string>
+  </dict>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Weekday</key><integer>${weekday}</integer>
+    <key>Hour</key><integer>$(( 10#$hour ))</integer>
+    <key>Minute</key><integer>$(( 10#$minute ))</integer>
+  </dict>
+  <key>Nice</key><integer>10</integer>
+  <key>StandardOutPath</key><string>${state}/scheduled.log</string>
+  <key>StandardErrorPath</key><string>${state}/scheduled.log</string>
+</dict>
+</plist>
+PLIST
+
+launchctl bootstrap "$domain" "$plist" || exit 1
+printf 'Housekeeping runs on %ss at %02d:%02d. Check on it with: mise run housekeeping:status\n' \
+  "${(C)days[weekday + 1]}" $(( 10#$hour )) $(( 10#$minute ))
+print -r -- "Run it now through launchd with: launchctl kickstart ${domain}/${label}"

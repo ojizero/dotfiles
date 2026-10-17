@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+#MISE description="Show the housekeeping schedule, a run in progress, and the last run"
+
+PYTHONDONTWRITEBYTECODE=1 exec uv run --no-cache --script "${0:A:h}/lib/status.py" "$@"

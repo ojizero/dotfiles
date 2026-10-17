@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+#MISE description="Clean up this Mac's disk and write an HTML report"
+#MISE raw=true
+
+# `--no-cache`: the cleanup runs `uv cache prune`, which waits forever on the
+# cache that `uv run` would otherwise hold open.
+PYTHONDONTWRITEBYTECODE=1 exec uv run --no-cache --script "${0:A:h}/lib/housekeeping.py" "$@"

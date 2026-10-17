@@ -87,3 +87,18 @@ configuration, credentials, plugins, or runtime state.
 | `m dotfiles:bootstrap` | Full `mise bootstrap --yes` |
 | `m dotfiles:bundle` | Install Homebrew packages from Brewfile |
 | `m dotfiles:edit` | Open dotfiles repo in `$EDITOR` |
+
+### Housekeeping
+
+Disk cleanup for macOS, as global mise tasks in [`.mise/tasks/housekeeping`](./.mise/tasks/housekeeping).
+Reports and history go to `~/.local/state/housekeeping/`.
+
+| Task | Description |
+|------|-------------|
+| `m housekeeping` | Clean caches, merged worktrees and old build output, then write an HTML report (`--dry-run` to preview) |
+| `m housekeeping:periodic` | Run it weekly through launchd, Saturdays 03:00 by default (`--day`, `--at`, `--remove`) |
+| `m housekeeping:status` | Show the schedule, a run in progress, and the last run |
+| `m housekeeping:disk` | Show disk and memory health and where the space goes; removes nothing |
+
+The `housekeeping` agent skill next to them is linked into `~/.agents/skills`, so agents in any
+project can check on it and diagnose disk space.
