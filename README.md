@@ -31,9 +31,23 @@ lists them (`env = ["linux-desktop"]`):
 |--------|--------|
 | [`linux-desktop`](./.mise.linux-desktop.toml) | Tailscale, Cursor, Helium (apt), Zen, Obsidian, Smile (Flatpak), automatic light/dark mode (Night Theme Switcher), T3 Code (pinned so it updates itself), Docker (apt), Mac-style keyboard (xremap + GNOME shortcuts + Mac layouts), lid and sleep policy, via [`bootstrap/linux/extras.setup`](./bootstrap/linux/extras.setup) |
 
-The keyboard service pins the internal keyboard by its `/dev/input/by-path` name in
-[`xremap/mac-keyboard.service`](./xremap/mac-keyboard.service); adjust it for another
-machine, and never select it by device name (the trackpad shares it).
+Machine-specific values in the `linux-desktop` module, to adjust for another machine or place:
+
+- **Keyboard device.** The keyboard service pins the internal keyboard by its
+  `/dev/input/by-path` name in [`xremap/mac-keyboard.service`](./xremap/mac-keyboard.service).
+  Never select it by device name (the trackpad shares it).
+- **Location.** [`bootstrap/linux/files/geolocation`](./bootstrap/linux/files/geolocation) is
+  installed as `/etc/geolocation`, geoclue's fixed location (latitude, longitude, altitude,
+  accuracy in metres). GNOME uses it for sunrise and sunset: Night Theme Switcher's light/dark
+  switching and Night Light. Macs have no GPS, and the Wi-Fi lookup (beaconDB) finds no
+  match here; its IP-based guess is too coarse for GNOME. Change the coordinates when the
+  machine moves, then run `mise bootstrap files apply -C ~/workspace/self/dotfiles`.
+- **Docker.** Docker Engine comes from Docker's apt repository as a system service, and
+  the extras add you to the `docker` group, so `docker` works without `sudo` after the next login.
+- **Updates that bypass Homebrew.** xremap is a mise tool from the module (update it with
+  `mise up -C ~/workspace/self/dotfiles`; the keyboard service runs mise's `latest`).
+  GNOME Shell updates the xremap and Night Theme Switcher extensions. T3 Code updates
+  itself; its cask is pinned so `brew upgrade` leaves it alone.
 
 ### Existing device
 
