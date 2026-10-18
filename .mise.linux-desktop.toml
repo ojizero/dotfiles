@@ -6,13 +6,13 @@
 [bootstrap.apt.sources.tailscale]
 uris = "https://pkgs.tailscale.com/stable/ubuntu"
 key = "https://pkgs.tailscale.com/stable/ubuntu/resolute.noarmor.gpg"
-fingerprint = ["2596A99EAAB33821893C0A79458CA832957F5868", "2F625B3A774B946822EDDBEEB1547A3DDAAF03C6"]
+fingerprint = "2596A99EAAB33821893C0A79458CA832957F5868"
 
 [bootstrap.apt.sources.helium]
 uris = "https://pkg.helium.computer/deb"
 suites = "stable"
 key = "https://raw.githubusercontent.com/imputnet/helium-linux/main/pubkey.asc"
-fingerprint = ["BE677C1989D35EAB2C5F26C9351601AD01D6378E", "1E4F1AD1286C31EEA101AC1FCCB6CCE66AAD96D4"]
+fingerprint = "BE677C1989D35EAB2C5F26C9351601AD01D6378E"
 
 [bootstrap.packages]
 
