@@ -46,7 +46,7 @@ for module in "${DOTFILES_PATH}"/.mise.*.toml; do
   [[ "${module}" == *.mise.local.toml ]] || mise trust "${module}"
 done
 
-# Machine modules, e.g. MISE_ENV=linux-desktop,t2 on an Ubuntu workstation; kept for later runs
+# Machine modules, e.g. MISE_ENV=linux-desktop on an Ubuntu workstation; kept for later runs
 if [[ -n "${MISE_ENV}" ]]; then
   mkdir -p ~/.config/mise
   echo "env = [\"${MISE_ENV//,/\", \"}\"]" > ~/.config/mise/miserc.local.toml

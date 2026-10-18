@@ -18,19 +18,18 @@ Run [`bootstrap/install.sh`](./bootstrap/install.sh). It will:
 3. Run `mise bootstrap --yes --force-dotfiles` (system packages, symlinks, Brewfile, tools, login shell, macOS defaults, extras)
 
 On an Ubuntu workstation, pick its machine modules when running it, for example
-`MISE_ENV=linux-desktop,t2 bootstrap/install.sh`. The choice is saved to
+`MISE_ENV=linux-desktop bootstrap/install.sh`. The choice is saved to
 `~/.config/mise/miserc.local.toml` for later runs.
 
 ### Machine modules (Ubuntu)
 
 The base config works on macOS, Ubuntu workstations, and root containers. Extra
 machine setup lives in modules, loaded only where `~/.config/mise/miserc.local.toml`
-lists them (`env = ["linux-desktop", "t2"]`):
+lists them (`env = ["linux-desktop"]`):
 
 | Module | Covers |
 |--------|--------|
 | [`linux-desktop`](./.mise.linux-desktop.toml) | Tailscale, Cursor, Helium (apt), Zen, Obsidian, Smile (Flatpak), T3 Code (pinned so it updates itself), rootless Docker, Mac-style keyboard (xremap + GNOME shortcuts + Mac layouts), lid and sleep policy, via [`bootstrap/linux/extras.setup`](./bootstrap/linux/extras.setup) |
-| [`t2`](./.mise.t2.toml) | T2 MacBook kernel, audio, Touch Bar, Touch ID, and kernel parameters from [t2linux](https://t2linux.org) |
 
 The keyboard service pins the internal keyboard by its `/dev/input/by-path` name in
 [`xremap/mac-keyboard.service`](./xremap/mac-keyboard.service); adjust it for another
