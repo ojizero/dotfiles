@@ -9,7 +9,7 @@ StartLimitBurst=3
 Type=simple
 Environment=RUST_LOG=warn
 ExecStartPre=%h/.config/xremap/mac-keyboard-ready
-ExecStart=%h/.local/bin/xremap --desktop gnome --no-window-logging --allow-launch false --watch=device,config --device /dev/input/by-path/pci-0000:04:00.1-usb-0:5:1.1-event-kbd %h/.config/xremap/mac.yml
+ExecStart=%h/.local/share/mise/installs/github-xremap-xremap/latest/xremap --desktop gnome --no-window-logging --allow-launch false --watch=device,config --device /dev/input/by-path/pci-0000:04:00.1-usb-0:5:1.1-event-kbd %h/.config/xremap/mac.yml
 Restart=on-failure
 RestartSec=5
 NoNewPrivileges=yes

@@ -2,6 +2,11 @@
 # Select it per machine in ~/.config/mise/miserc.local.toml (env = ["linux-desktop"]);
 # containers and servers leave it out and get only the base config.
 
+[tools]
+
+# Key remapper behind the Mac-style shortcuts (GNOME build); mise keeps it updated
+"github:xremap/xremap" = { version = "latest", matching = "gnome" }
+
 # Vendor apt repositories (mise writes /etc/apt/sources.list.d/mise-<name>.sources)
 [bootstrap.apt.sources.tailscale]
 uris = "https://pkgs.tailscale.com/stable/ubuntu"

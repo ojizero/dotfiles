@@ -25,7 +25,8 @@ On an Ubuntu workstation, pick its machine modules when running it, for example
 
 The base config works on macOS, Ubuntu workstations, and root containers. Extra
 machine setup lives in modules, loaded only where `~/.config/mise/miserc.local.toml`
-lists them (`env = ["linux-desktop"]`):
+lists them (`env = ["linux-desktop"]`). A desktop can instead link that file to
+[`bootstrap/linux/miserc.local.toml`](./bootstrap/linux/miserc.local.toml):
 
 | Module | Covers |
 |--------|--------|

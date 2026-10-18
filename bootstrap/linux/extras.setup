@@ -48,27 +48,14 @@ id -nG "${USER}" | grep -qw docker || sudo usermod -aG docker "${USER}"
 # Tailscale tray icon at login
 command -v tailscale >/dev/null && tailscale configure systray --enable-startup=freedesktop >/dev/null
 
-# Keyboard: xremap's GNOME build, pinned and checksummed (installed to ~/.local/bin)
-xremap_version="0.15.14"
-xremap_sha256="236ae42a8ecdf482e4c4c39493b685e009d3e2022bbde0d2a30d5d9ffe2bfe86"
-if [[ "$("${HOME}/.local/bin/xremap" --version 2>/dev/null)" != "xremap ${xremap_version}" ]]; then
-  tmp="$(mktemp -d)"
-  curl -fsSL -o "${tmp}/xremap.zip" "https://github.com/xremap/xremap/releases/download/v${xremap_version}/xremap-linux-x86_64-gnome.zip" &&
-    echo "${xremap_sha256}  ${tmp}/xremap.zip" | sha256sum --check --quiet &&
-    unzip -q -o "${tmp}/xremap.zip" xremap -d "${tmp}" &&
-    install -D -m 755 "${tmp}/xremap" "${HOME}/.local/bin/xremap"
-  rm -rf "${tmp}"
-fi
-
-# The GNOME extension that tells xremap which app is focused
+# The GNOME extension that tells xremap (installed by the linux-desktop module's tools) which app is focused.
+# Installed once for this GNOME version; GNOME Shell updates it from extensions.gnome.org after that.
 ext_uuid="xremap@k0kubun.com"
-ext_version="16"
-ext_sha256="ec9544258550a4e84b1fb0e86eb6eea9174ba15f3c0b2acb41576eca6ebb620f"
-if [[ "$(gnome-extensions info "${ext_uuid}" 2>/dev/null | awk '/Version:/ { print $2 }')" != "${ext_version}" ]]; then
+if ! gnome-extensions info "${ext_uuid}" >/dev/null 2>&1; then
+  shell_version="$(gnome-shell --version | awk '{ print $3 }')"
+  download="$(curl -fsSL "https://extensions.gnome.org/extension-info/?uuid=${ext_uuid}&shell_version=${shell_version}" | jq -r .download_url)"
   tmp="$(mktemp -d)"
-  curl -fsSL -o "${tmp}/ext.zip" "https://extensions.gnome.org/download-extension/${ext_uuid}.shell-extension.zip?version_tag=76494" &&
-    echo "${ext_sha256}  ${tmp}/ext.zip" | sha256sum --check --quiet &&
-    gnome-extensions install --force "${tmp}/ext.zip"
+  curl -fsSL -o "${tmp}/ext.zip" "https://extensions.gnome.org${download}" && gnome-extensions install --force "${tmp}/ext.zip"
   rm -rf "${tmp}"
 fi
 enabled="$(gsettings get org.gnome.shell enabled-extensions)"
