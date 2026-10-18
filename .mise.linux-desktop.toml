@@ -31,6 +31,8 @@ fingerprint = "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
 # Cursor manages its own apt source, so extras.setup installs its .deb instead.
 "apt:tailscale" = "latest"
 "apt:helium-bin" = "latest"
+# Lists, toggles and opens the settings of GNOME extensions (GNOME Tweaks no longer does)
+"apt:gnome-shell-extension-manager" = "latest"
 # Docker Engine from Docker's repository (system service; the docker group gives passwordless access)
 "apt:docker-ce" = "latest"
 "apt:docker-ce-cli" = "latest"

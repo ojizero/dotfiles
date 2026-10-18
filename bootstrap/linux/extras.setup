@@ -69,6 +69,11 @@ for ext_uuid in xremap@k0kubun.com nightthemeswitcher@romainvigier.fr; do
   fi
 done
 
+# Fixed location for GNOME's sunrise and sunset (geoclue's static source), kept out of git
+if [[ -f "${DOTFILES_PATH}/.geolocation.local" ]] && ! cmp -s "${DOTFILES_PATH}/.geolocation.local" /etc/geolocation; then
+  sudo install -m 644 "${DOTFILES_PATH}/.geolocation.local" /etc/geolocation
+fi
+
 # xremap needs the input group for the keyboard device (takes effect at next login)
 id -nG | grep -qw input || sudo usermod -aG input "${USER}"
 

@@ -36,12 +36,11 @@ Machine-specific values in the `linux-desktop` module, to adjust for another mac
 - **Keyboard device.** The keyboard service pins the internal keyboard by its
   `/dev/input/by-path` name in [`xremap/mac-keyboard.service`](./xremap/mac-keyboard.service).
   Never select it by device name (the trackpad shares it).
-- **Location.** [`bootstrap/linux/files/geolocation`](./bootstrap/linux/files/geolocation) is
-  installed as `/etc/geolocation`, geoclue's fixed location (latitude, longitude, altitude,
-  accuracy in metres). GNOME uses it for sunrise and sunset: Night Theme Switcher's light/dark
-  switching and Night Light. Macs have no GPS, and the Wi-Fi lookup (beaconDB) finds no
-  match here; its IP-based guess is too coarse for GNOME. Change the coordinates when the
-  machine moves, then run `mise bootstrap files apply -C ~/workspace/self/dotfiles`.
+- **Location.** GNOME needs a location for sunrise and sunset (Night Theme Switcher's light/dark
+  switching and Night Light). Macs have no GPS, and the Wi-Fi lookup (beaconDB) may find no
+  match; its IP-based guess is too coarse for GNOME. Give geoclue a fixed location in a
+  git-ignored `.geolocation.local` at the repo root, four lines: latitude, longitude, altitude
+  and accuracy in metres (`#` comments allowed). The extras install it as `/etc/geolocation`.
 - **Docker.** Docker Engine comes from Docker's apt repository as a system service, and
   the extras add you to the `docker` group, so `docker` works without `sudo` after the next login.
 - **Updates that bypass Homebrew.** xremap is a mise tool from the module (update it with
