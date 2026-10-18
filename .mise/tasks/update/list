@@ -1,5 +1,13 @@
 #!/usr/bin/env zsh
-#MISE description="List available macOS updates"
+#MISE description="List available system updates"
 #MISE raw=true
+
+if [[ "$(uname -s)" == "Linux" ]]; then
+  apt list --upgradable 2>/dev/null
+  command -v snap >/dev/null && snap refresh --list
+  command -v flatpak >/dev/null && flatpak remote-ls --updates
+  command -v fwupdmgr >/dev/null && fwupdmgr get-updates
+  exit 0
+fi
 
 sudo softwareupdate --list

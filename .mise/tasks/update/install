@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
-#MISE description="Install specific macOS updates"
+#MISE description="Install specific system updates"
 #MISE raw=true
 
 if [[ -z "$1" ]]; then
@@ -7,4 +7,8 @@ if [[ -z "$1" ]]; then
   exit 1
 fi
 
-sudo softwareupdate --install "$@"
+if [[ "$(uname -s)" == "Linux" ]]; then
+  sudo apt-get install --only-upgrade "$@"
+else
+  sudo softwareupdate --install "$@"
+fi
