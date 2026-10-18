@@ -181,7 +181,7 @@ run = "killall Dock 2>/dev/null || true"
 [tasks.bootstrap]
 
 run = '''
-if [[ "$(uname -s)" == "Darwin" ]]; then
+if [ "$(uname -s)" = "Darwin" ]; then
   zsh "${DOTFILES_PATH}/bootstrap/macos/extras.setup"
 fi
 '''
