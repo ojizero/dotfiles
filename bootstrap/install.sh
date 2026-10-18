@@ -42,6 +42,15 @@ fi
 # Point mise at repo config before symlinks exist
 export MISE_CONFIG_FILE="${DOTFILES_PATH}/.mise.toml"
 mise trust "${DOTFILES_PATH}/.mise.toml"
+for module in "${DOTFILES_PATH}"/.mise.*.toml; do
+  [[ "${module}" == *.mise.local.toml ]] || mise trust "${module}"
+done
+
+# Machine modules, e.g. MISE_ENV=linux-desktop,t2 on an Ubuntu workstation; kept for later runs
+if [[ -n "${MISE_ENV}" ]]; then
+  mkdir -p ~/.config/mise
+  echo "env = [\"${MISE_ENV//,/\", \"}\"]" > ~/.config/mise/miserc.local.toml
+fi
 
 # Seed local config if first run
 [[ -f .mise.local.toml ]] || cp .mise.local.toml.sample .mise.local.toml

@@ -1,0 +1,60 @@
+# Ubuntu desktop module: apps, keyboard, power and Docker for a GNOME workstation.
+# Select it per machine in ~/.config/mise/miserc.local.toml (env = ["linux-desktop"]);
+# containers and servers leave it out and get only the base config.
+
+# Vendor apt repositories (mise writes /etc/apt/sources.list.d/mise-<name>.sources)
+[bootstrap.apt.sources.tailscale]
+uris = "https://pkgs.tailscale.com/stable/ubuntu"
+key = "https://pkgs.tailscale.com/stable/ubuntu/resolute.noarmor.gpg"
+fingerprint = ["2596A99EAAB33821893C0A79458CA832957F5868", "2F625B3A774B946822EDDBEEB1547A3DDAAF03C6"]
+
+[bootstrap.apt.sources.cursor]
+uris = "https://downloads.cursor.com/aptrepo"
+suites = "stable"
+key = "https://downloads.cursor.com/keys/anysphere.asc"
+fingerprint = "380FF4BCDC34A4BD92A3565342A1772E62E492D6"
+
+[bootstrap.apt.sources.helium]
+uris = "https://pkg.helium.computer/deb"
+suites = "stable"
+key = "https://raw.githubusercontent.com/imputnet/helium-linux/main/pubkey.asc"
+fingerprint = ["BE677C1989D35EAB2C5F26C9351601AD01D6378E", "1E4F1AD1286C31EEA101AC1FCCB6CCE66AAD96D4"]
+
+[bootstrap.packages]
+
+# Apps whose daemon or Chromium sandbox needs a system install (AppArmor profiles ship with the .deb)
+"apt:tailscale" = "latest"
+"apt:cursor" = "latest"
+"apt:helium-bin" = "latest"
+# newuidmap/newgidmap for rootless Docker (Homebrew's docker-engine)
+"apt:uidmap" = "latest"
+
+# Lid closed on AC keeps the machine running
+[bootstrap.files."/etc/systemd/logind.conf.d/60-server-on-ac.conf"]
+source = "bootstrap/linux/files/logind-lid-on-ac.conf"
+
+# xremap writes through /dev/uinput
+[bootstrap.files."/etc/udev/rules.d/99-mac-keyboard-uinput.rules"]
+source = "bootstrap/linux/files/uinput.rules"
+
+[bootstrap.files."/etc/modules-load.d/mac-keyboard-uinput.conf"]
+source = "bootstrap/linux/files/uinput-modules.conf"
+
+[bootstrap.files."/etc/apparmor.d/linuxbrew-rootlesskit"]
+source = "bootstrap/linux/files/apparmor-rootlesskit"
+notify = ["apparmor"]
+
+[bootstrap.services.apparmor]
+on_change = "reload"
+
+[bootstrap.services.tailscaled]
+state = "running"
+
+[dotfiles]
+
+"~/.config/xremap" = "xremap"
+"~/.config/systemd/user/mac-keyboard.service" = "xremap/mac-keyboard.service"
+
+[tasks.bootstrap]
+
+run = 'zsh "${DOTFILES_PATH}/bootstrap/linux/extras.setup"'

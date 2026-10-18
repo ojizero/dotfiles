@@ -15,7 +15,26 @@ Run [`bootstrap/install.sh`](./bootstrap/install.sh). It will:
 
 1. Clone this repo from Forgejo to `~/workspace/self/dotfiles` using the existing SSH setup
 2. Install Homebrew (if missing) and `brew install mise`
-3. Run `mise bootstrap --yes --force-dotfiles` (symlinks, Brewfile, tools, macOS defaults, extras)
+3. Run `mise bootstrap --yes --force-dotfiles` (system packages, symlinks, Brewfile, tools, login shell, macOS defaults, extras)
+
+On an Ubuntu workstation, pick its machine modules when running it, for example
+`MISE_ENV=linux-desktop,t2 bootstrap/install.sh`. The choice is saved to
+`~/.config/mise/miserc.local.toml` for later runs.
+
+### Machine modules (Ubuntu)
+
+The base config works on macOS, Ubuntu workstations, and root containers. Extra
+machine setup lives in modules, loaded only where `~/.config/mise/miserc.local.toml`
+lists them (`env = ["linux-desktop", "t2"]`):
+
+| Module | Covers |
+|--------|--------|
+| [`linux-desktop`](./.mise.linux-desktop.toml) | Tailscale, Cursor, Helium (apt), Zen, Obsidian, Smile (Flatpak), rootless Docker, Mac-style keyboard (xremap + GNOME shortcuts + Mac layouts), lid and sleep policy, via [`bootstrap/linux/extras.setup`](./bootstrap/linux/extras.setup) |
+| [`t2`](./.mise.t2.toml) | T2 MacBook kernel, audio, Touch Bar, Touch ID, and kernel parameters from [t2linux](https://t2linux.org) |
+
+The keyboard service pins the internal keyboard by its `/dev/input/by-path` name in
+[`xremap/mac-keyboard.service`](./xremap/mac-keyboard.service); adjust it for another
+machine, and never select it by device name (the trackpad shares it).
 
 ### Existing device
 
@@ -88,6 +107,8 @@ configuration, credentials, plugins, or runtime state.
 | `m dotfiles:bootstrap` | Full `mise bootstrap --yes` |
 | `m dotfiles:bundle` | Install Homebrew packages from Brewfile |
 | `m dotfiles:edit` | Open dotfiles repo in `$EDITOR` |
+
+`m dns:*` and `m update:*` work on both macOS and Ubuntu (systemd-resolved; apt, snap, Flatpak and firmware).
 
 ### Housekeeping
 

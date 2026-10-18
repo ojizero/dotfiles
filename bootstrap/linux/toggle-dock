@@ -1,0 +1,9 @@
+#!/usr/bin/env zsh
+
+# Command+Option+D: switch the Ubuntu Dock between always shown and auto-hide
+key=(org.gnome.shell.extensions.dash-to-dock dock-fixed)
+if [[ "$(gsettings get "${key[@]}")" == "true" ]]; then
+  gsettings set "${key[@]}" false
+else
+  gsettings set "${key[@]}" true
+fi

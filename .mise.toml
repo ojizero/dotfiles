@@ -110,6 +110,10 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "apt:libssl-dev" = { os = "linux" }
 "apt:libncurses-dev" = { os = "linux" }
 
+[bootstrap.user]
+
+login_shell = '{% if os() == "macos" %}/bin/zsh{% else %}/usr/bin/zsh{% endif %}'
+
 [bootstrap.macos.dock]
 
 autohide = true

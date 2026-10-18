@@ -1,0 +1,146 @@
+#!/usr/bin/env zsh
+
+# Ubuntu desktop counterpart to bootstrap/macos/extras.setup, run by the
+# linux-desktop module's bootstrap task. Every step is safe to repeat.
+
+DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/workspace/self/dotfiles}"
+
+# Set a GNOME setting, skipping schemas this desktop does not ship
+gset() {
+  if gsettings list-keys "$1" >/dev/null 2>&1; then
+    gsettings set "$1" "$2" "$3"
+  else
+    echo "skipped ${1} ${2}: schema not installed" >&2
+  fi
+}
+
+# Add a custom GNOME shortcut under media-keys
+custom_bindings=()
+gcustom() {
+  local path="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${1}/"
+  local schema="org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:${path}"
+  gsettings set "${schema}" name "$2"
+  gsettings set "${schema}" command "$3"
+  gsettings set "${schema}" binding "$4"
+  custom_bindings+=("'${path}'")
+}
+
+# Flatpak apps from Flathub (mise does not add Flatpak remotes, so they are installed here)
+flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+for app in app.zen_browser.zen md.obsidian.Obsidian it.mijorus.smile; do
+  flatpak info --user "${app}" >/dev/null 2>&1 || flatpak install --user --noninteractive flathub "${app}"
+done
+
+# Rootless Docker from Homebrew's docker-engine (the AppArmor profile comes from the linux-desktop module)
+if command -v dockerd-rootless-setuptool.sh >/dev/null && ! systemctl --user is-enabled docker.service >/dev/null 2>&1; then
+  dockerd-rootless-setuptool.sh install && docker context use rootless
+fi
+docker_config="${HOME}/.docker/config.json"
+plugins_dir="${HOMEBREW_PREFIX:-/home/linuxbrew/.linuxbrew}/lib/docker/cli-plugins"
+mkdir -p "${docker_config:h}"
+[[ -f "${docker_config}" ]] || echo '{}' > "${docker_config}"
+if ! jq -e --arg dir "${plugins_dir}" '.cliPluginsExtraDirs // [] | index($dir)' "${docker_config}" >/dev/null; then
+  jq --arg dir "${plugins_dir}" '.cliPluginsExtraDirs = ((.cliPluginsExtraDirs // []) + [$dir])' "${docker_config}" > "${docker_config}.tmp" &&
+    mv "${docker_config}.tmp" "${docker_config}"
+fi
+
+# Tailscale tray icon at login
+command -v tailscale >/dev/null && tailscale configure systray --enable-startup=freedesktop >/dev/null
+
+# Keyboard: xremap's GNOME build, pinned and checksummed (installed to ~/.local/bin)
+xremap_version="0.15.14"
+xremap_sha256="236ae42a8ecdf482e4c4c39493b685e009d3e2022bbde0d2a30d5d9ffe2bfe86"
+if [[ "$("${HOME}/.local/bin/xremap" --version 2>/dev/null)" != "xremap ${xremap_version}" ]]; then
+  tmp="$(mktemp -d)"
+  curl -fsSL -o "${tmp}/xremap.zip" "https://github.com/xremap/xremap/releases/download/v${xremap_version}/xremap-linux-x86_64-gnome.zip" &&
+    echo "${xremap_sha256}  ${tmp}/xremap.zip" | sha256sum --check --quiet &&
+    unzip -q -o "${tmp}/xremap.zip" xremap -d "${tmp}" &&
+    install -D -m 755 "${tmp}/xremap" "${HOME}/.local/bin/xremap"
+  rm -rf "${tmp}"
+fi
+
+# The GNOME extension that tells xremap which app is focused
+ext_uuid="xremap@k0kubun.com"
+ext_version="16"
+ext_sha256="ec9544258550a4e84b1fb0e86eb6eea9174ba15f3c0b2acb41576eca6ebb620f"
+if [[ "$(gnome-extensions info "${ext_uuid}" 2>/dev/null | awk '/Version:/ { print $2 }')" != "${ext_version}" ]]; then
+  tmp="$(mktemp -d)"
+  curl -fsSL -o "${tmp}/ext.zip" "https://extensions.gnome.org/download-extension/${ext_uuid}.shell-extension.zip?version_tag=76494" &&
+    echo "${ext_sha256}  ${tmp}/ext.zip" | sha256sum --check --quiet &&
+    gnome-extensions install --force "${tmp}/ext.zip"
+  rm -rf "${tmp}"
+fi
+enabled="$(gsettings get org.gnome.shell enabled-extensions)"
+if [[ "${enabled}" != *"'${ext_uuid}'"* ]]; then
+  [[ "${enabled}" == "@as []" || "${enabled}" == "[]" ]] && enabled="['${ext_uuid}']" || enabled="${enabled%]}, '${ext_uuid}']"
+  gsettings set org.gnome.shell enabled-extensions "${enabled}"
+fi
+
+# xremap needs the input group for the keyboard device (takes effect at next login)
+id -nG | grep -qw input || sudo usermod -aG input "${USER}"
+
+systemctl --user daemon-reload
+systemctl --user enable mac-keyboard.service
+systemctl --user try-restart mac-keyboard.service
+
+# Mac keyboard layouts: English Macintosh ABC ISO and Arabic Macintosh
+gset org.gnome.desktop.input-sources sources "[('xkb', 'us+mac-iso'), ('xkb', 'ara+mac')]"
+
+# GNOME shortcuts matching macOS (Command = Super, Option = Alt). xremap turns
+# Control+arrows into Super+Page_Up/Page_Down/F10, which GNOME listens on below.
+SH=org.gnome.shell.keybindings
+WM=org.gnome.desktop.wm.keybindings
+MK=org.gnome.settings-daemon.plugins.media-keys
+gset org.gnome.mutter overlay-key "''"
+gset "${SH}" toggle-overview "['<Super>space', '<Super>F10']"
+gset "${SH}" toggle-application-view "[]"
+gset "${SH}" toggle-message-tray "[]"
+gset "${SH}" toggle-quick-settings "[]"
+gset "${SH}" focus-active-notification "[]"
+gset "${SH}" screenshot "['<Super><Shift>3', '<Shift>Print']"
+gset "${SH}" show-screenshot-ui "['<Super><Shift>4', '<Super><Shift>5', 'Print']"
+for i in {1..9}; do
+  gset "${SH}" "switch-to-application-${i}" "[]"
+  gset "${SH}" "open-new-window-application-${i}" "[]"
+done
+gset "${WM}" switch-applications "['<Super>Tab', '<Alt>Tab']"
+gset "${WM}" switch-applications-backward "['<Shift><Super>Tab', '<Shift><Alt>Tab']"
+gset "${WM}" switch-group "['<Super>Above_Tab']"
+gset "${WM}" switch-group-backward "['<Super><Shift>Above_Tab']"
+gset "${WM}" minimize "['<Super>m', '<Super>h']"
+gset "${WM}" toggle-fullscreen "['<Control><Super>f']"
+gset "${WM}" show-desktop "['<Super>F3']"
+gset "${WM}" switch-input-source "['<Control>space', 'XF86Keyboard']"
+gset "${WM}" switch-input-source-backward "['<Control><Shift>space']"
+gset "${WM}" switch-to-workspace-left "['<Super>Page_Up']"
+gset "${WM}" switch-to-workspace-right "['<Super>Page_Down']"
+gset "${WM}" switch-to-workspace-up "[]"
+gset "${WM}" switch-to-workspace-down "[]"
+for direction in left right up down; do
+  gset "${WM}" "move-to-monitor-${direction}" "[]"
+done
+gset "${MK}" screensaver "['<Control><Super>q']"
+gset "${MK}" logout "['<Super><Shift>q']"
+gset "${MK}" rotate-video-lock-static "['XF86RotationLockToggle']"
+gset org.gnome.mutter.keybindings switch-monitor "['XF86Display']"
+gset org.gnome.shell.extensions.dash-to-dock hot-keys false
+gset org.gnome.shell.extensions.dash-to-dock shortcut "[]"
+gset org.gnome.shell.extensions.dash-to-dock shortcut-text "''"
+gset org.gnome.shell.extensions.tiling-assistant tile-left-half "['<Control><Alt>Left']"
+gset org.gnome.shell.extensions.tiling-assistant tile-right-half "['<Control><Alt>Right']"
+gset org.gnome.shell.extensions.tiling-assistant tile-maximize "['<Control><Alt>Up']"
+
+# Shortcuts GNOME has no setting for
+gcustom force-quit "Force Quit" "resources" "<Super><Alt>Escape"
+gcustom emoji "Emoji & Symbols" "flatpak run it.mijorus.smile" "<Control><Super>space"
+gcustom dock "Show or hide the Dock" "${DOTFILES_PATH}/bootstrap/linux/toggle-dock" "<Super><Alt>d"
+gset "${MK}" custom-keybindings "[${(j:, :)custom_bindings}]"
+
+# Power: never sleep on AC (the lid is handled by logind), suspend after 15 minutes on battery
+gset org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type "'nothing'"
+gset org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 0
+gset org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type "'suspend'"
+gset org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 900
+
+# Run any updates on system
+mise run update:all
