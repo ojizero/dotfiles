@@ -42,18 +42,8 @@ fi
 # T3 Code (Brewfile AppImage) updates itself; Linux casks lack macOS's auto_updates flag, so pin it
 brew list --pinned --cask t3-code &>/dev/null || brew pin --cask t3-code
 
-# Rootless Docker from Homebrew's docker-engine (the AppArmor profile comes from the linux-desktop module)
-if command -v dockerd-rootless-setuptool.sh >/dev/null && ! systemctl --user is-enabled docker.service >/dev/null 2>&1; then
-  dockerd-rootless-setuptool.sh install && docker context use rootless
-fi
-docker_config="${HOME}/.docker/config.json"
-plugins_dir="${HOMEBREW_PREFIX:-/home/linuxbrew/.linuxbrew}/lib/docker/cli-plugins"
-mkdir -p "${docker_config:h}"
-[[ -f "${docker_config}" ]] || echo '{}' > "${docker_config}"
-if ! jq -e --arg dir "${plugins_dir}" '.cliPluginsExtraDirs // [] | index($dir)' "${docker_config}" >/dev/null; then
-  jq --arg dir "${plugins_dir}" '.cliPluginsExtraDirs = ((.cliPluginsExtraDirs // []) + [$dir])' "${docker_config}" > "${docker_config}.tmp" &&
-    mv "${docker_config}.tmp" "${docker_config}"
-fi
+# Docker without sudo (takes effect at next login)
+id -nG "${USER}" | grep -qw docker || sudo usermod -aG docker "${USER}"
 
 # Tailscale tray icon at login
 command -v tailscale >/dev/null && tailscale configure systray --enable-startup=freedesktop >/dev/null

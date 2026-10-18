@@ -14,14 +14,24 @@ suites = "stable"
 key = "https://raw.githubusercontent.com/imputnet/helium-linux/main/pubkey.asc"
 fingerprint = "BE677C1989D35EAB2C5F26C9351601AD01D6378E"
 
+[bootstrap.apt.sources.docker]
+uris = "https://download.docker.com/linux/ubuntu"
+components = "stable"
+key = "https://download.docker.com/linux/ubuntu/gpg"
+fingerprint = "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
+
 [bootstrap.packages]
 
 # Apps whose daemon or Chromium sandbox needs a system install (AppArmor profiles ship with the .deb).
 # Cursor manages its own apt source, so extras.setup installs its .deb instead.
 "apt:tailscale" = "latest"
 "apt:helium-bin" = "latest"
-# newuidmap/newgidmap for rootless Docker (Homebrew's docker-engine)
-"apt:uidmap" = "latest"
+# Docker Engine from Docker's repository (system service; the docker group gives passwordless access)
+"apt:docker-ce" = "latest"
+"apt:docker-ce-cli" = "latest"
+"apt:containerd.io" = "latest"
+"apt:docker-buildx-plugin" = "latest"
+"apt:docker-compose-plugin" = "latest"
 
 # Lid closed on AC keeps the machine running
 [bootstrap.files."/etc/systemd/logind.conf.d/60-server-on-ac.conf"]
@@ -34,10 +44,6 @@ source = "bootstrap/linux/files/uinput.rules"
 [bootstrap.files."/etc/modules-load.d/mac-keyboard-uinput.conf"]
 source = "bootstrap/linux/files/uinput-modules.conf"
 
-[bootstrap.files."/etc/apparmor.d/linuxbrew-rootlesskit"]
-source = "bootstrap/linux/files/apparmor-rootlesskit"
-notify = ["apparmor"]
-
 [bootstrap.files."/etc/apparmor.d/t3code-appimage"]
 source = "bootstrap/linux/files/apparmor-t3code-appimage"
 notify = ["apparmor"]
@@ -46,6 +52,9 @@ notify = ["apparmor"]
 on_change = "reload"
 
 [bootstrap.services.tailscaled]
+state = "running"
+
+[bootstrap.services.docker]
 state = "running"
 
 [dotfiles]

@@ -11,11 +11,6 @@ brew "bat"
 brew "cloudflared"
 brew "coreutils" if OS.mac?
 brew "docker", link: false if OS.mac?
-# Rootless Docker Engine on Linux (macOS uses Docker Desktop)
-brew "docker" if OS.linux?
-brew "docker-buildx" if OS.linux?
-brew "docker-compose" if OS.linux?
-brew "docker-engine" if OS.linux?
 brew "fd"
 brew "ffmpeg"
 brew "flyctl"
@@ -43,10 +38,8 @@ brew "nss" if OS.mac?
 brew "oh-my-posh"
 brew "poppler" if OS.mac?
 brew "ripgrep"
-brew "rootlesskit" if OS.linux?
 brew "sheets"
 brew "shellcheck"
-brew "slirp4netns" if OS.linux?
 brew "tree"
 brew "tree-sitter-cli"
 brew "viu"
