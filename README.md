@@ -29,7 +29,7 @@ lists them (`env = ["linux-desktop"]`):
 
 | Module | Covers |
 |--------|--------|
-| [`linux-desktop`](./.mise.linux-desktop.toml) | Tailscale, Cursor, Helium (apt), Zen, Obsidian, Smile (Flatpak), T3 Code (pinned so it updates itself), Docker (apt), Mac-style keyboard (xremap + GNOME shortcuts + Mac layouts), lid and sleep policy, via [`bootstrap/linux/extras.setup`](./bootstrap/linux/extras.setup) |
+| [`linux-desktop`](./.mise.linux-desktop.toml) | Tailscale, Cursor, Helium (apt), Zen, Obsidian, Smile (Flatpak), automatic light/dark mode (Night Theme Switcher), T3 Code (pinned so it updates itself), Docker (apt), Mac-style keyboard (xremap + GNOME shortcuts + Mac layouts), lid and sleep policy, via [`bootstrap/linux/extras.setup`](./bootstrap/linux/extras.setup) |
 
 The keyboard service pins the internal keyboard by its `/dev/input/by-path` name in
 [`xremap/mac-keyboard.service`](./xremap/mac-keyboard.service); adjust it for another

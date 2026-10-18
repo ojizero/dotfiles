@@ -48,21 +48,23 @@ id -nG "${USER}" | grep -qw docker || sudo usermod -aG docker "${USER}"
 # Tailscale tray icon at login
 command -v tailscale >/dev/null && tailscale configure systray --enable-startup=freedesktop >/dev/null
 
-# The GNOME extension that tells xremap (installed by the linux-desktop module's tools) which app is focused.
-# Installed once for this GNOME version; GNOME Shell updates it from extensions.gnome.org after that.
-ext_uuid="xremap@k0kubun.com"
-if ! gnome-extensions info "${ext_uuid}" >/dev/null 2>&1; then
-  shell_version="$(gnome-shell --version | awk '{ print $3 }')"
-  download="$(curl -fsSL "https://extensions.gnome.org/extension-info/?uuid=${ext_uuid}&shell_version=${shell_version}" | jq -r .download_url)"
-  tmp="$(mktemp -d)"
-  curl -fsSL -o "${tmp}/ext.zip" "https://extensions.gnome.org${download}" && gnome-extensions install --force "${tmp}/ext.zip"
-  rm -rf "${tmp}"
-fi
-enabled="$(gsettings get org.gnome.shell enabled-extensions)"
-if [[ "${enabled}" != *"'${ext_uuid}'"* ]]; then
-  [[ "${enabled}" == "@as []" || "${enabled}" == "[]" ]] && enabled="['${ext_uuid}']" || enabled="${enabled%]}, '${ext_uuid}']"
-  gsettings set org.gnome.shell enabled-extensions "${enabled}"
-fi
+# GNOME extensions from extensions.gnome.org, installed once for this GNOME version; GNOME Shell updates them after that.
+#   xremap@k0kubun.com: tells xremap (a linux-desktop module tool) which app is focused
+#   nightthemeswitcher@romainvigier.fr: light/dark mode by sunrise and sunset, like macOS's Auto appearance
+for ext_uuid in xremap@k0kubun.com nightthemeswitcher@romainvigier.fr; do
+  if ! gnome-extensions info "${ext_uuid}" >/dev/null 2>&1; then
+    shell_version="$(gnome-shell --version | awk '{ print $3 }')"
+    download="$(curl -fsSL "https://extensions.gnome.org/extension-info/?uuid=${ext_uuid}&shell_version=${shell_version}" | jq -r .download_url)"
+    tmp="$(mktemp -d)"
+    curl -fsSL -o "${tmp}/ext.zip" "https://extensions.gnome.org${download}" && gnome-extensions install --force "${tmp}/ext.zip"
+    rm -rf "${tmp}"
+  fi
+  enabled="$(gsettings get org.gnome.shell enabled-extensions)"
+  if [[ "${enabled}" != *"'${ext_uuid}'"* ]]; then
+    [[ "${enabled}" == "@as []" || "${enabled}" == "[]" ]] && enabled="['${ext_uuid}']" || enabled="${enabled%]}, '${ext_uuid}']"
+    gsettings set org.gnome.shell enabled-extensions "${enabled}"
+  fi
+done
 
 # xremap needs the input group for the keyboard device (takes effect at next login)
 id -nG | grep -qw input || sudo usermod -aG input "${USER}"
