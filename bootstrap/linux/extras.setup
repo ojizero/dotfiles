@@ -31,6 +31,14 @@ for app in app.zen_browser.zen md.obsidian.Obsidian it.mijorus.smile; do
   flatpak info --user "${app}" >/dev/null 2>&1 || flatpak install --user --noninteractive flathub "${app}"
 done
 
+# Cursor: its .deb adds and keeps its own apt source (a declared one would conflict), apt upgrades it after
+if ! dpkg-query -W cursor >/dev/null 2>&1; then
+  tmp="$(mktemp -d)"
+  curl -fsSL -o "${tmp}/cursor.deb" "https://api2.cursor.sh/updates/download/golden/linux-x64-deb/cursor/latest" &&
+    sudo apt-get install -y "${tmp}/cursor.deb"
+  rm -rf "${tmp}"
+fi
+
 # Rootless Docker from Homebrew's docker-engine (the AppArmor profile comes from the linux-desktop module)
 if command -v dockerd-rootless-setuptool.sh >/dev/null && ! systemctl --user is-enabled docker.service >/dev/null 2>&1; then
   dockerd-rootless-setuptool.sh install && docker context use rootless

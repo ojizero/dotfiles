@@ -8,12 +8,6 @@ uris = "https://pkgs.tailscale.com/stable/ubuntu"
 key = "https://pkgs.tailscale.com/stable/ubuntu/resolute.noarmor.gpg"
 fingerprint = ["2596A99EAAB33821893C0A79458CA832957F5868", "2F625B3A774B946822EDDBEEB1547A3DDAAF03C6"]
 
-[bootstrap.apt.sources.cursor]
-uris = "https://downloads.cursor.com/aptrepo"
-suites = "stable"
-key = "https://downloads.cursor.com/keys/anysphere.asc"
-fingerprint = "380FF4BCDC34A4BD92A3565342A1772E62E492D6"
-
 [bootstrap.apt.sources.helium]
 uris = "https://pkg.helium.computer/deb"
 suites = "stable"
@@ -22,9 +16,9 @@ fingerprint = ["BE677C1989D35EAB2C5F26C9351601AD01D6378E", "1E4F1AD1286C31EEA101
 
 [bootstrap.packages]
 
-# Apps whose daemon or Chromium sandbox needs a system install (AppArmor profiles ship with the .deb)
+# Apps whose daemon or Chromium sandbox needs a system install (AppArmor profiles ship with the .deb).
+# Cursor manages its own apt source, so extras.setup installs its .deb instead.
 "apt:tailscale" = "latest"
-"apt:cursor" = "latest"
 "apt:helium-bin" = "latest"
 # newuidmap/newgidmap for rootless Docker (Homebrew's docker-engine)
 "apt:uidmap" = "latest"
