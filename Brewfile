@@ -65,7 +65,7 @@ cask "affinity" if OS.mac?
 cask "bartender" if OS.mac?
 cask "claude" if OS.mac?
 cask "claude-code"
-cask "cursor" if OS.mac?
+cask "cursor" if OS.mac? # Linux: official .deb from linux-desktop extras, its own apt source keeps it updated
 cask "cursor-cli"
 cask "discord" if OS.mac?
 cask "docker-desktop" if OS.mac?
@@ -85,7 +85,7 @@ cask "signal" if OS.mac?
 cask "stats" if OS.mac?
 cask "steam" if OS.mac?
 cask "synology-drive" if OS.mac?
-cask "t3-code"
+cask "t3-code" # Linux: pinned by linux-desktop extras, the cask lacks auto_updates there so brew upgrade would roll back its self-updates
 cask "tableplus" if OS.mac?
 cask "tailscale-app" if OS.mac?
 cask "zed"
