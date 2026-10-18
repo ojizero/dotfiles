@@ -18,15 +18,14 @@ Run [`bootstrap/install.sh`](./bootstrap/install.sh). It will:
 3. Run `mise bootstrap --yes --force-dotfiles` (system packages, symlinks, Brewfile, tools, login shell, macOS defaults, extras)
 
 On an Ubuntu workstation, pick its machine modules when running it, for example
-`MISE_ENV=linux-desktop bootstrap/install.sh`. The choice is saved to
-`~/.config/mise/miserc.local.toml` for later runs.
+`MISE_ENV=linux-desktop bootstrap/install.sh`. The choice is saved to the repo's
+git-ignored `.miserc.local.toml`, linked to `~/.config/mise/miserc.local.toml`, for later runs.
 
 ### Machine modules (Ubuntu)
 
 The base config works on macOS, Ubuntu workstations, and root containers. Extra
 machine setup lives in modules, loaded only where `~/.config/mise/miserc.local.toml`
-lists them (`env = ["linux-desktop"]`). A desktop can instead link that file to
-[`bootstrap/linux/miserc.local.toml`](./bootstrap/linux/miserc.local.toml):
+lists them (`env = ["linux-desktop"]`):
 
 | Module | Covers |
 |--------|--------|

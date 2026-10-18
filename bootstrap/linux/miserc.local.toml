@@ -1,2 +1,0 @@
-# Machine modules for an Ubuntu desktop; link to ~/.config/mise/miserc.local.toml
-env = ["linux-desktop"]

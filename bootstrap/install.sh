@@ -46,10 +46,12 @@ for module in "${DOTFILES_PATH}"/.mise.*.toml; do
   [[ "${module}" == *.mise.local.toml ]] || mise trust "${module}"
 done
 
-# Machine modules, e.g. MISE_ENV=linux-desktop on an Ubuntu workstation; kept for later runs
+# Machine modules, e.g. MISE_ENV=linux-desktop on an Ubuntu workstation; kept in the repo (git-ignored)
+# and linked where mise reads it before any config, for later runs
 if [[ -n "${MISE_ENV}" ]]; then
+  echo "env = [\"${MISE_ENV//,/\", \"}\"]" > "${DOTFILES_PATH}/.miserc.local.toml"
   mkdir -p ~/.config/mise
-  echo "env = [\"${MISE_ENV//,/\", \"}\"]" > ~/.config/mise/miserc.local.toml
+  ln -sfn "${DOTFILES_PATH}/.miserc.local.toml" ~/.config/mise/miserc.local.toml
 fi
 
 # Seed local config if first run

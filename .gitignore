@@ -100,3 +100,4 @@ CLAUDE.local.md
 
 .mise.local.toml
 !.mise.local.toml.sample
+.miserc.local.toml
