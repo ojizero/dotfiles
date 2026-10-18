@@ -148,13 +148,15 @@ fi
 # source aborts the whole apply, so they must exist before it runs. This also
 # fires on the standalone `mise bootstrap dotfiles apply`, so both self-heal.
 # `seed-local` is a task because hooks get neither `[env]` nor templates.
-run = ["mkdir -p ~/.agents/skills", "mise run dotfiles:seed-local"]
+# Hooks before the tools step skip `mise run`'s tool auto-install, which would
+# otherwise install (and on Linux, compile) every tool before dotfiles exist.
+run = ["mkdir -p ~/.agents/skills", "MISE_TASK_RUN_AUTO_INSTALL=0 mise run dotfiles:seed-local"]
 
 [bootstrap.hooks.post-dotfiles]
 
 run = [
   "mkdir -p ~/.config ~/.local/nvim ~/.pi/agent",
-  "mise run dotfiles:bundle",
+  "MISE_TASK_RUN_AUTO_INSTALL=0 mise run dotfiles:bundle",
 ]
 
 [bootstrap.hooks.post-tools]
