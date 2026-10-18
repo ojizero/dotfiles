@@ -38,6 +38,10 @@ source = "bootstrap/linux/files/uinput-modules.conf"
 source = "bootstrap/linux/files/apparmor-rootlesskit"
 notify = ["apparmor"]
 
+[bootstrap.files."/etc/apparmor.d/t3code-appimage"]
+source = "bootstrap/linux/files/apparmor-t3code-appimage"
+notify = ["apparmor"]
+
 [bootstrap.services.apparmor]
 on_change = "reload"
 

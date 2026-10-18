@@ -39,6 +39,9 @@ if ! dpkg-query -W cursor >/dev/null 2>&1; then
   rm -rf "${tmp}"
 fi
 
+# T3 Code (Brewfile AppImage) updates itself; Linux casks lack macOS's auto_updates flag, so pin it
+brew list --pinned --cask t3-code &>/dev/null || brew pin --cask t3-code
+
 # Rootless Docker from Homebrew's docker-engine (the AppArmor profile comes from the linux-desktop module)
 if command -v dockerd-rootless-setuptool.sh >/dev/null && ! systemctl --user is-enabled docker.service >/dev/null 2>&1; then
   dockerd-rootless-setuptool.sh install && docker context use rootless

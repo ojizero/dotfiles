@@ -1,0 +1,10 @@
+# T3 Code's AppImage (Homebrew cask, updated in place by the app) runs from a
+# FUSE mount; its Chromium sandbox needs the user namespaces Ubuntu restricts.
+abi <abi/4.0>,
+include <tunables/global>
+
+profile t3code-appimage "/{home/*/Applications/T3 Code*.AppImage,tmp/.mount_T3*/t3code}" flags=(unconfined) {
+  userns,
+
+  include if exists <local/t3code-appimage>
+}

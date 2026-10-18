@@ -85,6 +85,7 @@ cask "signal" if OS.mac?
 cask "stats" if OS.mac?
 cask "steam" if OS.mac?
 cask "synology-drive" if OS.mac?
+cask "t3-code"
 cask "tableplus" if OS.mac?
 cask "tailscale-app" if OS.mac?
 cask "zed"

@@ -29,7 +29,7 @@ lists them (`env = ["linux-desktop", "t2"]`):
 
 | Module | Covers |
 |--------|--------|
-| [`linux-desktop`](./.mise.linux-desktop.toml) | Tailscale, Cursor, Helium (apt), Zen, Obsidian, Smile (Flatpak), rootless Docker, Mac-style keyboard (xremap + GNOME shortcuts + Mac layouts), lid and sleep policy, via [`bootstrap/linux/extras.setup`](./bootstrap/linux/extras.setup) |
+| [`linux-desktop`](./.mise.linux-desktop.toml) | Tailscale, Cursor, Helium (apt), Zen, Obsidian, Smile (Flatpak), T3 Code (pinned so it updates itself), rootless Docker, Mac-style keyboard (xremap + GNOME shortcuts + Mac layouts), lid and sleep policy, via [`bootstrap/linux/extras.setup`](./bootstrap/linux/extras.setup) |
 | [`t2`](./.mise.t2.toml) | T2 MacBook kernel, audio, Touch Bar, Touch ID, and kernel parameters from [t2linux](https://t2linux.org) |
 
 The keyboard service pins the internal keyboard by its `/dev/input/by-path` name in
