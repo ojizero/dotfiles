@@ -1,4 +1,5 @@
 #!/usr/bin/env zsh
 #MISE description="Run full mise bootstrap convergence"
 
-mise bootstrap --yes "$@"
+# `-C` loads the machine modules (.mise.<module>.toml) beside the repo config
+mise bootstrap --yes -C "${DOTFILES_PATH}" "$@"
