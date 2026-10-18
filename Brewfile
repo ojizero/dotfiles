@@ -14,6 +14,7 @@ brew "docker", link: false if OS.mac?
 brew "fd"
 brew "ffmpeg"
 brew "flyctl"
+brew "forgejo-cli"
 brew "fzf"
 brew "fx"
 brew "gawk" if OS.mac?
