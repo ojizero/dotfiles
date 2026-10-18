@@ -17,12 +17,12 @@ gset() {
 # Add a custom GNOME shortcut under media-keys
 custom_bindings=()
 gcustom() {
-  local path="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${1}/"
-  local schema="org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:${path}"
+  local key_path="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${1}/"
+  local schema="org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:${key_path}"
   gsettings set "${schema}" name "$2"
   gsettings set "${schema}" command "$3"
   gsettings set "${schema}" binding "$4"
-  custom_bindings+=("'${path}'")
+  custom_bindings+=("'${key_path}'")
 }
 
 # Flatpak apps from Flathub (mise does not add Flatpak remotes, so they are installed here)
