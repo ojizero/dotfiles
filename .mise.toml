@@ -99,6 +99,17 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 
 "~/workspace/self/dotfiles" = { url = "ssh://git@ssh-forge.ojizero.dev/ojizero/dotfiles.git", ref = "master" }
 
+[bootstrap.packages]
+
+# Ubuntu system packages; macOS ships or gets these through Homebrew.
+# zsh: login shell. libnss3-tools: certutil for mkcert. libfuse2t64: AppImage casks.
+# libssl-dev, libncurses-dev: mise compiles Erlang from source on Linux.
+"apt:zsh" = { os = "linux" }
+"apt:libnss3-tools" = { os = "linux" }
+"apt:libfuse2t64" = { os = "linux" }
+"apt:libssl-dev" = { os = "linux" }
+"apt:libncurses-dev" = { os = "linux" }
+
 [bootstrap.macos.dock]
 
 autohide = true
