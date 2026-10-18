@@ -3,8 +3,9 @@
 > Here be dragons 🐉
 
 My personal dotfiles, including my system setup and the recipes and aliases I
-use day to day. macOS is the primary workstation target. Ubuntu containers can
-use the same Zsh, Git, agent, and mise setup without installing Homebrew.
+use day to day. macOS is the primary workstation target, Ubuntu workstations use Homebrew
+for the same CLI tools. Ubuntu containers (running as root) can use the same
+Zsh, Git, agent, and mise setup without installing Homebrew.
 
 ## Setup
 

@@ -123,7 +123,8 @@ tap_to_click = true
 [bootstrap.hooks.pre-packages]
 
 run = '''
-if [ "$(uname -s)" != "Darwin" ]; then
+# Homebrew refuses to run as root (e.g. Ubuntu containers)
+if [ "$(id -u)" = "0" ]; then
   exit 0
 fi
 
@@ -166,4 +167,8 @@ run = "killall Dock 2>/dev/null || true"
 
 [tasks.bootstrap]
 
-run = '''zsh "${DOTFILES_PATH}/bootstrap/macos/extras.setup"'''
+run = '''
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  zsh "${DOTFILES_PATH}/bootstrap/macos/extras.setup"
+fi
+'''

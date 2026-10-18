@@ -22,12 +22,15 @@ if ! command -v brew >/dev/null 2>&1; then
   /usr/bin/env bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-case "$(uname -m)" in
-  arm64)
+case "$(uname -s)/$(uname -m)" in
+  Darwin/arm64)
     eval "$(/opt/homebrew/bin/brew shellenv)"
     ;;
-  x86_64)
+  Darwin/x86_64)
     eval "$(/usr/local/bin/brew shellenv)"
+    ;;
+  Linux/*)
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
     ;;
 esac
 
