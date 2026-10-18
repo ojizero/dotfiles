@@ -1,0 +1,178 @@
+# Mac-style shortcuts on GNOME (Command = Super, Option = Alt).
+# Keymaps are tried in order and the first match wins. Every keymap sets
+# exact_match so a chord only fires with exactly its modifiers held; otherwise
+# extra modifiers leak through (Ctrl+Cmd+Q would become Ctrl+Q and quit apps).
+keymap:
+  - name: Mac system chords
+    exact_match: true
+    remap:
+      # Spaces and Mission Control; GNOME listens on keys apps never send
+      Ctrl-Left: Super-PageUp
+      Ctrl-Right: Super-PageDown
+      Ctrl-Up: Super-F10
+  - name: Cocoa emacs keys
+    exact_match: true
+    application:
+      not: ['/(?i)(ptyxis|gnome-terminal|gnome-console|org\.gnome\.console|org\.gnome\.kgx|alacritty|kitty|ghostty|wezterm|foot)/']
+    remap:
+      Ctrl-a: Home
+      Ctrl-e: End
+      Ctrl-b: Left
+      Ctrl-f: Right
+      Ctrl-p: Up
+      Ctrl-n: Down
+      Ctrl-h: BackSpace
+      Ctrl-d: Delete
+      Ctrl-k: [Shift-End, Delete]
+  - name: Mac shortcuts in terminals
+    exact_match: true
+    application:
+      only: ['/(?i)(ptyxis|gnome-terminal|gnome-console|org\.gnome\.console|org\.gnome\.kgx|alacritty|kitty|ghostty|wezterm|foot)/']
+    remap:
+      Super-c: Ctrl-Shift-c
+      Super-v: Ctrl-Shift-v
+      Super-a: Ctrl-Shift-a
+      Super-t: Ctrl-Shift-t
+      Super-n: Ctrl-Shift-n
+      Super-w: Ctrl-Shift-w
+      Super-q: Ctrl-Shift-q
+      Super-f: Ctrl-Shift-f
+      Super-l: Ctrl-l
+      Super-Shift-t: Ctrl-Shift-t
+      Super-Shift-v: Ctrl-Shift-v
+      Super-z: Ctrl-Shift-Minus
+      Super-Left: Ctrl-a
+      Super-Right: Ctrl-e
+      Super-BackSpace: Ctrl-u
+      Alt-Left: Alt-b
+      Alt-Right: Alt-f
+      Alt-BackSpace: Ctrl-w
+      Super-comma: Ctrl-comma
+  - name: Mac Files navigation
+    exact_match: true
+    application:
+      only: ['org.gnome.Nautilus', 'org.gnome.nautilus', 'Nautilus']
+    remap:
+      Super-Up: Alt-Up
+      Super-Down: Alt-Down
+      Super-BackSpace: Delete
+      Super-i: Alt-Enter
+      Super-Shift-g: Ctrl-l
+      Super-Shift-h: Alt-Home
+      Super-Shift-dot: Ctrl-h
+      Super-1: Ctrl-2
+      Super-2: Ctrl-1
+  - name: Chromium quit
+    exact_match: true
+    application:
+      only: ['/(?i)(helium|chromium|google-chrome)/']
+    remap:
+      Super-q: Ctrl-Shift-q
+  - name: Browser redo
+    exact_match: true
+    application:
+      only: ['/(?i)(firefox|zen|helium|chromium|google-chrome)/']
+    remap:
+      Super-Shift-z: Ctrl-Shift-z
+  - name: Editor indent
+    exact_match: true
+    application:
+      only: ['/(?i)(zed|cursor|obsidian)/']
+    remap:
+      Super-LeftBrace: Ctrl-LeftBrace
+      Super-RightBrace: Ctrl-RightBrace
+  - name: Mac shortcuts in desktop applications
+    exact_match: true
+    application:
+      not: ['/(?i)(ptyxis|gnome-terminal|gnome-console|org\.gnome\.console|org\.gnome\.kgx|alacritty|kitty|ghostty|wezterm|foot)/']
+    remap:
+      Super-c: Ctrl-c
+      Super-v: Ctrl-v
+      Super-x: Ctrl-x
+      Super-z: Ctrl-z
+      Super-Shift-z: Ctrl-Shift-z
+      Super-Shift-v: Ctrl-Shift-v
+      Super-Shift-t: Ctrl-Shift-t
+      Super-Shift-n: Ctrl-Shift-n
+      Super-Shift-s: Ctrl-Shift-s
+      Super-Shift-f: Ctrl-Shift-f
+      Super-Shift-g: Ctrl-Shift-g
+      Super-comma: Ctrl-comma
+      Super-a: Ctrl-a
+      Super-s: Ctrl-s
+      Super-f: Ctrl-f
+      Super-g: Ctrl-g
+      Super-n: Ctrl-n
+      Super-o: Ctrl-o
+      Super-p: Ctrl-p
+      Super-t: Ctrl-t
+      Super-w: Ctrl-w
+      Super-q: Ctrl-q
+      Super-l: Ctrl-l
+      Super-Shift-t: Ctrl-Shift-t
+      Super-Shift-v: Ctrl-Shift-v
+      Super-r: Ctrl-r
+      Super-b: Ctrl-b
+      Super-i: Ctrl-i
+      Super-u: Ctrl-u
+      Super-k: Ctrl-k
+      Super-equal: Ctrl-equal
+      Super-minus: Ctrl-minus
+      Super-0: Ctrl-0
+      Super-Left: Home
+      Super-Right: End
+      Super-Up: Ctrl-Home
+      Super-Down: Ctrl-End
+      Super-BackSpace: [Shift-Home, BackSpace]
+      Super-Shift-Left: Shift-Home
+      Super-Shift-Right: Shift-End
+      Super-Shift-Up: Ctrl-Shift-Home
+      Super-Shift-Down: Ctrl-Shift-End
+      Alt-Shift-Left: Ctrl-Shift-Left
+      Alt-Shift-Right: Ctrl-Shift-Right
+      Alt-Delete: Ctrl-Delete
+      Super-LeftBrace: Alt-Left
+      Super-RightBrace: Alt-Right
+      Super-Shift-LeftBrace: Ctrl-PageUp
+      Super-Shift-RightBrace: Ctrl-PageDown
+      Alt-Left: Ctrl-Left
+      Alt-Right: Ctrl-Right
+      Alt-BackSpace: Ctrl-BackSpace
+      Super-1: Ctrl-1
+      Super-2: Ctrl-2
+      Super-3: Ctrl-3
+      Super-4: Ctrl-4
+      Super-5: Ctrl-5
+      Super-6: Ctrl-6
+      Super-7: Ctrl-7
+      Super-8: Ctrl-8
+      Super-9: Ctrl-9
+      Super-Shift-c: Ctrl-Shift-c
+      Super-Shift-x: Ctrl-Shift-x
+      Super-Shift-w: Ctrl-Shift-w
+      Super-Shift-p: Ctrl-Shift-p
+      Super-Shift-o: Ctrl-Shift-o
+      Super-Shift-r: Ctrl-Shift-r
+      Super-Shift-l: Ctrl-Shift-l
+      Super-Shift-b: Ctrl-Shift-b
+      Super-Shift-i: Ctrl-Shift-i
+      Super-Shift-k: Ctrl-Shift-k
+      Super-Shift-a: Ctrl-Shift-a
+      Super-Shift-e: Ctrl-Shift-e
+      Super-d: Ctrl-d
+      Super-e: Ctrl-e
+      # Developer tools and Cmd+Opt tab switching
+      Super-Alt-i: Ctrl-Shift-i
+      Super-Alt-j: Ctrl-Shift-j
+      Super-Alt-c: Ctrl-Shift-c
+      Super-Alt-u: Ctrl-u
+      Super-Alt-Left: Ctrl-PageUp
+      Super-Alt-Right: Ctrl-PageDown
+      # Editor keys
+      Super-slash: Ctrl-slash
+      Super-j: Ctrl-j
+      Super-dot: Ctrl-dot
+      Super-Enter: Ctrl-Enter
+      Super-Shift-Enter: Ctrl-Shift-Enter
+      Super-backslash: Ctrl-backslash
+      Super-Shift-Delete: Ctrl-Shift-Delete

@@ -1,0 +1,14 @@
+#!/bin/sh
+# Do not enable generic mappings until GNOME can identify the focused app.
+count=0
+while [ "$count" -lt 20 ]; do
+    if gdbus call --session --dest org.gnome.Shell \
+        --object-path /com/k0kubun/Xremap \
+        --method com.k0kubun.Xremap.ActiveWindow >/dev/null 2>&1; then
+        exit 0
+    fi
+    count=$((count + 1))
+    sleep 2
+done
+echo 'Xremap GNOME extension is not active. Log out and back in, then retry.' >&2
+exit 1
