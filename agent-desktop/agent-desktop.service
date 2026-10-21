@@ -1,0 +1,19 @@
+[Unit]
+Description=Agent desktop: headless Sway beside GNOME, driven by AI agents through the Cua Driver
+Requires=agent-desktop-bus.service
+After=agent-desktop-bus.service
+StartLimitIntervalSec=120
+StartLimitBurst=3
+
+[Service]
+Type=simple
+ExecStartPre=/bin/rm -f %t/agent-desktop/wayland.env
+# Sway alone uses the shared runtime directory, so its socket keeps the wayland-N form
+# there. Software rendering: the GPU render node is only granted to the active seat (GNOME)
+ExecStart=%h/.config/agent-desktop/run env XDG_RUNTIME_DIR=%t WLR_BACKENDS=headless WLR_RENDERER=pixman WLR_RENDERER_ALLOW_SOFTWARE=1 WLR_LIBINPUT_NO_DEVICES=1 WLR_HEADLESS_OUTPUTS=1 sway --config %h/.config/agent-desktop/sway.conf
+ExecStopPost=/bin/rm -f %t/agent-desktop/wayland.env
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

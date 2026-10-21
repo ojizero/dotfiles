@@ -1,0 +1,55 @@
+#!/usr/bin/env zsh
+
+# Runs a command in the agent desktop: the headless Sway beside GNOME that only
+# AI agents drive (computer-use module). It starts from an empty environment, so
+# nothing leaks in from GNOME or T3 Code (DISPLAY, GNOME's bus, ELECTRON_RUN_AS_NODE),
+# and gives the command Sway's display, a private D-Bus session bus, its own runtime
+# directory and agent-only XDG folders, so apps keep profiles apart from their GNOME
+# copies. Examples:
+#   ~/.config/agent-desktop/run helium
+#   ~/.config/agent-desktop/run --wait wayvnc    (waits until Sway is up)
+#   ~/.config/agent-desktop/run --announce       (run by Sway: shares its display)
+
+runtime="${XDG_RUNTIME_DIR%/agent-desktop/runtime}"
+runtime="${runtime:-/run/user/${UID}}/agent-desktop"
+data="${HOME}/.agent-desktop"
+mkdir -p "${runtime}" "${data}"/{config,cache,state,data}
+# Services started on the private bus put sockets and FUSE mounts (document portal,
+# gvfs, keyring, AT-SPI) in $XDG_RUNTIME_DIR; GNOME's own live in the shared one
+mkdir -p -m 700 "${runtime}/runtime"
+
+# Sway picks the next free wayland-N name in the shared runtime directory; hand it,
+# as an absolute path, and the IPC socket to the other units and the private bus
+if [[ "$1" == --announce ]]; then
+  display="${WAYLAND_DISPLAY}"
+  [[ "${display}" == /* ]] || display="${XDG_RUNTIME_DIR}/${display}"
+  print -r -- "WAYLAND_DISPLAY=${display}"$'\n'"SWAYSOCK=${SWAYSOCK}" >"${runtime}/wayland.env.tmp"
+  mv "${runtime}/wayland.env.tmp" "${runtime}/wayland.env"
+  exec dbus-update-activation-environment WAYLAND_DISPLAY="${display}" SWAYSOCK="${SWAYSOCK}" XDG_CURRENT_DESKTOP=sway
+fi
+
+if [[ "$1" == --wait ]]; then
+  shift
+  for _ in {1..100}; do
+    [[ -s "${runtime}/wayland.env" ]] && break
+    sleep 0.2
+  done
+fi
+
+vars=(
+  HOME="${HOME}" USER="${USER}" LOGNAME="${LOGNAME:-${USER}}" SHELL="${SHELL}" LANG="${LANG:-C.UTF-8}"
+  # A fixed PATH: the caller's may carry T3 Code's AppImage mounts or GNOME session tools
+  PATH="${0:a:h}/bin:${HOME}/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  XDG_RUNTIME_DIR="${runtime}/runtime"
+  XDG_CONFIG_HOME="${data}/config" XDG_CACHE_HOME="${data}/cache"
+  XDG_STATE_HOME="${data}/state" XDG_DATA_HOME="${data}/data"
+  XDG_DATA_DIRS="${HOME}/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share"
+  # A moved XDG_DATA_HOME would otherwise hide the user-installed Flatpaks
+  FLATPAK_USER_DIR="${HOME}/.local/share/flatpak"
+  XDG_CURRENT_DESKTOP=sway XDG_SESSION_DESKTOP=sway XDG_SESSION_TYPE=wayland
+  DBUS_SESSION_BUS_ADDRESS="unix:path=${runtime}/bus"
+  CUA_DRIVER_RS_ENABLE_WAYLAND=1 CUA_DRIVER_RS_TELEMETRY_ENABLED=false
+)
+[[ -s "${runtime}/wayland.env" ]] && vars+=("${(@f)$(<"${runtime}/wayland.env")}")
+
+exec env -i "${vars[@]}" "$@"

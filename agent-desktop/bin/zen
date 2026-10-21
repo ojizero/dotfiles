@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+
+# Zen in the agent desktop, with its own profile. Flatpak apps ignore the agent
+# XDG folders, so the profile is passed here; the GNOME profile stays untouched.
+profile="${HOME}/.var/app/app.zen_browser.zen/agent-desktop"
+mkdir -p "${profile}"
+# Firefox reads the screen-reader flag only at startup; force its accessibility tree on for the agent
+exec flatpak run --env=GNOME_ACCESSIBILITY=1 app.zen_browser.zen --profile "${profile}" "$@"

@@ -1,0 +1,43 @@
+# Computer use for AI agents: a headless Sway desktop beside GNOME, driven through
+# the Cua Driver, with VNC on localhost for sign-ins and watching. Agents keep
+# running in GNOME. Select it per machine next to linux-desktop in
+# ~/.config/mise/miserc.local.toml (env = ["linux-desktop", "computer-use"]);
+# containers and servers leave it out and get only the base config.
+
+[bootstrap.packages]
+
+# Headless compositor and VNC server for the agent desktop
+"apt:sway" = "latest"
+"apt:wayvnc" = "latest"
+# What the Cua Driver runs on Sway: typing (wtype), screenshots (grim), recordings
+# (wf-recorder, ffmpeg), opening files (xdg-utils), D-Bus (gdbus, dbus-daemon), accessibility
+"apt:wtype" = "latest"
+"apt:grim" = "latest"
+"apt:wf-recorder" = "latest"
+"apt:ffmpeg" = "latest"
+"apt:xdg-utils" = "latest"
+"apt:libglib2.0-bin" = "latest"
+"apt:dbus-daemon" = "latest"
+"apt:at-spi2-core" = "latest"
+
+[dotfiles]
+
+"~/.config/agent-desktop" = "agent-desktop"
+"~/.config/systemd/user/agent-desktop.service" = "agent-desktop/agent-desktop.service"
+"~/.config/systemd/user/agent-desktop-bus.service" = "agent-desktop/agent-desktop-bus.service"
+"~/.config/systemd/user/agent-desktop-vnc.service" = "agent-desktop/agent-desktop-vnc.service"
+"~/.config/systemd/user/agent-desktop-cua.service" = "agent-desktop/agent-desktop-cua.service"
+# Inside the agent desktop, the Helium and Zen launchers open the agent profiles
+"~/.agent-desktop/data/applications/helium.desktop" = "agent-desktop/applications/helium.desktop"
+"~/.agent-desktop/data/applications/app.zen_browser.zen.desktop" = "agent-desktop/applications/app.zen_browser.zen.desktop"
+
+# A second `[tasks.bootstrap]` would replace linux-desktop's, so this module hooks in
+# its own task; hooks from every module run
+[bootstrap.hooks.final]
+
+run = "MISE_TASK_RUN_AUTO_INSTALL=0 mise run computer-use:setup"
+
+[tasks."computer-use:setup"]
+
+description = "Install the Cua Driver and start the agent desktop (headless Sway, VNC, Cua daemon)"
+run = 'zsh "${DOTFILES_PATH}/bootstrap/linux/computer-use.setup"'

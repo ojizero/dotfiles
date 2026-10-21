@@ -1,0 +1,14 @@
+[Unit]
+Description=Agent desktop: VNC on localhost only (reach it over SSH or Tailscale)
+BindsTo=agent-desktop.service
+PartOf=agent-desktop.service
+After=agent-desktop.service
+
+[Service]
+Type=simple
+ExecStart=%h/.config/agent-desktop/run --wait wayvnc --output=HEADLESS-1 --disable-resizing --render-cursor --socket=%t/agent-desktop/wayvncctl 127.0.0.1 5900
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=agent-desktop.service

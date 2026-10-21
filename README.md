@@ -18,7 +18,7 @@ Run [`bootstrap/install.sh`](./bootstrap/install.sh). It will:
 3. Run `mise bootstrap --yes --force-dotfiles` (system packages, symlinks, Brewfile, tools, login shell, macOS defaults, extras)
 
 On an Ubuntu workstation, pick its machine modules when running it, for example
-`MISE_ENV=linux-desktop bootstrap/install.sh`. The choice is saved to the repo's
+`MISE_ENV=linux-desktop bootstrap/install.sh` (or `MISE_ENV=linux-desktop,computer-use`). The choice is saved to the repo's
 git-ignored `.miserc.local.toml`, linked to `~/.config/mise/miserc.local.toml`, for later runs.
 
 ### Machine modules (Ubuntu)
@@ -30,6 +30,7 @@ lists them (`env = ["linux-desktop"]`):
 | Module | Covers |
 |--------|--------|
 | [`linux-desktop`](./.mise.linux-desktop.toml) | Tailscale, Cursor, Helium (apt), Zen, Obsidian, Smile (Flatpak), automatic light/dark mode (Night Theme Switcher), T3 Code (pinned so it updates itself), Docker (apt), Mac-style keyboard (xremap + GNOME shortcuts + Mac layouts), lid and sleep policy, via [`bootstrap/linux/extras.setup`](./bootstrap/linux/extras.setup) |
+| [`computer-use`](./.mise.computer-use.toml) | An agent desktop for AI agents next to GNOME: headless Sway, VNC on localhost, the Cua Driver daemon and its MCP server for Claude Code and Codex, agent-only Zen and Helium profiles, via [`agent-desktop/`](./agent-desktop) and [`bootstrap/linux/computer-use.setup`](./bootstrap/linux/computer-use.setup). Needs `linux-desktop` (`env = ["linux-desktop", "computer-use"]`) |
 
 Machine-specific values in the `linux-desktop` module, to adjust for another machine or place:
 
@@ -47,6 +48,61 @@ Machine-specific values in the `linux-desktop` module, to adjust for another mac
   `mise up -C ~/workspace/self/dotfiles`; the keyboard service runs mise's `latest`).
   GNOME Shell updates the xremap and Night Theme Switcher extensions. T3 Code updates
   itself; its cask is pinned so `brew upgrade` leaves it alone.
+
+#### The computer-use module
+
+AI agents keep running in GNOME (for example in T3 Code). They drive apps in a second
+desktop, a headless Sway that only they use, through the [Cua Driver](https://cua.ai/docs/cua-driver).
+GNOME stays your desktop, and its screen can stay locked. Four systemd user services run it
+while your user manager runs (that is, while you are logged in to GNOME):
+
+| Service | Runs |
+|---------|------|
+| `agent-desktop` | Headless Sway, 1920x1080, no XWayland, software rendering ([`sway.conf`](./agent-desktop/sway.conf)) |
+| `agent-desktop-bus` | A private D-Bus session bus for everything in the agent desktop |
+| `agent-desktop-vnc` | wayvnc on `127.0.0.1:5900` |
+| `agent-desktop-cua` | `cua-driver serve` on `$XDG_RUNTIME_DIR/agent-desktop/cua-driver.sock` |
+
+`systemctl --user restart agent-desktop` restarts all four; `stop` and `start` work the same way.
+
+- **Connect an agent.** Agents use the daemon's socket:
+  `cua-driver mcp --socket /run/user/$UID/agent-desktop/cua-driver.sock`. The setup registers this
+  MCP server as `cua-driver` for Claude Code (user scope) and Codex. Do not use a bare
+  `cua-driver mcp`: on Linux it starts its own runtime in the agent's environment, which is GNOME.
+- **Watch it, or sign in to sites.** Tunnel VNC over SSH or Tailscale, then open a VNC viewer on
+  `localhost:5900`: `ssh -L 5900:localhost:5900 <this machine>`.
+- **Run an app in the agent desktop yourself.**
+  `~/.config/agent-desktop/run <command>` runs a command with the agent desktop's environment.
+- **Clean environment.** [`agent-desktop/run`](./agent-desktop/run) starts every service from an
+  empty environment, so nothing leaks in from GNOME or T3 Code (`DISPLAY`, GNOME's bus,
+  `ELECTRON_RUN_AS_NODE`). It gives the services the Sway display, the private bus, their own
+  runtime directory (`$XDG_RUNTIME_DIR/agent-desktop/runtime`) and agent-only XDG folders in
+  `~/.agent-desktop`. On GNOME's bus the driver's accessibility signal would start Orca, and in the
+  shared runtime directory the agent desktop's document portal, gvfs and keyring would collide with
+  GNOME's. Never import the agent desktop's variables into the user manager
+  (`systemctl --user import-environment`): GNOME shares it.
+- **Separate profiles.** Native apps get their own profiles from the agent XDG folders, so one copy
+  can run in each desktop at the same time. dconf and the keyring are separate too. Flatpak apps
+  ignore these folders, so the agent desktop has launchers first on its `PATH`, plus matching
+  desktop entries: `zen` opens the profile `~/.var/app/app.zen_browser.zen/agent-desktop`, and
+  `helium` opens `~/.agent-desktop/config/net.imput.helium` and keeps passwords in the profile.
+  Your GNOME profiles stay untouched.
+- **Flatpak apps and accessibility.** AT-SPI knows a Flatpak app (Zen) by the pid of its
+  `xdg-dbus-proxy`, not the pid that owns its window. Pass the proxy's pid (from `list_apps`) with
+  the window's `window_id` to `get_window_state` and element actions, and the window's own pid to
+  typing and keys (`delivery_mode: "foreground"`).
+- **Recordings.** Over one MCP connection, `start_recording` with `record_video: true` writes an
+  H.264 `recording.mp4` and per-step evidence; `cua-driver recording render <dir> <out.mp4>` makes a
+  zoom-on-click video. Recording stops when the MCP client disconnects.
+- **Updates.** The apt packages update with the system. The Cua Driver has no apt package or Homebrew
+  formula: the setup installs it once into `~/.cua-driver` (`~/.local/bin/cua-driver`), and
+  `cua-driver update --apply` updates it (`cua-driver check-update` checks; every release is marked
+  pre-release on GitHub, and releases come often). The daemon service restarts on the new version.
+  Telemetry is off (`cua-driver telemetry disable`).
+- **Not covered yet.** Snap apps (Firefox, Thunderbird) only start on a private bus inside a systemd
+  scope named `snap.<snap>.<app>-<uuid>`, so they do not run in the agent desktop. Sway uses software
+  rendering, because the GPU render node is only granted to the active seat. After a reboot nothing
+  starts until you log in to GNOME: the disk is encrypted and auto-login and linger are off.
 
 ### Existing device
 
