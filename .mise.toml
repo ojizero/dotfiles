@@ -82,6 +82,7 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.config/uv" = "uv"
 "~/.config/ghostty" = "ghostty"
 "~/.config/nvim" = "nvim"
+"~/.config/zed" = "zed"
 "~/.config/worktrunk" = "worktrunk"
 "~/.pi/agent/settings.json" = ".pi/agent/settings.json"
 "~/.pi/agent/extensions" = ".pi/agent/extensions"

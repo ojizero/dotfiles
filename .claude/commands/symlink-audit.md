@@ -31,6 +31,7 @@ From `[dotfiles]` in `.mise.toml`:
 | `~/.claude/statusline-command.sh` | `.claude/statusline-command.sh` |
 | `~/.config/ghostty` | `ghostty` |
 | `~/.config/nvim` | `nvim` |
+| `~/.config/zed` | `zed` |
 | `~/.config/worktrunk` | `worktrunk` |
 
 ## Manual verification
