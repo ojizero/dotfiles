@@ -27,9 +27,14 @@ gcustom() {
 
 # Flatpak apps from Flathub (mise does not add Flatpak remotes, so they are installed here)
 flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-for app in app.zen_browser.zen md.obsidian.Obsidian it.mijorus.smile; do
+for app in app.zen_browser.zen md.obsidian.Obsidian it.mijorus.smile org.gnome.World.Secrets org.keepassxc.KeePassXC; do
   flatpak info --user "${app}" >/dev/null 2>&1 || flatpak install --user --noninteractive flathub "${app}"
 done
+
+# ~/.local is already a whole-directory dotfile, so deploy this launcher here.
+if ! cmp -s "${DOTFILES_PATH}/bootstrap/linux/bin/keepassxc-cli" "${HOME}/.local/bin/keepassxc-cli" || [[ ! -x "${HOME}/.local/bin/keepassxc-cli" ]]; then
+  install -Dm755 "${DOTFILES_PATH}/bootstrap/linux/bin/keepassxc-cli" "${HOME}/.local/bin/keepassxc-cli"
+fi
 
 # Cursor: its .deb adds and keeps its own apt source (a declared one would conflict), apt upgrades it after
 if ! dpkg-query -W cursor >/dev/null 2>&1; then

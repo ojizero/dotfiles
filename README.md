@@ -29,7 +29,7 @@ lists them (`env = ["linux-desktop"]`):
 
 | Module | Covers |
 |--------|--------|
-| [`linux-desktop`](./.mise.linux-desktop.toml) | Tailscale, Cursor, Helium (apt), Zen, Obsidian, Smile (Flatpak), automatic light/dark mode (Night Theme Switcher), T3 Code (pinned so it updates itself), Docker (apt), Mac-style keyboard (xremap + GNOME shortcuts + Mac layouts), lid and sleep policy, via [`bootstrap/linux/extras.setup`](./bootstrap/linux/extras.setup) |
+| [`linux-desktop`](./.mise.linux-desktop.toml) | Tailscale, Cursor, Helium (apt), Zen, Obsidian, Smile, Secrets, KeePassXC (Flatpak), automatic light/dark mode (Night Theme Switcher), T3 Code (pinned so it updates itself), Docker (apt), Mac-style keyboard (xremap + GNOME shortcuts + Mac layouts), lid and sleep policy, via [`bootstrap/linux/extras.setup`](./bootstrap/linux/extras.setup) |
 | [`computer-use`](./.mise.computer-use.toml) | An agent desktop for AI agents next to GNOME: headless Sway, VNC on localhost, the Cua Driver daemon and its MCP server for Claude Code and Codex, agent-only Zen and Helium profiles, via [`agent-desktop/`](./agent-desktop) and [`bootstrap/linux/computer-use.setup`](./bootstrap/linux/computer-use.setup). Needs `linux-desktop` (`env = ["linux-desktop", "computer-use"]`) |
 
 Machine-specific values in the `linux-desktop` module, to adjust for another machine or place:
@@ -48,6 +48,19 @@ Machine-specific values in the `linux-desktop` module, to adjust for another mac
   `mise up -C ~/workspace/self/dotfiles`; the keyboard service runs mise's `latest`).
   GNOME Shell updates the xremap and Night Theme Switcher extensions. T3 Code updates
   itself; its cask is pinned so `brew upgrade` leaves it alone.
+
+#### Password managers (Linux desktop)
+
+The desktop extras install GNOME Secrets and KeePassXC as user Flatpaks from
+Flathub, the Linux install method recommended by both upstream projects.
+Open Secrets from the app launcher or run `flatpak run --user org.gnome.World.Secrets`.
+Secrets does not support passkey authentication.
+
+The whole KeePassXC app is installed to get its official bundled `keepassxc-cli`.
+The Linux desktop extras copy [the shell launcher](./bootstrap/linux/bin/keepassxc-cli)
+into `~/.local/bin/keepassxc-cli`; run `keepassxc-cli --help` to see its commands.
+This is not the third-party Python `kpxc-cli`. macOS keeps its native CLI.
+Both apps update through the existing `m update:all` Flatpak step.
 
 #### The computer-use module
 
