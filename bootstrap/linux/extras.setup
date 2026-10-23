@@ -145,5 +145,10 @@ gset org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 0
 gset org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type "'suspend'"
 gset org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 900
 
+# Local server reserve policy: opt in on a fresh machine with
+# DOTFILES_BATTERY_RESERVE=1. Maintain existing installs, preserving arming and
+# threshold; explicit 0 skips this step. First install is observation-only.
+bash "${DOTFILES_PATH}/bootstrap/linux/battery-reserve/bootstrap.sh" || exit $?
+
 # Run any updates on system
 mise run update:all

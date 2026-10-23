@@ -1,0 +1,15 @@
+#!/usr/bin/python3
+from pathlib import Path
+
+# ADP1 is the firmware AC adapter (\\_SB_.ADP1), separate from macsmc-ac.
+# Use the idempotent sysfs interface, never toggle /proc/acpi/wakeup blindly.
+for name in ('/sys/class/power_supply/macsmc-ac/power/wakeup',
+             '/sys/class/power_supply/macsmc-battery/power/wakeup',
+             '/sys/devices/platform/ACPI0003:00/power/wakeup'):
+    p = Path(name)
+    if not p.exists():
+        print(f'Unavailable wake source: {name}', flush=True)
+        continue
+    if p.read_text().strip() != 'enabled':
+        p.write_text('enabled\n')
+    print(f'{name}: {p.read_text().strip()} (capability enabled; wake unverified)', flush=True)

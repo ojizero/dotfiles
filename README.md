@@ -49,6 +49,12 @@ Machine-specific values in the `linux-desktop` module, to adjust for another mac
   GNOME Shell updates the xremap and Night Theme Switcher extensions. T3 Code updates
   itself; its cask is pinned so `brew upgrade` leaves it alone.
 
+Sagittarius A* has an opt-in [local battery reserve policy](./bootstrap/linux/battery-reserve/README.md)
+for closed-lid server use: suspend at 20% on battery, preserving the GNOME session.
+The Linux desktop bootstrap maintains an existing installation; opt in on a fresh
+MacBookPro16,1 with `DOTFILES_BATTERY_RESERVE=1` (or explicitly skip with `0`).
+Its reviewed installer, configuration, measured hardware test and rollback live there.
+
 #### Password managers (Linux desktop)
 
 The desktop extras install GNOME Secrets and KeePassXC as user Flatpaks from
