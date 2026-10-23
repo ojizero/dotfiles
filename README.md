@@ -88,6 +88,42 @@ configuration, credentials, plugins, or runtime state.
 | `m dotfiles:bundle` | Install Homebrew packages from Brewfile |
 | `m dotfiles:edit` | Open dotfiles repo in `$EDITOR` |
 
+### Remote Linux unlock
+
+```sh
+mise linux:unlock sagittarius-a
+```
+
+Uses the SSH alias `<device>-unlock` for the interactive LUKS passphrase prompt,
+then waits for normal SSH through `<device>`. If neither endpoint is ready yet,
+it retries within the timeout. A closed unlock connection does not count as
+success; only a working normal SSH connection advances to desktop startup.
+Hosts, addresses, ports and keys
+belong in `~/.ssh/config`; this task has no device IPs. Normal SSH probes use
+batch mode, so load passphrase-protected login keys into your SSH agent first.
+Use `--timeout 300` to change the default 180-second connection retry window.
+An already-unlocked host skips the LUKS step. An existing GNOME session is reused,
+and the task avoids starting another inhibitor if its own is already running.
+
+The remote host must run Linux with GDM/GNOME, Ghostty, Python 3 and
+`gnome-session-inhibit`. Its account must have sudo access. From GDM's login
+screen, the task temporarily enables automatic login for the SSH user, restarts
+GDM, and restores the previous runtime configuration after GNOME starts. It
+leaves existing desktops on seat0 untouched and does not enable permanent
+automatic login. Select GNOME as that user's normal GDM session beforehand.
+
+The task installs a GNOME-only autostart entry that opens Ghostty with idle and
+suspend inhibited, then locks the screen. Other autostart apps continue starting
+behind the lock. It verifies both inhibitors and the screen lock before returning;
+closing the Ghostty window releases the inhibitors. There is a brief unlocked
+desktop during startup. Automatic login does not unlock the login keyring, so
+apps using saved credentials may still need its password. Headless Sway is not
+part of this flow. If desktop startup fails, the temporary GDM override is restored;
+the task does not reboot or change LUKS credentials.
+
+Remove `~/.config/autostart/gnome-inhibit-and-lock.desktop` on the remote host
+to disable the inhibitor and screen-lock behavior on future GNOME logins.
+
 ### Housekeeping
 
 Disk cleanup for macOS, as global mise tasks in [`.mise/tasks/housekeeping`](./.mise/tasks/housekeeping).
