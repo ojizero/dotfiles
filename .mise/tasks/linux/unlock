@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+#MISE description="Unlock Linux over SSH, start GNOME, inhibit sleep, and lock the screen"
+#MISE raw=true
+#USAGE arg "<device>" help="SSH alias; early-boot SSH must be configured as <device>-unlock"
+#USAGE flag "--timeout <seconds>" default="180" help="Time to retry boot/unlock connections before normal SSH becomes available"
+set -euo pipefail
+trap 'exit 130' INT
+trap 'exit 143' TERM HUP
+
+device=${usage_device:-${1:-}}
+timeout=${usage_timeout:-180}
+if [[ ! $device =~ ^[a-zA-Z0-9][a-zA-Z0-9_.-]*$ ]]; then
+  echo 'Usage: mise linux:unlock <device> [--timeout <seconds>]' >&2
+  exit 2
+fi
+if [[ ! $timeout =~ ^[1-9][0-9]*$ ]]; then
+  echo '--timeout must be a positive number of seconds.' >&2
+  exit 2
+fi
+
+task_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+ssh_probe=(-n -o BatchMode=yes -o ConnectTimeout=5 -o ConnectionAttempts=1)
+
+if ! ssh "${ssh_probe[@]}" "$device" true 2>/dev/null; then
+  printf 'Normal SSH is unavailable. Retrying boot/unlock connections for up to %s seconds.\n' "$timeout"
+  deadline=$((SECONDS + timeout))
+  while true; do
+    # It may have unlocked elsewhere or finished booting since the last attempt.
+    if ssh "${ssh_probe[@]}" "$device" true 2>/dev/null; then
+      break
+    fi
+    if (( SECONDS >= deadline )); then
+      echo 'Normal SSH did not become available. The host may still be locked, booting, or unreachable; check both SSH aliases and the console.' >&2
+      exit 1
+    fi
+    printf 'Trying %s-unlock. Enter your LUKS passphrase if prompted; Ctrl+C cancels.\n' "$device"
+    # Exit 255 can mean "not listening yet" or a normal disconnect during boot.
+    # Neither it nor exit 0 proves unlock succeeded; only normal SSH advances us.
+    unlock_status=0
+    ssh -t -o ConnectTimeout=5 -o ConnectionAttempts=1 "${device}-unlock" || unlock_status=$?
+    if (( unlock_status != 0 && unlock_status != 255 )); then
+      printf 'Unlock SSH exited with status %s.\n' "$unlock_status" >&2
+      exit "$unlock_status"
+    fi
+    sleep 2
+  done
+else
+  printf '%s is already unlocked; continuing with the GNOME session.\n' "$device"
+fi
+
+# Transfer the versioned helper separately so the final SSH session has a real
+# terminal for sudo. Passwords and private keys stay with SSH/PAM, never argv.
+ssh "$device" 'umask 077; mkdir -p "$HOME/.local/lib/dotfiles"; cat > "$HOME/.local/lib/dotfiles/gnome-login.sh"' \
+  < "$task_dir/lib/gnome-login.sh"
+ssh -t "$device" 'bash "$HOME/.local/lib/dotfiles/gnome-login.sh"'
