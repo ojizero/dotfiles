@@ -24,7 +24,28 @@ echo 'Keeping GNOME awake behind the lock screen. Leave this terminal running.'
 exec gnome-session-inhibit --app-id=local.gnome-inhibit-and-lock \
   --reason='Keep remote GNOME apps running behind a locked screen' \
   --inhibit=idle --inhibit=suspend \
-  sh -c 'gdbus call --session --dest org.gnome.ScreenSaver --object-path /org/gnome/ScreenSaver --method org.gnome.ScreenSaver.Lock || exit 1; exec sleep infinity'
+  bash -c '
+    locked() {
+      gdbus call --session --timeout 3 --dest org.gnome.ScreenSaver \
+        --object-path /org/gnome/ScreenSaver --method org.gnome.ScreenSaver.GetActive \
+        2>/dev/null | grep -q "(true,)"
+    }
+    if ! locked; then
+      # GNOME can lock successfully without replying to Lock. Verify state below.
+      gdbus call --session --timeout 5 --dest org.gnome.ScreenSaver \
+        --object-path /org/gnome/ScreenSaver --method org.gnome.ScreenSaver.Lock \
+        >/dev/null 2>&1 || true
+    fi
+    deadline=$((SECONDS + 15))
+    until locked; do
+      if (( SECONDS >= deadline )); then
+        echo "GNOME screen lock could not be verified; releasing inhibitor." >&2
+        exit 1
+      fi
+      sleep 1
+    done
+    exec sleep infinity
+  '
 INHIBIT
 chmod 755 "$HOME/.local/bin/gnome-inhibit-and-lock"
 python3 - <<'PY'
@@ -40,14 +61,14 @@ PY
 session_call() {
   local method=$1
   shift
-  gdbus call --session --dest org.gnome.SessionManager \
+  gdbus call --session --timeout 3 --dest org.gnome.SessionManager \
     --object-path /org/gnome/SessionManager --method "org.gnome.SessionManager.$method" "$@"
 }
 gnome_running() {
   session_call IsSessionRunning 2>/dev/null | grep -q '(true,)'
 }
 screen_call() {
-  gdbus call --session --dest org.gnome.ScreenSaver \
+  gdbus call --session --timeout 5 --dest org.gnome.ScreenSaver \
     --object-path /org/gnome/ScreenSaver --method "org.gnome.ScreenSaver.$1"
 }
 
@@ -135,9 +156,16 @@ until inhibitor_running && session_call IsInhibited 4 2>/dev/null | grep -q '(tr
   (( SECONDS < deadline )) || fail 'GNOME started, but idle/suspend inhibition could not be verified.'
   sleep 1
 done
-screen_call Lock >/dev/null
+screen_locked() {
+  screen_call GetActive 2>/dev/null | grep -q '(true,)'
+}
+if ! screen_locked; then
+  # Lock is not reliably idempotent: an already locked GNOME can time out on a
+  # redundant request. Even a timed-out request may have locked successfully.
+  screen_call Lock >/dev/null 2>&1 || true
+fi
 deadline=$((SECONDS + 15))
-until screen_call GetActive 2>/dev/null | grep -q '(true,)'; do
+until screen_locked; do
   (( SECONDS < deadline )) || fail 'GNOME screen lock could not be verified.'
   sleep 1
 done

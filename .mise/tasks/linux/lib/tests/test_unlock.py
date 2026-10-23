@@ -103,7 +103,7 @@ class UnlockTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertEqual(state['calls'], [])
 
-    def test_reuses_existing_gnome_without_sudo_or_gdm_restart(self):
+    def prepare_running_gnome(self):
         home = self.root / 'home'
         runtime = self.root / 'run'
         home.mkdir()
@@ -113,14 +113,48 @@ class UnlockTests(unittest.TestCase):
             self.command(cmd, '#!/bin/sh\nexit 0\n')
         for cmd in ['sudo', 'systemctl', 'systemd-run']:
             self.command(cmd, '#!/bin/sh\necho "unexpected desktop restart" >&2\nexit 99\n')
-        self.command('gdbus', '#!/bin/sh\necho "(true,)"\n')
+        self.command('gdbus', '''#!/bin/sh
+printf '%s\\n' "$*" >> "$DBUS_LOG"
+case "$*" in
+  *org.gnome.ScreenSaver.GetActive*)
+    if test -f "$SCREEN_STATE"; then echo '(true,)'; else echo '(false,)'; fi ;;
+  *org.gnome.ScreenSaver.Lock*)
+    touch "$SCREEN_STATE"
+    echo 'Error: Timeout was reached' >&2
+    exit 1 ;;
+  *) echo '(true,)' ;;
+esac
+''')
         self.command('python3', '#!/bin/sh\nexec ' + shlex.quote(sys.executable) + ' "$@"\n')
-        env = dict(self.env, HOME=str(home), XDG_RUNTIME_DIR=str(runtime))
+        env = dict(self.env, HOME=str(home), XDG_RUNTIME_DIR=str(runtime),
+                   DBUS_LOG=str(self.root / 'dbus.log'), SCREEN_STATE=str(self.root / 'locked'))
+        return env, home
+
+    def test_reuses_existing_locked_gnome_without_redundant_lock_or_restart(self):
+        env, home = self.prepare_running_gnome()
+        Path(env['SCREEN_STATE']).touch()
         result = subprocess.run(['bash', str(REMOTE)], env=env, capture_output=True, text=True, timeout=10)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn('screen locked', result.stdout)
         self.assertIn('OnlyShowIn=GNOME;', (home / '.config/autostart/gnome-inhibit-and-lock.desktop').read_text())
         self.assertTrue((home / '.local/bin/gnome-inhibit-and-lock').stat().st_mode & 0o100)
+        self.assertNotIn('org.gnome.ScreenSaver.Lock\n', Path(env['DBUS_LOG']).read_text())
+
+    def test_lock_timeout_is_success_only_when_locked_state_is_verified(self):
+        env, home = self.prepare_running_gnome()
+        result = subprocess.run(['bash', str(REMOTE)], env=env, capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('screen locked', result.stdout)
+        self.assertIn('org.gnome.ScreenSaver.Lock\n', Path(env['DBUS_LOG']).read_text())
+
+        # The autostart terminal must also retain its inhibitor after this same
+        # timeout, rather than terminating its command and releasing inhibition.
+        self.command('gnome-session-inhibit', '#!/bin/sh\nwhile [ "$1" != bash ]; do shift; done\nexec "$@"\n')
+        Path(env['SCREEN_STATE']).unlink()
+        result = subprocess.run(['bash', str(home / '.local/bin/gnome-inhibit-and-lock')],
+                                env=env, capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue(Path(env['SCREEN_STATE']).exists())
 
 
 if __name__ == '__main__':
