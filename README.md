@@ -62,6 +62,89 @@ into `~/.local/bin/keepassxc-cli`; run `keepassxc-cli --help` to see its command
 This is not the third-party Python `kpxc-cli`. macOS keeps its native CLI.
 Both apps update through the existing `m update:all` Flatpak step.
 
+#### Sagittarius A*: network and LUKS remote unlock
+
+Host `sagittarius-a` runs Ubuntu 26.04.1 with T2 kernel `7.3.0-3-t2-resolute`
+as of 2026-10-23. Its root filesystem is inside LUKS; `/boot` is separate and
+unencrypted. The configuration below lives on the host. The dotfiles bootstrap
+does not provision it.
+
+**Network configuration.** Normal Ubuntu uses NetworkManager with Netplan
+integration. Wi-Fi profile `p` (UUID `746ba88f-c43b-4285-9a6c-70f1984ee477`)
+uses interface `wlp5s0`, autoconnect, and persistent manual IPv4 settings.
+Read the saved profile and its Netplan sources for the current address, gateway,
+and DNS; do not assume DHCP.
+
+Early boot has a separate address source:
+`/etc/systemd/network/20-initrd-unlock.network` (mode `0644`). It configures
+`wlp5s0` with static IPv4, gateway, and DNS, with `DHCP=no`,
+`IPv6AcceptRA=no`, and `LinkLocalAddressing=no`. Keep these values consistent
+with the normal Wi-Fi profile. There is no shared configuration source yet.
+When the address changes, update both sources and rebuild the applicable
+initramfs images. Use `<unlock-ip>` below for the address in the early network
+configuration; the deployment address is not a fixed property of this host.
+
+**Before disk unlock.** Dracut starts Wi-Fi and OpenSSH before LUKS unlock.
+Root SSH listens on port `2222`, accepts public keys only, and forces
+`/usr/bin/systemd-tty-ask-password-agent --query`. Forwarding is disabled.
+Replace `<unlock-ip>` with that configured address and connect with an authorized key:
+
+```bash
+ssh -p 2222 'root@<unlock-ip>'
+```
+
+Enter the disk passphrase at the forced prompt. Normal SSH and Tailscale are
+separate services that run after unlock. Tailscale has not been verified as a
+pre-unlock transport. This setup uses Dracut and OpenSSH, not
+`dropbear-initramfs`.
+
+Persistent Dracut configuration is `/etc/dracut.conf.d/90-remote-unlock.conf`.
+The modules are `46sshd`, `/usr/lib/dracut/modules.d/47unlock-wifi`, and
+`/usr/lib/dracut/modules.d/99zzunlock-sanitize`. Wi-Fi settings are in
+`/etc/dracut-sshd/initrd-wifi.conf` (mode `0600`), and its service source is
+`/etc/dracut-sshd/initrd-wifi.service` (mode `0644`). The Wi-Fi credential must
+be in the unencrypted boot image so Wi-Fi can connect before encrypted root is
+available. Do not copy the credential into this repo or logs.
+
+**Repair completed on 2026-10-23.** The early Wi-Fi settings still selected an
+old network. The early network file had mode `0600`, which caused
+systemd-networkd to report `Permission denied`. The repair selected SSID `p`
+with its saved credential, set the early static network values to match the
+normal profile, and corrected the network and Wi-Fi service file permissions.
+Normal Ubuntu's saved manual IPv4 configuration, active address, route, and SSH
+access were verified. SSH policy, authorized keys, disk credentials, and LUKS
+slots did not change.
+
+Both `/boot/initrd.img-7.2.11-3-t2-resolute` and
+`/boot/initrd.img-7.3.0-3-t2-resolute` were rebuilt. Each candidate was unpacked
+and checked before atomic replacement. Checks passed for Wi-Fi and static
+network settings, networkd-readable files, private credential permissions,
+unchanged SSH policy and keys, enabled SSH/Wi-Fi/networkd units, required
+executables and Broadcom firmware, sanitized account password fields, crypttab
+without a key file, and SSH daemon syntax. The generic fallback image was not
+modified.
+
+Root-only backups of the source configuration and original T2 images are in
+`/var/backups/remote-unlock-20261023T121516Z`. Host-local evidence is in
+`/home/oji/audit-remote-unlock.py` and `/home/oji/audit-remote-unlock.log`, plus
+`/home/oji/repair-remote-unlock.py` and `/home/oji/repair-remote-unlock.log`.
+The repair log ends in `SUCCESS`; no repair processes or temporary candidate
+images remained. The repair helper contains one-time deployment settings. It
+is not a configurable provisioning tool.
+
+**Reboot test pending.** Image checks passed, but no reboot was performed after
+the repair. End-to-end remote unlock is not yet proven. Keep a local-unlock
+recovery path available, then check:
+
+1. Check the router's DHCP exclusion or reservation for the configured static
+   address. This was not configured or verified. A ping/neighbor probe found no
+   responding host at that address at the time; it does not prevent a later
+   address conflict.
+2. Reboot and verify early Wi-Fi association and public-key SSH authentication
+   on port `2222` at `<unlock-ip>`.
+3. Enter the LUKS passphrase through the forced prompt and verify the transition
+   to normal Ubuntu, including normal SSH and the saved network configuration.
+
 #### The computer-use module
 
 AI agents keep running in GNOME (for example in T3 Code). They drive apps in a second
