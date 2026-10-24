@@ -51,6 +51,8 @@ Machine-specific values in the `linux-desktop` module, to adjust for another mac
 
 Sagittarius A* has an opt-in [local battery reserve policy](./bootstrap/linux/battery-reserve/README.md)
 for closed-lid server use: suspend at 20% on battery, preserving the GNOME session.
+Its root lid guard blocks ordinary sleep and sleep-key handling while closed;
+the reserve policy keeps its explicit inhibitor bypass. Opening releases the guard.
 The Linux desktop bootstrap maintains an existing installation; opt in on a fresh
 MacBookPro16,1 with `DOTFILES_BATTERY_RESERVE=1` (or explicitly skip with `0`).
 Its reviewed installer, configuration, measured hardware test and rollback live there.

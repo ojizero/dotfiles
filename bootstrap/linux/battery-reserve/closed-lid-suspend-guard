@@ -1,0 +1,63 @@
+#!/usr/bin/python3
+"""Block ordinary sleep while closed; root battery reserve bypasses inhibitors."""
+from pathlib import Path
+import signal
+import subprocess
+import time
+
+LID = Path('/proc/acpi/button/lid/LID0/state')
+INHIBIT = [
+    '/usr/bin/systemd-inhibit', '--no-ask-password',
+    '--what=sleep:idle:handle-suspend-key:handle-hibernate-key',
+    '--mode=block', '--who=Closed lid battery reserve policy',
+    '--why=Lid closed: stay awake except for the root battery-reserve policy',
+    '/usr/bin/sleep', 'infinity',
+]
+
+
+def lid_closed(path=LID):
+    state = path.read_text().split(':', 1)[-1].strip()
+    if state not in ('open', 'closed'):
+        raise ValueError(f'Unknown lid state: {state!r}')
+    return state == 'closed'
+
+
+def release(child):
+    if child is not None and child.poll() is None:
+        child.terminate()
+        try:
+            child.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            child.kill()
+            child.wait()
+
+
+def main():
+    stopping = False
+    child = None
+
+    def stop(signum, frame):
+        nonlocal stopping
+        stopping = True
+
+    signal.signal(signal.SIGTERM, stop)
+    signal.signal(signal.SIGINT, stop)
+    try:
+        while not stopping:
+            closed = lid_closed()
+            if child is not None and child.poll() is not None:
+                raise RuntimeError(f'Sleep inhibitor exited unexpectedly: {child.returncode}')
+            if closed and child is None:
+                child = subprocess.Popen(INHIBIT)
+                print('Lid closed: acquiring sleep/key/idle inhibitor; battery reserve bypass retained.', flush=True)
+            elif not closed and child is not None:
+                release(child)
+                child = None
+                print('Lid opened: released inhibitor.', flush=True)
+            time.sleep(0.25)
+    finally:
+        release(child)
+
+
+if __name__ == '__main__':
+    main()

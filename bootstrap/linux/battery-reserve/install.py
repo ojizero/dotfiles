@@ -13,16 +13,20 @@ BACKUP = Path('/var/backups/battery-reserve-original')
 FILES = {
     '/usr/local/libexec/battery-reserve': ('battery-reserve', 0o755),
     '/usr/local/libexec/battery-reserve-wake': ('battery-reserve-wake', 0o755),
+    '/usr/local/libexec/closed-lid-suspend-guard': ('closed-lid-suspend-guard', 0o755),
     '/etc/battery-reserve.conf': ('battery-reserve.conf', 0o644),
     '/etc/systemd/system/battery-reserve.service': ('battery-reserve.service', 0o644),
     '/etc/systemd/system/battery-reserve.timer': ('battery-reserve.timer', 0o644),
     '/etc/systemd/system/battery-reserve-wake.service': ('battery-reserve-wake.service', 0o644),
+    '/etc/systemd/system/closed-lid-suspend-guard.service': ('closed-lid-suspend-guard.service', 0o644),
     '/etc/systemd/logind.conf.d/70-battery-reserve.conf': ('70-battery-reserve.conf', 0o644),
 }
 UPOWER = Path('/etc/UPower/UPower.conf')
 WAKE = ['/sys/class/power_supply/macsmc-ac/power/wakeup',
         '/sys/class/power_supply/macsmc-battery/power/wakeup',
         '/sys/devices/platform/ACPI0003:00/power/wakeup']
+GUARD = 'closed-lid-suspend-guard.service'
+UNITS = ('battery-reserve.timer', 'battery-reserve-wake.service', GUARD)
 
 
 def run(*args, check=True):
@@ -30,11 +34,17 @@ def run(*args, check=True):
 
 
 def backup():
-    if (BACKUP / 'manifest.json').exists():
-        return
     BACKUP.mkdir(mode=0o700, parents=True, exist_ok=True)
-    manifest = {'files': {}, 'wake': {}}
+    manifest_path = BACKUP / 'manifest.json'
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text())
+    else:
+        manifest = {'files': {}, 'wake': {}, 'units': {}}
+    # Extend older backups for newly managed files/units. Never replace an
+    # original snapshot with an already-installed version on repeat installs.
     for name in [*FILES, str(UPOWER)]:
+        if name in manifest['files']:
+            continue
         p = Path(name)
         if p.is_symlink():
             raise RuntimeError(f'refusing to replace symlink: {p}')
@@ -44,21 +54,26 @@ def backup():
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(p, dest)
     for name in WAKE:
-        if Path(name).exists():
+        if name not in manifest['wake'] and Path(name).exists():
             manifest['wake'][name] = Path(name).read_text().strip()
-    manifest['units'] = {}
-    for unit in ('battery-reserve.timer', 'battery-reserve-wake.service'):
+    for unit in UNITS:
+        if unit in manifest['units']:
+            continue
         manifest['units'][unit] = {
             'enabled': subprocess.run(['systemctl', 'is-enabled', unit], capture_output=True,
                                       text=True).stdout.strip() == 'enabled',
             'active': subprocess.run(['systemctl', 'is-active', unit], capture_output=True,
                                      text=True).stdout.strip() == 'active'}
-    (BACKUP / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+    temp = manifest_path.with_suffix('.tmp')
+    temp.write_text(json.dumps(manifest, indent=2) + '\n')
+    temp.replace(manifest_path)
 
 
 def rollback():
     m = json.loads((BACKUP / 'manifest.json').read_text())
-    run('systemctl', 'disable', '--now', 'battery-reserve.timer', 'battery-reserve-wake.service', check=False)
+    # Only retire units recorded in this backup, including the guard after an
+    # upgrade. An older, unextended backup does not own a separate live guard.
+    run('systemctl', 'disable', '--now', *m['units'], check=False)
     run('systemctl', 'stop', 'battery-reserve.service', check=False)
     for name, existed in m['files'].items():
         p = Path(name)
@@ -110,13 +125,17 @@ def main():
         p.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(SOURCE / source, p)
         p.chmod(mode)
+        os.chown(p, 0, 0)
     UPOWER.write_text(upower)
     run('/usr/local/libexec/battery-reserve', '--dry-run')
     run('systemd-analyze', 'verify', '/etc/systemd/system/battery-reserve.service',
-        '/etc/systemd/system/battery-reserve.timer', '/etc/systemd/system/battery-reserve-wake.service')
+        '/etc/systemd/system/battery-reserve.timer', '/etc/systemd/system/battery-reserve-wake.service',
+        '/etc/systemd/system/closed-lid-suspend-guard.service')
     run('systemctl', 'daemon-reload')
     run('systemctl', 'reload', 'systemd-logind')
     run('systemctl', 'try-restart', 'upower.service')
+    run('systemctl', 'enable', GUARD)
+    run('systemctl', 'restart', GUARD)
     run('systemctl', 'enable', '--now', 'battery-reserve-wake.service', 'battery-reserve.timer')
     print(f'Installed. Config preserved on repeat installs. Original backup: {BACKUP}')
     print('First installation is DISARMED: inspect /etc/battery-reserve.conf before arming.')

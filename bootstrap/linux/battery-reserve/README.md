@@ -33,6 +33,33 @@ machine. On a replacement machine, run that existing workflow to reestablish
 GNOME's autostart/inhibitor before relying on uninterrupted operation above
 reserve; the system reserve service itself does not require GNOME.
 
+## Closed-lid suspend guard
+
+The package also installs the root system service
+`closed-lid-suspend-guard.service` under `multi-user.target`. Its script reads
+`/proc/acpi/button/lid/LID0/state` every 0.25 seconds. While closed, it holds a
+block inhibitor for `sleep:idle:handle-suspend-key:handle-hibernate-key`, named
+`Closed lid battery reserve policy`. Opening the lid releases this guard's
+inhibitor. Other sleep settings and existing GNOME inhibitors still apply.
+The child inhibitor is supervised; child or lid-read failure exits the guard,
+and systemd restarts it after three seconds.
+
+The policy is to stay awake with the lid closed until the battery reserve
+requests suspend, then use the previously tested charger wake path. The root
+reserve request still uses `systemctl --check-inhibitors=no suspend` and can
+bypass this guard without stopping it. Root ownership makes the guard
+independent of login and GNOME, not absolute enforcement: privileged commands
+can explicitly bypass inhibitors. Polling introduces a small transition delay;
+there are also gaps during service start or failure recovery.
+
+The installer copies only the system guard: script mode `0755`, unit mode
+`0644`, both owned by root. It starts/restarts the guard on installation and
+enables it for boot. It does not install a user guard or enable linger. The
+temporary user guard from the live migration is disabled; its unused files
+are not part of this package. GNOME's existing workflow is unchanged.
+The guard runs even while reserve suspension is disarmed; arming controls only
+the battery policy's automatic suspend requests.
+
 ## Installation and status
 
 Reviewed source lives in this directory. First installation starts DISARMED,
@@ -45,13 +72,18 @@ sudo /usr/bin/python3 /home/oji/workspace/self/dotfiles/bootstrap/linux/battery-
 The installer backs up original files and wake settings to
 `/var/backups/battery-reserve-original` before edits. Repeated installations
 preserve that original backup and `/etc/battery-reserve.conf`, including arming.
+On upgrade, the backup manifest adds snapshots for newly managed guard files
+and its prior unit state without replacing any earlier original snapshots.
 It installs root-owned copies rather than running files from the user's home.
 It does not change the GNOME inhibitor, idle preferences, apps, or sessions.
 
 ```sh
 /usr/local/libexec/battery-reserve --dry-run
 systemctl status battery-reserve.timer battery-reserve-wake.service
+systemctl status closed-lid-suspend-guard.service
+systemd-inhibit --list --no-pager
 journalctl -u battery-reserve.service -u battery-reserve-wake.service -n 30
+journalctl -u closed-lid-suspend-guard.service -n 30
 sudo cat /var/lib/battery-reserve/state.json
 busctl get-property org.freedesktop.login1 /org/freedesktop/login1 org.freedesktop.login1.Manager HandleLidSwitch
 ```
@@ -168,6 +200,21 @@ Rollback reloads logind and restarts UPower; it does not restart GNOME or
 change network/LUKS. The original backup and inert state directory remain
 for inspection. Rollback restores the former battery lid behavior too.
 
+Rollback removes the guard if it was absent when first backed up. If the guard
+already existed (as after the 2026-10-24 live migration), rollback restores its
+pre-package files and unit state instead. That independently installed guard
+will remain active if it was active before package integration. An old backup
+that has not been extended does not manage the separate guard. To explicitly
+release the closed-lid inhibitor without rolling back the reserve policy:
+
+```sh
+sudo systemctl disable --now closed-lid-suspend-guard.service
+```
+
+The next non-skipped bootstrap enables it again. Stopping only the battery
+timer, or setting `armed=false`, does not disable the guard. Stopping the guard
+does not remove the logind lid-ignore drop-in or GNOME's existing inhibitors.
+
 ## Verification record, 2026-10-23
 
 Before edits: AC=0, capacity=44% (later 41%), lid open, GNOME unlocked and
@@ -233,8 +280,38 @@ sudo sed -i 's/^armed = false$/armed = true/' /etc/battery-reserve.conf
 No restart/reinstallation is needed. This change allows future low-battery
 automatic suspension; it is safe to arm while the verified AC supply is online.
 
-Run the isolated tests with `/usr/bin/python3 -m unittest -v test_policy.py`
+Run the isolated tests with `/usr/bin/python3 -B -m unittest discover -v`
 from this directory. Current T2 guidance says t2bce handles its own suspend
 and resume; never force-unload it. Suspend remains model-dependent:
 [postinstall](https://wiki.t2linux.org/guides/postinstall/),
 [device state](https://wiki.t2linux.org/state/).
+
+## Closed-lid incident and migration, 2026-10-24
+
+At 09:36:44 EET, logind's button dispatcher logged `Suspend key pressed short`
+and initiated deep/S3 sleep. Resume completed at 12:03:46. The lid had been
+closed since 2026-10-23 16:41; no thermal or battery trigger was identified.
+The journal did not identify the input device. ACPI Sleep Button, the internal
+keyboard, tiny-dfr virtual input and xremap all advertise `KEY_SLEEP`; none can
+be named as the cause from this evidence.
+
+On wake, the `mac-fan-daytime` watchdog expired and its guard was killed.
+Manual override is now `N` and firmware fan control was restored. That
+experiment is no longer running; it is not managed by this battery package.
+
+The user ran the separate system-guard migration at 12:13:57 EET. The live
+handoff verified at 12:14 that the root service was active with `NRestarts=0`
+and the lid closed. Logind listed its root UID 0 block inhibitor for
+`sleep:idle:handle-suspend-key:handle-hibernate-key`. The reserve timer and wake
+service remained enabled and active. The read-only reserve check showed
+`armed=True`, threshold 20, debounce 30 seconds, rearm 120 seconds, AC online
+and battery 98%, with `decision=ac`. The former user guard was disabled and
+inactive, and `Linger=no` was restored. Its unused user files remain installed.
+
+Source integration copies the installed system script and unit exactly and
+adds them to this package's installer, backup and rollback. Isolated parser,
+inhibitor lifecycle and backup/rollback tests cover the source behavior.
+The live migration and status above were reported by the implementation
+thread; this source integration did not run an installer or suspend test.
+No reboot, lid-cycle or actual sleep test has validated the new guard yet.
+The 2026-10-23 charger-wake test predates the guard and was not repeated today.
