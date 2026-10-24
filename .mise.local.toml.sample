@@ -7,6 +7,9 @@
 # 1 installs; 0 skips; unset maintains an existing installation only.
 # First installation is disarmed until a local hardware test and config edit.
 # DOTFILES_BATTERY_RESERVE = "1"
+# MacBookPro16,1 local adapter for neofand Quiet (separate from battery policy).
+# 1 installs and starts; 0 skips; unset maintains only an enabled installation.
+# DOTFILES_MAC_QUIET_FANS = "1"
 
 [settings.pipx]
 # This is the default but I'm setting it still as to self document pipx using uvx

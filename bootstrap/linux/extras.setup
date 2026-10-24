@@ -150,5 +150,9 @@ gset org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 900
 # threshold; explicit 0 skips this step. First install is observation-only.
 bash "${DOTFILES_PATH}/bootstrap/linux/battery-reserve/bootstrap.sh" || exit $?
 
+# MacBookPro16,1 Quiet fan adapter: opt in with DOTFILES_MAC_QUIET_FANS=1.
+# Default maintains an installed, enabled controller; 0 explicitly skips.
+bash "${DOTFILES_PATH}/bootstrap/linux/mac-quiet-fans/bootstrap.sh" || exit $?
+
 # Run any updates on system
 mise run update:all

@@ -57,6 +57,12 @@ The Linux desktop bootstrap maintains an existing installation; opt in on a fres
 MacBookPro16,1 with `DOTFILES_BATTERY_RESERVE=1` (or explicitly skip with `0`).
 Its reviewed installer, configuration, measured hardware test and rollback live there.
 
+The same hardware can opt in to the [Quiet fan adapter](./bootstrap/linux/mac-quiet-fans/README.md)
+with `DOTFILES_MAC_QUIET_FANS=1`. It adapts neofand's selected Quiet curve to
+`macsmc_hwmon`; it is separate from the battery policy. Default bootstrap only
+maintains an already enabled installation. Its live installation is verified;
+reboot and suspend behavior remain untested.
+
 #### Password managers (Linux desktop)
 
 The desktop extras install GNOME Secrets and KeePassXC as user Flatpaks from

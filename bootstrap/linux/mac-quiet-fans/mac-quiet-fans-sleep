@@ -1,0 +1,21 @@
+#!/bin/sh
+# Release manual control across suspend; restore the enabled profile on resume.
+set -eu
+marker=/run/mac-quiet-fans/resume-after-sleep
+case "$1" in
+  pre)
+    if systemctl is-active --quiet mac-quiet-fans.service; then
+      mkdir -p /run/mac-quiet-fans
+      touch "$marker"
+      systemctl stop mac-quiet-fans.service
+    fi
+    ;;
+  post)
+    if test -e "$marker"; then
+      rm -f "$marker"
+      if systemctl is-enabled --quiet mac-quiet-fans.service; then
+        systemctl start --no-block mac-quiet-fans.service
+      fi
+    fi
+    ;;
+esac
