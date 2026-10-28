@@ -1,6 +1,6 @@
 # What housekeeping cleans, and why
 
-The rules below are enforced in the mise tasks under [`.mise/tasks/housekeeping/`](../../); this file explains them. Change behaviour in the code, then here.
+The rules below are enforced in the mise tasks under [`mise-tasks/housekeeping/`](../../); this file explains them. Change behaviour in the code, then here.
 
 ## Every run (routine)
 

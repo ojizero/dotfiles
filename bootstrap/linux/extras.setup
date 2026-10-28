@@ -44,7 +44,12 @@ if ! dpkg-query -W cursor >/dev/null 2>&1; then
   rm -rf "${tmp}"
 fi
 
-# T3 Code (Brewfile AppImage) updates itself; Linux casks lack macOS's auto_updates flag, so pin it
+# App casks through Homebrew itself: on Linux, mise's cask installer only handles fonts
+for cask in claude-code cursor-cli t3-code zed; do
+  brew list --cask "${cask}" &>/dev/null || brew install --cask "${cask}"
+done
+
+# T3 Code (AppImage cask) updates itself; Linux casks lack macOS's auto_updates flag, so pin it
 brew list --pinned --cask t3-code &>/dev/null || brew pin --cask t3-code
 
 # Docker without sudo (takes effect at next login)

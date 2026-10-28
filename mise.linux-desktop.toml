@@ -1,6 +1,6 @@
 # Ubuntu desktop module: apps, keyboard, power and Docker for a GNOME workstation.
-# Select it per machine in ~/.config/mise/miserc.local.toml (env = ["linux-desktop"]);
-# containers and servers leave it out and get only the base config.
+# Select it per device in devices/<name>.toml (env = ["linux-desktop"]); servers
+# leave it out and get only the base and linux configs.
 
 [tools]
 

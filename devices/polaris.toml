@@ -1,0 +1,2 @@
+# Polaris: macOS (the macos module loads automatically)
+auto_env = true

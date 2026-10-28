@@ -34,7 +34,7 @@ The `linux-desktop` extras call this package's `bootstrap.sh`.
 `DOTFILES_MAC_QUIET_FANS=1` explicitly installs and starts it on a fresh
 MacBookPro16,1. Value `0` skips it. Unset/`auto` maintains only an installed,
 enabled service; it does not reenable a disabled controller. The optional
-per-machine setting is shown in `.mise.local.toml.sample`.
+per-machine setting is shown in `mise.local.toml.sample`.
 
 Manual installation from the dotfiles checkout:
 

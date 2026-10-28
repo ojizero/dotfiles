@@ -1,0 +1,88 @@
+# macOS module: Homebrew apps, system preferences and extras for every Mac.
+# Loaded automatically on macOS by `auto_env = true` in the device file
+# (devices/<name>.toml, linked to ~/.config/mise/miserc.local.toml).
+
+[bootstrap.brew]
+
+# Casks mise installs get Homebrew's metadata, so `brew upgrade` takes them over
+# after bootstrap. Needs mise 2026.10.20 (older versions warn and skip it).
+# Third-party tap casks are left out, so extras.setup installs those with brew.
+homebrew_metadata = true
+
+[bootstrap.packages]
+
+# GNU and macOS-only formulae (Linux ships these or gets them through apt)
+"brew:coreutils" = "latest"
+"brew:gawk" = "latest"
+"brew:gnu-tar" = "latest"
+"brew:gnupg" = "latest"
+"brew:gnutls" = "latest"
+"brew:grep" = "latest"
+"brew:nss" = "latest"
+"brew:poppler" = "latest"
+"brew:watch" = "latest"
+"brew:wget" = "latest"
+
+# Apps and command-line casks
+"brew-cask:adguard" = "latest"
+"brew-cask:affinity" = "latest"
+"brew-cask:bartender" = "latest"
+"brew-cask:claude" = "latest"
+"brew-cask:claude-code" = "latest"
+"brew-cask:cursor" = "latest"
+"brew-cask:cursor-cli" = "latest"
+"brew-cask:discord" = "latest"
+"brew-cask:docker-desktop" = "latest"
+"brew-cask:epic-games" = "latest"
+"brew-cask:firefox" = "latest"
+"brew-cask:ghostty" = "latest"
+"brew-cask:helium-browser" = "latest"
+"brew-cask:imageoptim" = "latest"
+"brew-cask:iterm2" = "latest"
+"brew-cask:obs" = "latest"
+"brew-cask:obsidian" = "latest"
+"brew-cask:opencode-desktop" = "latest"
+"brew-cask:rode-central" = "latest"
+"brew-cask:signal" = "latest"
+"brew-cask:stats" = "latest"
+"brew-cask:steam" = "latest"
+"brew-cask:synology-drive" = "latest"
+"brew-cask:t3-code" = "latest"
+"brew-cask:tableplus" = "latest"
+"brew-cask:tailscale-app" = "latest"
+"brew-cask:zed" = "latest"
+"brew-cask:zen" = "latest"
+"brew-cask:zoom" = "latest"
+
+[bootstrap.user]
+
+login_shell = "/bin/zsh"
+
+[bootstrap.macos.dock]
+
+autohide = true
+magnification = true
+mru_spaces = false
+show_recents = false
+
+[bootstrap.macos.finder]
+
+show_pathbar = true
+show_status_bar = true
+
+[bootstrap.macos.trackpad]
+
+tap_to_click = true
+
+[bootstrap.macos.defaults]
+
+"com.apple.dock" = { mineffect = "scale" }
+"NSGlobalDomain" = { AppleInterfaceStyleSwitchesAutomatically = true, AppleShowScrollBars = "Automatic", "com.apple.trackpad.scaling" = 3.0 }
+
+[bootstrap.hooks.post-defaults]
+
+run = "killall Dock 2>/dev/null || true"
+
+[tasks.bootstrap]
+
+run = 'zsh "${DOTFILES_PATH}/bootstrap/macos/extras.setup"'

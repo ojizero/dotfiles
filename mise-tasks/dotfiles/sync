@@ -3,7 +3,7 @@
 
 old_ref="$(git -C "${DOTFILES_PATH}" rev-parse HEAD)"
 git -C "${DOTFILES_PATH}" pull -p
-# Apply dotfiles + tools only — avoid full bootstrap (defaults, extras, unconditional bundle)
+# Apply dotfiles + tools only — avoid full bootstrap (defaults, extras); packages only when configs changed
 # `-C` is required: without it repo-relative sources resolve against
 # `~/.config/mise` and the apply aborts with "sources do not exist".
 mise bootstrap dotfiles apply --yes -C "${DOTFILES_PATH}"
@@ -12,8 +12,10 @@ mise install
 # package manager changed. Migrate legacy Bun installs, then no-op on later runs.
 mise run dotfiles:migrate-aube
 
-if git -C "${DOTFILES_PATH}" diff --name-only "${old_ref}" HEAD -- Brewfile .local/Brewfile | grep -q .; then
-  mise run dotfiles:bundle
+if [[ "$(readlink ~/.config/mise/miserc.local.toml)" != "${DOTFILES_PATH}/devices/"* ]]; then
+  echo "This machine is not migrated yet: run \`zsh \"\${DOTFILES_PATH}/mise-tasks/dotfiles/migrate-devices\" <device>\`." >&2
+elif git -C "${DOTFILES_PATH}" diff --name-only "${old_ref}" HEAD -- 'mise.toml' 'mise.*.toml' devices | grep -q .; then
+  mise bootstrap packages apply --yes -C "${DOTFILES_PATH}"
 fi
 
 if git -C "${DOTFILES_PATH}" diff --name-only "${old_ref}" HEAD -- dotagent/agents.toml | grep -q .; then

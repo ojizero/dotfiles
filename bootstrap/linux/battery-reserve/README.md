@@ -11,11 +11,11 @@ or module unload hooks.
 the same reviewed installer when `/etc/battery-reserve.conf` already exists,
 or when `DOTFILES_BATTERY_RESERVE=1` opts in on a fresh machine. Other desktops
 skip it by default. Set `DOTFILES_BATTERY_RESERVE=0` to skip it explicitly.
-The optional `[env]` entry is documented in `.mise.local.toml.sample`.
-For a fresh device, select `linux-desktop` and opt in, for example:
+The optional `[env]` entry is documented in `mise.local.toml.sample`.
+For a fresh device, use a device file that selects `linux-desktop` and opt in, for example:
 
 ```sh
-DOTFILES_BATTERY_RESERVE=1 MISE_ENV=linux-desktop bootstrap/install.sh
+DOTFILES_BATTERY_RESERVE=1 DEVICE=sagittarius-a bootstrap/install.sh
 ```
 
 The installer checks the hardware model and installs disarmed. Complete the
@@ -27,7 +27,7 @@ disabled timer across bootstrap, explicitly skip this step with value 0;
 
 The GNOME `local.gnome-inhibit-and-lock` process is an existing separate
 desktop setup, not created by this installer. Its deployment is already
-tracked on origin/master in `.mise/tasks/linux/lib/gnome-login.sh` (commits
+tracked on origin/master in `mise-tasks/linux/lib/gnome-login.sh` (commits
 93aa354 and 38bf395), used by `mise linux:unlock <device>` from the originating
 machine. On a replacement machine, run that existing workflow to reestablish
 GNOME's autostart/inhibitor before relying on uninterrupted operation above

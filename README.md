@@ -4,8 +4,7 @@
 
 My personal dotfiles, including my system setup and the recipes and aliases I
 use day to day. macOS is the primary workstation target, Ubuntu workstations use Homebrew
-for the same CLI tools. Ubuntu containers (running as root) can use the same
-Zsh, Git, agent, and mise setup without installing Homebrew.
+for the same CLI tools.
 
 ## Setup
 
@@ -15,22 +14,28 @@ Run [`bootstrap/install.sh`](./bootstrap/install.sh). It will:
 
 1. Clone this repo from Forgejo to `~/workspace/self/dotfiles` using the existing SSH setup
 2. Install Homebrew (if missing) and `brew install mise`
-3. Run `mise bootstrap --yes --force-dotfiles` (system packages, symlinks, Brewfile, tools, login shell, macOS defaults, extras)
+3. Link the device file (below) to `~/.config/mise/miserc.local.toml`
+4. Run `mise bootstrap --yes --force-dotfiles` (packages, symlinks, tools, login shell, macOS defaults, extras)
 
-On an Ubuntu workstation, pick its machine modules when running it, for example
-`MISE_ENV=linux-desktop bootstrap/install.sh` (or `MISE_ENV=linux-desktop,computer-use`). The choice is saved to the repo's
-git-ignored `.miserc.local.toml`, linked to `~/.config/mise/miserc.local.toml`, for later runs.
+### Devices and modules
 
-### Machine modules (Ubuntu)
+Each device has a file in [`devices/`](./devices), named after its short hostname
+(pick another with `DEVICE=<name> bootstrap/install.sh`). It turns on `auto_env`,
+so the OS module loads by itself, and lists the device's machine modules:
 
-The base config works on macOS, Ubuntu workstations, and root containers. Extra
-machine setup lives in modules, loaded only where `~/.config/mise/miserc.local.toml`
-lists them (`env = ["linux-desktop"]`):
+```toml
+# devices/sagittarius-a.toml
+auto_env = true
+env = ["linux-desktop", "computer-use"]
+```
 
-| Module | Covers |
-|--------|--------|
-| [`linux-desktop`](./.mise.linux-desktop.toml) | Tailscale, Cursor, Helium (apt), Zen, Obsidian, Smile, Secrets, KeePassXC (Flatpak), automatic light/dark mode (Night Theme Switcher), T3 Code (pinned so it updates itself), Docker (apt), Mac-style keyboard (xremap + GNOME shortcuts + Mac layouts), lid and sleep policy, via [`bootstrap/linux/extras.setup`](./bootstrap/linux/extras.setup) |
-| [`computer-use`](./.mise.computer-use.toml) | An agent desktop for AI agents next to GNOME: headless Sway, VNC on localhost, the Cua Driver daemon and its MCP server for Claude Code and Codex, agent-only Zen and Helium profiles, via [`agent-desktop/`](./agent-desktop) and [`bootstrap/linux/computer-use.setup`](./bootstrap/linux/computer-use.setup). Needs `linux-desktop` (`env = ["linux-desktop", "computer-use"]`) |
+| Module | Loaded | Covers |
+|--------|--------|--------|
+| [base](./mise.toml) | always | Tools, dotfiles, Homebrew formulae and fonts for every device |
+| [`macos`](./mise.macos.toml) | on macOS | macOS formulae and app casks, macOS defaults, [`bootstrap/macos/extras.setup`](./bootstrap/macos/extras.setup) |
+| [`linux`](./mise.linux.toml) | on Linux | apt basics (zsh, build libraries), login shell |
+| [`linux-desktop`](./mise.linux-desktop.toml) | device file | Tailscale, Cursor, Helium (apt), Zen, Obsidian, Smile, Secrets, KeePassXC (Flatpak), automatic light/dark mode (Night Theme Switcher), T3 Code (pinned so it updates itself), Docker (apt), Claude Code, Cursor CLI and Zed (Homebrew casks), Mac-style keyboard (xremap + GNOME shortcuts + Mac layouts), lid and sleep policy, via [`bootstrap/linux/extras.setup`](./bootstrap/linux/extras.setup) |
+| [`computer-use`](./mise.computer-use.toml) | device file | An agent desktop for AI agents next to GNOME: headless Sway, VNC on localhost, the Cua Driver daemon and its MCP server for Claude Code and Codex, agent-only Zen and Helium profiles, via [`agent-desktop/`](./agent-desktop) and [`bootstrap/linux/computer-use.setup`](./bootstrap/linux/computer-use.setup). Needs `linux-desktop` (`env = ["linux-desktop", "computer-use"]`) |
 
 Machine-specific values in the `linux-desktop` module, to adjust for another machine or place:
 
@@ -214,7 +219,30 @@ while your user manager runs (that is, while you are logged in to GNOME):
   rendering, because the GPU render node is only granted to the active seat. After a reboot nothing
   starts until you log in to GNOME: the disk is encrypted and auto-login and linger are off.
 
+### Homebrew
+
+Homebrew packages are declared in `[bootstrap.packages]` (`brew:` formulae,
+`brew-cask:` casks), not in a Brewfile. mise installs them itself into Homebrew's
+prefix during bootstrap; after that `brew` manages them as usual (on macOS,
+`homebrew_metadata` hands mise-installed casks to `brew upgrade`). Install
+anything not needed at bootstrap with `brew` directly. Never run
+`mise bootstrap packages prune`: it uninstalls every formula the configs don't declare.
+
+Homebrew itself still installs the casks mise can't: app casks on Linux (mise
+only installs fonts there) and third-party tap casks on macOS, from the OS extras.
+
 ### Existing device
+
+Devices set up before `devices/` (with `MISE_ENV`, dotted `.mise.*` paths and a Brewfile)
+migrate once after pulling. The pull breaks the `~/.config/mise/tasks` link, so run the task directly:
+
+```bash
+zsh "${DOTFILES_PATH}/mise-tasks/dotfiles/migrate-devices" [device]
+```
+
+It moves `.mise.local.toml` to `mise.local.toml`, links the device file, re-points the
+dotfile links at the renamed paths, removes `~/.Brewfile`, moves `.local/Brewfile`
+entries to `mise.local.toml` and checks nothing is missing.
 
 After pulling changes, converge with:
 
@@ -256,7 +284,7 @@ All personal repos live under `~/workspace/`. Dotfiles are cloned to:
 ~/workspace/self/dotfiles
 ```
 
-This path is declared in `.mise.toml` as `[env].DOTFILES_PATH` and `[bootstrap.repos]`, exported in `.zshrc`, and used by `bootstrap/install.sh`.
+This path is declared in `mise.toml` as `[env].DOTFILES_PATH` and `[bootstrap.repos]`, exported in `.zshrc`, and used by `bootstrap/install.sh`.
 
 ### Local configurations
 
@@ -268,8 +296,8 @@ are included as `~/.local/.gitconfig` in the main `.gitconfig` file. During boot
 a symlink is created pointing `~/.local` to `./.local`, and you can add
 `./.local/.gitconfig` with machine-specific Git settings.
 
-Per-machine mise overrides live in `.mise.local.toml` (git-ignored). Copy from
-`.mise.local.toml.sample` or let bootstrap seed it on first run.
+Per-machine mise overrides live in `mise.local.toml` (git-ignored). Copy from
+`mise.local.toml.sample` or let bootstrap seed it on first run.
 
 Codex execution-policy rules live under [`.codex/rules`](./.codex/rules).
 Mise links them into `~/.codex/rules` without replacing Codex's machine-local
@@ -280,10 +308,10 @@ configuration, credentials, plugins, or runtime state.
 | Task | Description |
 |------|-------------|
 | `m dotfiles:pull` | Pull latest changes |
-| `m dotfiles:sync` | Pull + apply dotfiles + install tools + bundle if Brewfile changed |
+| `m dotfiles:sync` | Pull + apply dotfiles + install tools + packages if configs changed |
 | `m dotfiles:status` | Show bootstrap and dotfiles drift |
 | `m dotfiles:bootstrap` | Full `mise bootstrap --yes` |
-| `m dotfiles:bundle` | Install Homebrew packages from Brewfile |
+| `m dotfiles:migrate-devices` | One-time move to a `devices/` file and mise-managed packages |
 | `m dotfiles:edit` | Open dotfiles repo in `$EDITOR` |
 
 `m dns:*` and `m update:*` work on both macOS and Ubuntu (systemd-resolved; apt, snap, Flatpak and firmware).
@@ -326,7 +354,7 @@ to disable the inhibitor and screen-lock behavior on future GNOME logins.
 
 ### Housekeeping
 
-Disk cleanup for macOS, as global mise tasks in [`.mise/tasks/housekeeping`](./.mise/tasks/housekeeping).
+Disk cleanup for macOS, as global mise tasks in [`mise-tasks/housekeeping`](./mise-tasks/housekeeping).
 Reports and history go to `~/.local/state/housekeeping/`.
 
 | Task | Description |

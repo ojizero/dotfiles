@@ -1,7 +1,7 @@
 ---
 paths:
   - "omz/**/*.zsh"
-  - ".mise/tasks/**"
+  - "mise-tasks/**"
   - ".zshrc"
   - ".zprofile"
 ---
@@ -13,7 +13,7 @@ Shell script conventions:
 - File suffix aliases use the `alias -s ext='cmd'` pattern
 - Functions: use `function name {` or `name() {` consistently with surrounding code
 - Environment exports: `export VAR="value"` with double quotes
-- Mise tasks are standalone zsh scripts in `.mise/tasks/` with `#MISE` frontmatter comments
-- Dotfiles tasks: `dotfiles:pull`, `dotfiles:sync`, `dotfiles:status`, `dotfiles:bootstrap`, `dotfiles:bundle`, `dotfiles:edit`
+- Mise tasks are standalone zsh scripts in `mise-tasks/` with `#MISE` frontmatter comments
+- Dotfiles tasks: `dotfiles:pull`, `dotfiles:sync`, `dotfiles:status`, `dotfiles:bootstrap`, `dotfiles:migrate-devices`, `dotfiles:edit`
 - Files in `omz/auto/` are auto-loaded via cat glob in `.zshrc`
 - Module placement: aliases in `aliases.zsh`, env vars in `misc.zsh`, completions in `completions.zsh`

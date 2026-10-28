@@ -67,14 +67,13 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 
 "~/.local" = ".local"
 "~/.brew-aliases" = ".brew-aliases"
-"~/.Brewfile" = "Brewfile"
 "~/.zshrc" = ".zshrc"
 "~/.zprofile" = ".zprofile"
 "~/.gitconfig" = ".gitconfig"
 "~/.bunfig.toml" = "bunfig.toml"
-"~/.config/mise/config.toml" = ".mise.toml"
-"~/.config/mise/config.local.toml" = ".mise.local.toml"
-"~/.config/mise/tasks" = ".mise/tasks"
+"~/.config/mise/config.toml" = "mise.toml"
+"~/.config/mise/config.local.toml" = "mise.local.toml"
+"~/.config/mise/tasks" = "mise-tasks"
 "~/.claude/settings.json" = ".claude/settings.json"
 "~/.claude/statusline-command.sh" = ".claude/statusline-command.sh"
 "~/.claude-x/settings.json" = ".claude-x/settings.json"
@@ -89,7 +88,7 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.codex/rules/host-tools.rules" = ".codex/rules/host-tools.rules"
 "~/.agents/agents.toml" = "dotagent/agents.toml"
 # dotagents refuses local skills outside `~/.agents`, so link this one directly.
-"~/.agents/skills/housekeeping" = ".mise/tasks/housekeeping/skill"
+"~/.agents/skills/housekeeping" = "mise-tasks/housekeeping/skill"
 
 # dotagents only links `~/.claude/skills`, so mirror it for the alternate
 # profile. The source is generated, not repo content, so the pre-dotfiles hook
@@ -102,48 +101,46 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 
 [bootstrap.packages]
 
-# Ubuntu system packages; macOS ships or gets these through Homebrew.
-# zsh: login shell. libnss3-tools: certutil for mkcert. libfuse2t64: AppImage casks.
-# libssl-dev, libncurses-dev: mise compiles Erlang from source on Linux.
-"apt:zsh" = { os = "linux" }
-"apt:libnss3-tools" = { os = "linux" }
-"apt:libfuse2t64" = { os = "linux" }
-"apt:libssl-dev" = { os = "linux" }
-"apt:libncurses-dev" = { os = "linux" }
-
-[bootstrap.user]
-
-login_shell = '{% if os() == "macos" %}/bin/zsh{% else %}/usr/bin/zsh{% endif %}'
-
-[bootstrap.macos.dock]
-
-autohide = true
-magnification = true
-mru_spaces = false
-show_recents = false
-
-[bootstrap.macos.finder]
-
-show_pathbar = true
-show_status_bar = true
-
-[bootstrap.macos.trackpad]
-
-tap_to_click = true
-
-[bootstrap.macos.defaults]
-
-"com.apple.dock" = { mineffect = "scale" }
-"NSGlobalDomain" = { AppleInterfaceStyleSwitchesAutomatically = true, AppleShowScrollBars = "Automatic", "com.apple.trackpad.scaling" = 3.0 }
+# Homebrew formulae and font casks for every device. mise installs them itself
+# (it never runs `brew`) into Homebrew's prefix, so `brew` manages them after.
+# OS-specific packages live in mise.macos.toml and mise.linux.toml.
+"brew:anomalyco/tap/opencode" = "latest"
+"brew:bat" = "latest"
+"brew:cloudflared" = "latest"
+"brew:fd" = "latest"
+"brew:ffmpeg" = "latest"
+"brew:flyctl" = "latest"
+"brew:forgejo-cli" = "latest"
+"brew:fx" = "latest"
+"brew:fzf" = "latest"
+"brew:gh" = "latest"
+"brew:git-delta" = "latest"
+"brew:git-lfs" = "latest"
+"brew:glab" = "latest"
+"brew:glow" = "latest"
+"brew:jq" = "latest"
+"brew:just" = "latest"
+"brew:mise" = "latest"
+"brew:mkcert" = "latest"
+"brew:ncdu" = "latest"
+"brew:neovim" = "latest"
+"brew:oh-my-posh" = "latest"
+"brew:ripgrep" = "latest"
+"brew:sheets" = "latest"
+"brew:shellcheck" = "latest"
+"brew:tree" = "latest"
+"brew:tree-sitter-cli" = "latest"
+"brew:viu" = "latest"
+"brew:websocat" = "latest"
+"brew:worktrunk" = "latest"
+"brew:zoxide" = "latest"
+"brew-cask:font-fira-code" = "latest"
+"brew-cask:font-fira-code-nerd-font" = "latest"
 
 [bootstrap.hooks.pre-packages]
 
 run = '''
-# Homebrew refuses to run as root (e.g. Ubuntu containers)
-if [ "$(id -u)" = "0" ]; then
-  exit 0
-fi
-
+# Homebrew stays for day-to-day use and the casks mise cannot install
 export NONINTERACTIVE=1
 if ! command -v brew >/dev/null 2>&1; then
   /usr/bin/env bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -173,23 +170,8 @@ run = ["mkdir -p ~/.agents/skills", "MISE_TASK_RUN_AUTO_INSTALL=0 mise run dotfi
 
 [bootstrap.hooks.post-dotfiles]
 
-run = [
-  "mkdir -p ~/.config ~/.local/nvim ~/.pi/agent",
-  "MISE_TASK_RUN_AUTO_INSTALL=0 mise run dotfiles:bundle",
-]
+run = "mkdir -p ~/.config ~/.local/nvim ~/.pi/agent"
 
 [bootstrap.hooks.post-tools]
 
 run = ["mise run dotfiles:trust", "mise run dotfiles:agents"]
-
-[bootstrap.hooks.post-defaults]
-
-run = "killall Dock 2>/dev/null || true"
-
-[tasks.bootstrap]
-
-run = '''
-if [ "$(uname -s)" = "Darwin" ]; then
-  zsh "${DOTFILES_PATH}/bootstrap/macos/extras.setup"
-fi
-'''

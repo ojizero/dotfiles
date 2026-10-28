@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Canonical paths — keep in sync with .mise.toml [env] DOTFILES_PATH and [bootstrap.repos]
+# Canonical paths — keep in sync with mise.toml [env] DOTFILES_PATH and [bootstrap.repos]
 DOTFILES_CLONE_PATH=${DOTFILES_CLONE_PATH:-~/workspace/self}
 DOTFILES_PATH=${DOTFILES_PATH:-${DOTFILES_CLONE_PATH}/dotfiles}
 
@@ -40,22 +40,24 @@ if ! command -v mise >/dev/null 2>&1; then
 fi
 
 # Point mise at repo config before symlinks exist
-export MISE_CONFIG_FILE="${DOTFILES_PATH}/.mise.toml"
-mise trust "${DOTFILES_PATH}/.mise.toml"
-for module in "${DOTFILES_PATH}"/.mise.*.toml; do
-  [[ "${module}" == *.mise.local.toml ]] || mise trust "${module}"
+export MISE_CONFIG_FILE="${DOTFILES_PATH}/mise.toml"
+mise trust "${DOTFILES_PATH}/mise.toml"
+for module in "${DOTFILES_PATH}"/mise.*.toml; do
+  [[ "${module}" == *mise.local.toml ]] || mise trust "${module}"
 done
 
-# Machine modules, e.g. MISE_ENV=linux-desktop on an Ubuntu workstation; kept in the repo (git-ignored)
-# and linked where mise reads it before any config, for later runs
-if [[ -n "${MISE_ENV}" ]]; then
-  echo "env = [\"${MISE_ENV//,/\", \"}\"]" > "${DOTFILES_PATH}/.miserc.local.toml"
-  mkdir -p ~/.config/mise
-  ln -sfn "${DOTFILES_PATH}/.miserc.local.toml" ~/.config/mise/miserc.local.toml
+# Device file (devices/<name>.toml, default: the short hostname) picks the OS and machine
+# modules; linked where mise reads it before any config, for later runs
+DEVICE=${DEVICE:-$(hostname -s | tr '[:upper:]' '[:lower:]')}
+if [[ ! -f "${DOTFILES_PATH}/devices/${DEVICE}.toml" ]]; then
+  echo "No devices/${DEVICE}.toml: add one, or pick another with DEVICE=<name>" >&2
+  exit 1
 fi
+mkdir -p ~/.config/mise
+ln -sfn "${DOTFILES_PATH}/devices/${DEVICE}.toml" ~/.config/mise/miserc.local.toml
 
 # Seed local config if first run
-[[ -f .mise.local.toml ]] || cp .mise.local.toml.sample .mise.local.toml
+[[ -f mise.local.toml ]] || cp mise.local.toml.sample mise.local.toml
 
-# Single convergence command (symlinks, brew bundle, tools, macOS extras)
+# Single convergence command (packages, symlinks, tools, macOS extras)
 mise bootstrap --yes --force-dotfiles

@@ -1,8 +1,7 @@
 # Computer use for AI agents: a headless Sway desktop beside GNOME, driven through
 # the Cua Driver, with VNC on localhost for sign-ins and watching. Agents keep
-# running in GNOME. Select it per machine next to linux-desktop in
-# ~/.config/mise/miserc.local.toml (env = ["linux-desktop", "computer-use"]);
-# containers and servers leave it out and get only the base config.
+# running in GNOME. Select it per device next to linux-desktop in
+# devices/<name>.toml (env = ["linux-desktop", "computer-use"]).
 
 [bootstrap.packages]
 
