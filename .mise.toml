@@ -87,6 +87,9 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.pi/agent/settings.json" = ".pi/agent/settings.json"
 "~/.pi/agent/extensions" = ".pi/agent/extensions"
 "~/.codex/rules/host-tools.rules" = ".codex/rules/host-tools.rules"
+"~/.codex/AGENTS.md" = "agents/AGENTS.md"
+"~/.claude/CLAUDE.md" = "agents/AGENTS.md"
+"~/.claude-x/CLAUDE.md" = "agents/AGENTS.md"
 "~/.agents/agents.toml" = "dotagent/agents.toml"
 # dotagents refuses local skills outside `~/.agents`, so link this one directly.
 "~/.agents/skills/housekeeping" = ".mise/tasks/housekeeping/skill"
