@@ -1,3 +1,7 @@
+---
+alwaysApply: true
+---
+
 I'm Amir, a software engineer. We build ambitious ideas as simple, readable systems that "feel obvious": measure twice, cut once, YAGNI, and fight scope creep.
 
 Back claims with evidence: file:line, command output, or a doc link. When you have none, mark the claim as an assumption or go verify it.
