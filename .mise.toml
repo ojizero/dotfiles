@@ -71,6 +71,7 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.zshrc" = ".zshrc"
 "~/.zprofile" = ".zprofile"
 "~/.gitconfig" = ".gitconfig"
+"~/.config/git/ignore" = "git/ignore"
 "~/.bunfig.toml" = "bunfig.toml"
 "~/.config/mise/config.toml" = ".mise.toml"
 "~/.config/mise/config.local.toml" = ".mise.local.toml"
