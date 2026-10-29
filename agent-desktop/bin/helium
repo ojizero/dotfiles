@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+
+# Helium in the agent desktop, with its own profile (the agent XDG folders already
+# separate it; the flag makes it explicit). Passwords stay in the profile instead of
+# a keyring, and the full accessibility tree lets the agent read web pages.
+exec /usr/bin/helium --user-data-dir="${XDG_CONFIG_HOME:-${HOME}/.agent-desktop/config}/net.imput.helium" \
+  --ozone-platform=wayland --no-first-run --password-store=basic --force-renderer-accessibility "$@"

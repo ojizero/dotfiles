@@ -1,0 +1,18 @@
+[Unit]
+Description=Local battery reserve suspend policy
+After=systemd-logind.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/battery-reserve
+StateDirectory=battery-reserve
+StateDirectoryMode=0700
+UMask=0077
+TimeoutStartSec=0
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX

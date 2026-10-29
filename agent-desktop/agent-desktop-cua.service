@@ -1,0 +1,15 @@
+[Unit]
+Description=Agent desktop: Cua Driver daemon (agents connect with cua-driver mcp --socket %t/agent-desktop/cua-driver.sock)
+BindsTo=agent-desktop.service
+PartOf=agent-desktop.service
+After=agent-desktop.service
+
+[Service]
+Type=simple
+ExecStart=%h/.config/agent-desktop/run --wait %h/.local/bin/cua-driver serve --socket %t/agent-desktop/cua-driver.sock --pid-file %t/agent-desktop/cua-driver.pid
+# Also after a clean exit: `cua-driver update --apply` stops the daemon to swap the binary
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=agent-desktop.service

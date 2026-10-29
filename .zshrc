@@ -1,6 +1,9 @@
 # Canonical clone path — keep in sync with mise.toml [env] DOTFILES_PATH
 export DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/workspace/self/dotfiles}"
 
+# Non-login shells on Linux (e.g. `ssh host cmd`) skip .zprofile, load Homebrew here as a fallback
+[[ -z "${HOMEBREW_PREFIX}" && -x /home/linuxbrew/.linuxbrew/bin/brew ]] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
 # This seems to break Claude, but at this point I don't really care to hack around it.
 # https://github.com/anthropics/claude-code/issues/2407
 source <(zoxide init --cmd "${ZOXIDE_CMD_OVERRIDE:-cd}" zsh)

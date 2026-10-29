@@ -1,0 +1,23 @@
+[Unit]
+Description=Keep closed laptop awake except for battery reserve suspension
+After=systemd-logind.service
+Wants=systemd-logind.service
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/python3 /usr/local/libexec/closed-lid-suspend-guard
+Restart=on-failure
+RestartSec=3
+KillMode=control-group
+TimeoutStopSec=5
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

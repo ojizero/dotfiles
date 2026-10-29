@@ -1,0 +1,10 @@
+[Unit]
+Description=Enable available Mac local AC wake sources (hardware test still required)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/battery-reserve-wake
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

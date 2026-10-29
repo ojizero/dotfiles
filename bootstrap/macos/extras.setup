@@ -17,6 +17,12 @@ if [[ ! -f "${gatekeeper_cache}" ]]; then
   touch "${gatekeeper_cache}"
 fi
 
+# Third-party tap casks through Homebrew itself: mise cannot hand those over to it
+if ! brew list --cask flux-markdown &>/dev/null; then
+  brew trust --tap xykong/tap
+  brew install --cask xykong/tap/flux-markdown
+fi
+
 # Run any updates on system
 mise run update:all
 

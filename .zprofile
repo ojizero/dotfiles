@@ -1,7 +1,8 @@
 # Load Homebrew packages and binaries
 #
 # This differs between Apple Silicon and Intel based
-# Macs so we check the machine architecture before
+# Macs so we check the machine architecture before,
+# on Linux Homebrew lives under /home/linuxbrew
 if [[ "$(uname -s)" == "Darwin" ]]; then
   case "$(machine)" in
     arm*)
@@ -12,6 +13,8 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
       eval "$(/usr/local/bin/brew shellenv)"
       ;;
   esac
+elif [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
 if [[ -d "${HOME}/.local/bin" ]]; then

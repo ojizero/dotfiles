@@ -1,0 +1,3 @@
+#!/bin/sh
+# Run the official CLI bundled with the user-installed KeePassXC Flatpak.
+exec /usr/bin/flatpak run --user --command=keepassxc-cli org.keepassxc.KeePassXC "$@"

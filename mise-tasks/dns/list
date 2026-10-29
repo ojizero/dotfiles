@@ -1,0 +1,9 @@
+#!/usr/bin/env zsh
+#MISE description="List DNS servers"
+
+# On Linux /etc/resolv.conf only names the systemd-resolved stub; its upstream servers are listed here
+resolv_conf=/etc/resolv.conf
+[[ -f /run/systemd/resolve/resolv.conf ]] && resolv_conf=/run/systemd/resolve/resolv.conf
+
+echo "List of the DNS servers:"
+cat "${resolv_conf}" | grep nameserver | cut -b 11-

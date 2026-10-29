@@ -1,0 +1,3 @@
+# Sagittarius A*: Ubuntu workstation with the agent desktop
+auto_env = true
+env = ["linux-desktop", "computer-use"]

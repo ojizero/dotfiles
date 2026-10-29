@@ -1,0 +1,17 @@
+[Unit]
+Description=Agent desktop: private D-Bus session bus (keeps the agent's apps and accessibility off GNOME's bus)
+PartOf=agent-desktop.service
+
+[Service]
+Type=simple
+ExecStartPre=/bin/rm -f %t/agent-desktop/bus
+# The document portal and gvfs it starts leave their FUSE mounts behind when stopped
+ExecStartPre=-/usr/bin/fusermount3 -u -z %t/agent-desktop/runtime/doc
+ExecStartPre=-/usr/bin/fusermount3 -u -z %t/agent-desktop/runtime/gvfs
+ExecStart=%h/.config/agent-desktop/run dbus-daemon --session --nofork --nopidfile --nosyslog --address=unix:path=%t/agent-desktop/bus
+# Ready once the socket exists (this dbus-daemon does not report readiness to systemd)
+ExecStartPost=/bin/sh -c 'until [ -S "$$0" ]; do sleep 0.1; done' %t/agent-desktop/bus
+ExecStopPost=-/usr/bin/fusermount3 -u -z %t/agent-desktop/runtime/doc
+ExecStopPost=-/usr/bin/fusermount3 -u -z %t/agent-desktop/runtime/gvfs
+Restart=on-failure
+RestartSec=2

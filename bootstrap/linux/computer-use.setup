@@ -1,0 +1,32 @@
+#!/usr/bin/env zsh
+
+# Agent desktop for the computer-use module, run by its final bootstrap hook: the
+# Cua Driver, the agent-desktop user services, and the Cua MCP server for the
+# agents on this machine. Every step is safe to repeat and changes nothing once
+# the setup is in place.
+
+# Cua Driver: no apt package or Homebrew formula, so it installs per user into
+# ~/.cua-driver with ~/.local/bin/cua-driver; it updates itself with `cua-driver update --apply`
+cua="${HOME}/.local/bin/cua-driver"
+if [[ ! -x "${cua}" ]]; then
+  curl -fsSL https://cua.ai/driver/install.sh | CUA_DRIVER_RS_TELEMETRY_ENABLED=false bash -s -- --no-modify-path
+fi
+
+# Telemetry is on by default
+[[ "$("${cua}" telemetry status --json | jq -r .enabled)" == false ]] || "${cua}" telemetry disable
+
+# Headless Sway with its private bus, VNC on localhost and the Cua Driver daemon.
+# They run while the user manager does (the GNOME login), locked screen or not.
+systemctl --user daemon-reload
+systemctl --user enable agent-desktop.service agent-desktop-vnc.service agent-desktop-cua.service
+systemctl --user start agent-desktop.service
+
+# Agents reach the daemon through its socket; a bare `cua-driver mcp` would start
+# its own runtime in the agent's environment (GNOME's display) instead
+mcp=("${cua}" mcp --socket "${XDG_RUNTIME_DIR}/agent-desktop/cua-driver.sock")
+if command -v claude >/dev/null && ! claude mcp get cua-driver &>/dev/null; then
+  claude mcp add --scope user cua-driver -- "${mcp[@]}"
+fi
+if command -v codex >/dev/null && ! codex mcp get cua-driver &>/dev/null; then
+  codex mcp add cua-driver -- "${mcp[@]}"
+fi

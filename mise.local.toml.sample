@@ -1,0 +1,21 @@
+# System-specific mise configuration
+# This file is git-ignored and serves as a local override layer
+# on top of the base config (~/.config/mise/config.toml)
+
+[env]
+# MacBookPro16,1 closed-lid server reserve policy (linux-desktop bootstrap).
+# 1 installs; 0 skips; unset maintains an existing installation only.
+# First installation is disarmed until a local hardware test and config edit.
+# DOTFILES_BATTERY_RESERVE = "1"
+# MacBookPro16,1 local adapter for neofand Quiet (separate from battery policy).
+# 1 installs and starts; 0 skips; unset maintains only an enabled installation.
+# DOTFILES_MAC_QUIET_FANS = "1"
+
+[settings.pipx]
+# This is the default but I'm setting it still as to self document pipx using uvx
+uvx = true
+
+[tools]
+
+#"npm:@mariozechner/pi-coding-agent" = "latest"
+#"pipx:git+ssh://github.com/FoothillSolutions/agent_playground.git" = "latest"

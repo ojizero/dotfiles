@@ -1,0 +1,12 @@
+# Agent-desktop override of /usr/share/applications/helium.desktop: opens the agent profile
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Helium
+GenericName=Web Browser
+Comment=Access the Internet (agent profile)
+Exec=helium %U
+Icon=helium
+StartupWMClass=helium
+Categories=Network;WebBrowser;
+MimeType=text/html;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;

@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+#MISE description="Install all available system updates"
+#MISE raw=true
+
+if [[ ! -z "$1" ]] && [[ "$1" = '--with-brew' ]]; then
+  brew update && brew upgrade && brew upgrade --casks
+elif [[ ! -z "$1" ]]; then
+  echo "Unknown option: ${1}" >&2
+  exit 1
+fi
+
+if [[ "$(uname -s)" == "Linux" ]]; then
+  sudo apt-get update && sudo apt-get upgrade -y
+  command -v snap >/dev/null && sudo snap refresh
+  command -v flatpak >/dev/null && flatpak update -y
+  # fwupdmgr exits 2 when there is nothing to update
+  command -v fwupdmgr >/dev/null && { sudo fwupdmgr refresh --force && sudo fwupdmgr update -y --no-reboot-check || [[ $? -eq 2 ]] }
+  exit
+fi
+
+sudo softwareupdate --install --all

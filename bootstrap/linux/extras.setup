@@ -1,0 +1,163 @@
+#!/usr/bin/env zsh
+
+# Ubuntu desktop counterpart to bootstrap/macos/extras.setup, run by the
+# linux-desktop module's bootstrap task. Every step is safe to repeat.
+
+DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/workspace/self/dotfiles}"
+
+# Set a GNOME setting, skipping schemas this desktop does not ship
+gset() {
+  if gsettings list-keys "$1" >/dev/null 2>&1; then
+    gsettings set "$1" "$2" "$3"
+  else
+    echo "skipped ${1} ${2}: schema not installed" >&2
+  fi
+}
+
+# Add a custom GNOME shortcut under media-keys
+custom_bindings=()
+gcustom() {
+  local key_path="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${1}/"
+  local schema="org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:${key_path}"
+  gsettings set "${schema}" name "$2"
+  gsettings set "${schema}" command "$3"
+  gsettings set "${schema}" binding "$4"
+  custom_bindings+=("'${key_path}'")
+}
+
+# Flatpak apps from Flathub (mise does not add Flatpak remotes, so they are installed here)
+flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+for app in app.zen_browser.zen md.obsidian.Obsidian it.mijorus.smile org.gnome.World.Secrets org.keepassxc.KeePassXC; do
+  flatpak info --user "${app}" >/dev/null 2>&1 || flatpak install --user --noninteractive flathub "${app}"
+done
+
+# ~/.local is already a whole-directory dotfile, so deploy this launcher here.
+if ! cmp -s "${DOTFILES_PATH}/bootstrap/linux/bin/keepassxc-cli" "${HOME}/.local/bin/keepassxc-cli" || [[ ! -x "${HOME}/.local/bin/keepassxc-cli" ]]; then
+  install -Dm755 "${DOTFILES_PATH}/bootstrap/linux/bin/keepassxc-cli" "${HOME}/.local/bin/keepassxc-cli"
+fi
+
+# Cursor: its .deb adds and keeps its own apt source (a declared one would conflict), apt upgrades it after
+if ! dpkg-query -W cursor >/dev/null 2>&1; then
+  tmp="$(mktemp -d)"
+  curl -fsSL -o "${tmp}/cursor.deb" "https://api2.cursor.sh/updates/download/golden/linux-x64-deb/cursor/latest" &&
+    sudo apt-get install -y "${tmp}/cursor.deb"
+  rm -rf "${tmp}"
+fi
+
+# App casks through Homebrew itself: on Linux, mise's cask installer only handles fonts
+for cask in claude-code cursor-cli t3-code zed; do
+  brew list --cask "${cask}" &>/dev/null || brew install --cask "${cask}"
+done
+
+# T3 Code (AppImage cask) updates itself; Linux casks lack macOS's auto_updates flag, so pin it
+brew list --pinned --cask t3-code &>/dev/null || brew pin --cask t3-code
+
+# Docker without sudo (takes effect at next login)
+id -nG "${USER}" | grep -qw docker || sudo usermod -aG docker "${USER}"
+
+# Tailscale tray icon at login
+command -v tailscale >/dev/null && tailscale configure systray --enable-startup=freedesktop >/dev/null
+
+# GNOME extensions from extensions.gnome.org, installed once for this GNOME version; GNOME Shell updates them after that.
+#   xremap@k0kubun.com: tells xremap (a linux-desktop module tool) which app is focused
+#   nightthemeswitcher@romainvigier.fr: light/dark mode by sunrise and sunset, like macOS's Auto appearance
+for ext_uuid in xremap@k0kubun.com nightthemeswitcher@romainvigier.fr; do
+  if ! gnome-extensions info "${ext_uuid}" >/dev/null 2>&1; then
+    shell_version="$(gnome-shell --version | awk '{ print $3 }')"
+    download="$(curl -fsSL "https://extensions.gnome.org/extension-info/?uuid=${ext_uuid}&shell_version=${shell_version}" | jq -r .download_url)"
+    tmp="$(mktemp -d)"
+    curl -fsSL -o "${tmp}/ext.zip" "https://extensions.gnome.org${download}" && gnome-extensions install --force "${tmp}/ext.zip"
+    rm -rf "${tmp}"
+  fi
+  # GNOME Shell only knows a freshly installed extension after the next login; until then, list it as enabled
+  if ! gnome-extensions enable "${ext_uuid}" 2>/dev/null; then
+    enabled="$(gsettings get org.gnome.shell enabled-extensions)"
+    if [[ "${enabled}" != *"'${ext_uuid}'"* ]]; then
+      [[ "${enabled}" == "@as []" || "${enabled}" == "[]" ]] && enabled="['${ext_uuid}']" || enabled="${enabled%]}, '${ext_uuid}']"
+      gsettings set org.gnome.shell enabled-extensions "${enabled}"
+    fi
+  fi
+done
+
+# Fixed location for GNOME's sunrise and sunset (geoclue's static source), kept out of git
+if [[ -f "${DOTFILES_PATH}/.geolocation.local" ]] && ! cmp -s "${DOTFILES_PATH}/.geolocation.local" /etc/geolocation; then
+  sudo install -m 644 "${DOTFILES_PATH}/.geolocation.local" /etc/geolocation
+fi
+
+# xremap needs the input group for the keyboard device (takes effect at next login)
+id -nG | grep -qw input || sudo usermod -aG input "${USER}"
+
+systemctl --user daemon-reload
+systemctl --user enable mac-keyboard.service
+systemctl --user try-restart mac-keyboard.service
+
+# Mac keyboard layouts: English Macintosh ABC ISO and Arabic Macintosh
+gset org.gnome.desktop.input-sources sources "[('xkb', 'us+mac-iso'), ('xkb', 'ara+mac')]"
+
+# GNOME shortcuts matching macOS (Command = Super, Option = Alt). xremap turns
+# Control+arrows into Super+Page_Up/Page_Down/F10, which GNOME listens on below.
+SH=org.gnome.shell.keybindings
+WM=org.gnome.desktop.wm.keybindings
+MK=org.gnome.settings-daemon.plugins.media-keys
+gset org.gnome.mutter overlay-key "''"
+gset "${SH}" toggle-overview "['<Super>space', '<Super>F10']"
+gset "${SH}" toggle-application-view "[]"
+gset "${SH}" toggle-message-tray "[]"
+gset "${SH}" toggle-quick-settings "[]"
+gset "${SH}" focus-active-notification "[]"
+gset "${SH}" screenshot "['<Super><Shift>3', '<Shift>Print']"
+gset "${SH}" show-screenshot-ui "['<Super><Shift>4', '<Super><Shift>5', 'Print']"
+for i in {1..9}; do
+  gset "${SH}" "switch-to-application-${i}" "[]"
+  gset "${SH}" "open-new-window-application-${i}" "[]"
+done
+gset "${WM}" switch-applications "['<Super>Tab', '<Alt>Tab']"
+gset "${WM}" switch-applications-backward "['<Shift><Super>Tab', '<Shift><Alt>Tab']"
+gset "${WM}" switch-group "['<Super>Above_Tab']"
+gset "${WM}" switch-group-backward "['<Super><Shift>Above_Tab']"
+gset "${WM}" minimize "['<Super>m', '<Super>h']"
+gset "${WM}" toggle-fullscreen "['<Control><Super>f']"
+gset "${WM}" show-desktop "['<Super>F3']"
+gset "${WM}" switch-input-source "['<Control>space', 'XF86Keyboard']"
+gset "${WM}" switch-input-source-backward "['<Control><Shift>space']"
+gset "${WM}" switch-to-workspace-left "['<Super>Page_Up']"
+gset "${WM}" switch-to-workspace-right "['<Super>Page_Down']"
+gset "${WM}" switch-to-workspace-up "[]"
+gset "${WM}" switch-to-workspace-down "[]"
+for direction in left right up down; do
+  gset "${WM}" "move-to-monitor-${direction}" "[]"
+done
+gset "${MK}" screensaver "['<Control><Super>q']"
+gset "${MK}" logout "['<Super><Shift>q']"
+gset "${MK}" rotate-video-lock-static "['XF86RotationLockToggle']"
+gset org.gnome.mutter.keybindings switch-monitor "['XF86Display']"
+gset org.gnome.shell.extensions.dash-to-dock hot-keys false
+gset org.gnome.shell.extensions.dash-to-dock shortcut "[]"
+gset org.gnome.shell.extensions.dash-to-dock shortcut-text "''"
+gset org.gnome.shell.extensions.tiling-assistant tile-left-half "['<Control><Alt>Left']"
+gset org.gnome.shell.extensions.tiling-assistant tile-right-half "['<Control><Alt>Right']"
+gset org.gnome.shell.extensions.tiling-assistant tile-maximize "['<Control><Alt>Up']"
+
+# Shortcuts GNOME has no setting for
+gcustom force-quit "Force Quit" "resources" "<Super><Alt>Escape"
+gcustom emoji "Emoji & Symbols" "flatpak run it.mijorus.smile" "<Control><Super>space"
+gcustom dock "Show or hide the Dock" "${DOTFILES_PATH}/bootstrap/linux/toggle-dock" "<Super><Alt>d"
+gset "${MK}" custom-keybindings "[${(j:, :)custom_bindings}]"
+
+# Power: never sleep on AC (the lid is handled by logind), suspend after 15 minutes on battery
+gset org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type "'nothing'"
+gset org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 0
+gset org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type "'suspend'"
+gset org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 900
+
+# Local server reserve policy: opt in on a fresh machine with
+# DOTFILES_BATTERY_RESERVE=1. Maintain existing installs, preserving arming and
+# threshold; explicit 0 skips this step. First install is observation-only.
+bash "${DOTFILES_PATH}/bootstrap/linux/battery-reserve/bootstrap.sh" || exit $?
+
+# MacBookPro16,1 Quiet fan adapter: opt in with DOTFILES_MAC_QUIET_FANS=1.
+# Default maintains an installed, enabled controller; 0 explicitly skips.
+bash "${DOTFILES_PATH}/bootstrap/linux/mac-quiet-fans/bootstrap.sh" || exit $?
+
+# Run any updates on system
+mise run update:all

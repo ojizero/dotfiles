@@ -1,0 +1,70 @@
+#!/usr/bin/env zsh
+#MISE description="Move this machine to its devices/ file, undotted mise paths and mise-managed Homebrew packages"
+
+# One-time move from MISE_ENV/.miserc.local.toml, the dotted .mise.* paths and the
+# Brewfile. Safe to repeat. The pull breaks the ~/.config/mise/tasks link, so run it
+# directly the first time: zsh "${DOTFILES_PATH}/mise-tasks/dotfiles/migrate-devices" [device]
+export DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/workspace/self/dotfiles}"
+device="${1:-${(L)$(hostname -s)}}"
+device_file="${DOTFILES_PATH}/devices/${device}.toml"
+
+if [[ ! -f "${device_file}" ]]; then
+  echo "No devices/${device}.toml: add one, or pass the device name." >&2
+  exit 1
+fi
+
+# The git-ignored local config follows the rename; the pull leaves only caches in .mise/
+if [[ -f "${DOTFILES_PATH}/.mise.local.toml" && ! -e "${DOTFILES_PATH}/mise.local.toml" ]]; then
+  mv "${DOTFILES_PATH}/.mise.local.toml" "${DOTFILES_PATH}/mise.local.toml"
+  echo "Moved .mise.local.toml to mise.local.toml"
+fi
+if [[ -d "${DOTFILES_PATH}/.mise" ]]; then
+  find "${DOTFILES_PATH}/.mise" -type d -name __pycache__ -prune -exec rm -rf {} +
+  find "${DOTFILES_PATH}/.mise" -depth -type d -empty -delete
+  [[ -d "${DOTFILES_PATH}/.mise" ]] && echo "Left .mise/ in place: it still has files the move did not expect." >&2
+fi
+
+# The device file replaces the generated .miserc.local.toml
+mkdir -p ~/.config/mise
+ln -sfn "${device_file}" ~/.config/mise/miserc.local.toml
+rm -f "${DOTFILES_PATH}/.miserc.local.toml"
+echo "Linked devices/${device}.toml to ~/.config/mise/miserc.local.toml"
+
+# Trust the renamed configs, then re-point the dotfile links (config, tasks, skills) at them
+zsh "${DOTFILES_PATH}/mise-tasks/dotfiles/trust"
+mise bootstrap dotfiles apply --yes -C "${DOTFILES_PATH}"
+
+# ~/.Brewfile pointed at the removed Brewfile
+if [[ -L ~/.Brewfile && "$(readlink ~/.Brewfile)" == "${DOTFILES_PATH}/Brewfile" ]]; then
+  rm ~/.Brewfile
+  echo "Removed the ~/.Brewfile link"
+fi
+
+# Machine-specific Brewfile entries move to mise.local.toml
+local_brewfile="${DOTFILES_PATH}/.local/Brewfile"
+if [[ -f "${local_brewfile}" ]]; then
+  packages=()
+  while IFS= read -r line; do
+    if [[ "${line}" =~ '^ *brew "([^"]+)"' ]]; then
+      packages+=("brew:${match[1]}")
+    elif [[ "${line}" =~ '^ *cask "([^"]+)"' ]]; then
+      packages+=("brew-cask:${match[1]}")
+    elif [[ "${line}" =~ '^ *mas ' ]]; then
+      echo "Skipped (no Mac App Store support): ${line}" >&2
+    fi
+  done < "${local_brewfile}"
+  if (( ${#packages[@]} )); then
+    mise bootstrap packages use --no-install -p "${DOTFILES_PATH}/mise.local.toml" "${packages[@]}"
+  fi
+  mv "${local_brewfile}" "${local_brewfile}.migrated"
+  echo "Moved .local/Brewfile to .local/Brewfile.migrated"
+fi
+
+zsh "${DOTFILES_PATH}/mise-tasks/dotfiles/trust"
+
+# Homebrew already installed everything from the Brewfile, so nothing should be missing
+if mise bootstrap packages status --missing -C "${DOTFILES_PATH}"; then
+  echo "All declared packages are installed."
+else
+  echo "Install the missing packages with \`m dotfiles:bootstrap\`." >&2
+fi

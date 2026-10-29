@@ -12,25 +12,25 @@ m dotfiles:status                          # bootstrap + dotfiles status
 
 ## Expected symlinks
 
-From `[dotfiles]` in `.mise.toml`:
+From `[dotfiles]` in `mise.toml`:
 
 | Target in $HOME | Source in repo |
 |-----------------|----------------|
 | `~/.local` | `.local` |
 | `~/.brew-aliases` | `.brew-aliases` |
-| `~/.Brewfile` | `Brewfile` |
 | `~/.zshrc` | `.zshrc` |
 | `~/.zprofile` | `.zprofile` |
 | `~/.gitconfig` | `.gitconfig` |
 | `~/.bunfig.toml` | `bunfig.toml` |
-| `~/.config/mise/config.toml` | `.mise.toml` |
-| `~/.config/mise/config.local.toml` | `.mise.local.toml` |
-| `~/.config/mise/tasks` | `.mise/tasks` |
-| `~/.agents/skills/housekeeping` | `.mise/tasks/housekeeping/skill` |
+| `~/.config/mise/config.toml` | `mise.toml` |
+| `~/.config/mise/config.local.toml` | `mise.local.toml` |
+| `~/.config/mise/tasks` | `mise-tasks` |
+| `~/.agents/skills/housekeeping` | `mise-tasks/housekeeping/skill` |
 | `~/.claude/settings.json` | `.claude/settings.json` |
 | `~/.claude/statusline-command.sh` | `.claude/statusline-command.sh` |
 | `~/.config/ghostty` | `ghostty` |
 | `~/.config/nvim` | `nvim` |
+| `~/.config/zed` | `zed` |
 | `~/.config/worktrunk` | `worktrunk` |
 
 ## Manual verification

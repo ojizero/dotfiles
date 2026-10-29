@@ -1,0 +1,18 @@
+#!/usr/bin/env zsh
+#MISE description="Add a DNS server"
+#MISE raw=true
+
+if [[ -z "$1" ]]; then
+  echo "usage: m dns:add <IP/Hostname>" >&2
+  exit 1
+fi
+
+if [[ "$(uname -s)" == "Linux" ]]; then
+  # systemd-resolved owns /etc/resolv.conf; add to the default-route link (lasts until the link reconnects)
+  link=$(ip route show default | awk '{ print $5; exit }')
+  current=(${(z)$(resolvectl dns "${link}" | cut -d: -f2-)})
+  sudo resolvectl dns "${link}" "${current[@]}" "${1}"
+else
+  sudo sh -c "echo nameserver '${1}' >> /etc/resolv.conf"
+fi
+echo "${1} added"

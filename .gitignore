@@ -98,5 +98,9 @@ CLAUDE.local.md
 
 ### Mise ###
 
+mise.local.toml
+!mise.local.toml.sample
+# Pre-rename name, until `m dotfiles:migrate-devices` moves it
 .mise.local.toml
-!.mise.local.toml.sample
+.miserc.local.toml
+.geolocation.local

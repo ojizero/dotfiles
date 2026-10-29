@@ -1,0 +1,154 @@
+#!/usr/bin/python3
+"""Local battery reserve policy. No network, desktop, or RTC dependencies."""
+import argparse
+import configparser
+import fcntl
+import json
+import os
+from pathlib import Path
+import subprocess
+import time
+
+CONFIG = Path('/etc/battery-reserve.conf')
+STATE = Path('/var/lib/battery-reserve/state.json')
+AC = Path('/sys/class/power_supply/macsmc-ac/online')
+BATTERY = Path('/sys/class/power_supply/macsmc-battery/capacity')
+COMMAND = ['/usr/bin/systemctl', '--check-inhibitors=no', 'suspend']
+
+
+def config(path=CONFIG):
+    c = configparser.ConfigParser()
+    if not c.read(path) or set(c.sections()) != {'policy'}:
+        raise ValueError('missing configuration or [policy] section')
+    p = c['policy']
+    if set(p) != {'armed', 'threshold', 'debounce_seconds', 'ac_rearm_seconds'}:
+        raise ValueError('unexpected or missing configuration keys')
+    result = dict(armed=p.getboolean('armed'), threshold=p.getint('threshold'),
+                  debounce=p.getint('debounce_seconds'), rearm=p.getint('ac_rearm_seconds'))
+    if not (5 <= result['threshold'] <= 80 and 15 <= result['debounce'] <= 300
+            and 60 <= result['rearm'] <= 3600):
+        raise ValueError('threshold/debounce/rearm outside safe configuration bounds')
+    return result
+
+
+def read_ac():
+    value = AC.read_text().strip()
+    if value not in ('0', '1'):
+        raise ValueError('invalid AC state')
+    return int(value)
+
+
+def sample():
+    # Read AC twice so transitions during a battery read fail closed.
+    ac = read_ac()
+    value = BATTERY.read_text().strip()
+    if not value.isdecimal() or not 0 <= int(value) <= 100:
+        raise ValueError('invalid battery capacity')
+    if ac != read_ac():
+        raise ValueError('AC changed during sample')
+    return ac, int(value)
+
+
+def decide(s, ac, capacity, now, p):
+    """Mutate boot-local state and return a reviewable decision."""
+    if ac:
+        s.pop('low_since', None)
+        s.setdefault('ac_since', now)
+        if now - s['ac_since'] >= p['rearm']:
+            s.pop('latched', None)
+        return 'ac'
+    s.pop('ac_since', None)
+    if s.get('latched'):
+        return 'latched-until-stable-ac'
+    if capacity > p['threshold']:
+        s.pop('low_since', None)
+        return 'above-reserve'
+    s.setdefault('low_since', now)
+    if now - s['low_since'] < p['debounce']:
+        return 'debouncing'
+    return 'suspend' if p['armed'] else 'disarmed-would-suspend'
+
+
+def save(s):
+    temp = STATE.with_suffix('.tmp')
+    with temp.open('w') as f:
+        json.dump(s, f)
+        f.flush()
+        os.fsync(f.fileno())
+    temp.replace(STATE)
+
+
+def tick(s, p, now, reader=sample, ac_reader=read_ac, persist=save,
+         run=subprocess.run, test=False):
+    try:
+        ac, capacity = reader()
+    except (OSError, ValueError) as e:
+        s.pop('low_since', None)
+        s.pop('ac_since', None)
+        persist(s)
+        return f'unknown-data: {e}; no action'
+    decision = decide(s, ac, capacity, now, p)
+    if test:
+        if ac or capacity < 10:
+            return 'test refused: requires battery power and capacity >=10%'
+        decision = 'suspend'
+    if decision == 'suspend':
+        try:
+            # Last-moment local AC recheck, deliberately after debounce.
+            if ac_reader() != 0:
+                s.pop('low_since', None)
+                persist(s)
+                return 'AC restored before action; cancelled'
+        except (OSError, ValueError) as e:
+            s.pop('low_since', None)
+            persist(s)
+            return f'AC recheck failed: {e}; cancelled'
+        # Persist BEFORE the request: survive immediate wake, command failure,
+        # daemon restart, or a manual wake without AC. No automatic retry loop.
+        s['latched'] = True
+        s.pop('low_since', None)
+        persist(s)
+        print(f'battery-reserve: AC=0 capacity={capacity}%; requesting suspend; '
+              'overriding inhibitors for this request; latch set', flush=True)
+        try:
+            result = run(COMMAND, check=False, timeout=45)
+            return f'suspend request returned {result.returncode}; latch retained (not proof of sleep)'
+        except (OSError, subprocess.TimeoutExpired) as e:
+            return f'suspend request failed: {e}; latch retained; investigate before rearming'
+    persist(s)
+    return f'AC={ac} capacity={capacity}% decision={decision}'
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--dry-run', action='store_true', help='read only; no state writes or suspend')
+    parser.add_argument('--test-suspend', action='store_true', help='EXPLICIT controlled test: bypass threshold/arming/latch')
+    args = parser.parse_args()
+    if args.dry_run and args.test_suspend:
+        parser.error('choose dry-run OR controlled suspend')
+    p = config()
+    if args.dry_run:
+        ac, capacity = sample()
+        print(f'config={p} AC={ac} capacity={capacity}%; fresh decision='
+              f'{decide({}, ac, capacity, time.monotonic(), p)}; no writes or actions')
+        return
+    if os.geteuid() != 0:
+        parser.error('root required except for --dry-run')
+    STATE.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    with (STATE.parent / 'lock').open('w') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        boot = Path('/proc/sys/kernel/random/boot_id').read_text().strip()
+        try:
+            s = json.loads(STATE.read_text())
+            if not isinstance(s, dict):
+                raise ValueError('state is not an object')
+        except FileNotFoundError:
+            s = {}
+        # Corrupt state deliberately fails the service, rather than erasing a latch.
+        if s.get('boot') != boot:
+            s = {'boot': boot}
+        print('battery-reserve: ' + tick(s, p, time.monotonic(), test=args.test_suspend), flush=True)
+
+
+if __name__ == '__main__':
+    main()

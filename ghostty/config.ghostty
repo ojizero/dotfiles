@@ -60,3 +60,27 @@ keybind = super+left=text:\x01
 keybind = super+right=text:\x05
 # Option+Backspace = backward delete word (ESC DEL)
 keybind = alt+backspace=text:\x1b\x7f
+
+# macOS Ghostty defaults, spelled out so Linux (where Cmd is Super) matches
+keybind = super+k=clear_screen
+keybind = super+d=new_split:right
+keybind = super+shift+d=new_split:down
+keybind = super+left_bracket=goto_split:previous
+keybind = super+right_bracket=goto_split:next
+keybind = super+shift+left_bracket=previous_tab
+keybind = super+shift+right_bracket=next_tab
+keybind = super+shift+enter=toggle_split_zoom
+keybind = super+equal=increase_font_size:1
+keybind = super+minus=decrease_font_size:1
+keybind = super+zero=reset_font_size
+keybind = super+up=jump_to_prompt:-1
+keybind = super+down=jump_to_prompt:1
+keybind = super+digit_1=goto_tab:1
+keybind = super+digit_2=goto_tab:2
+keybind = super+digit_3=goto_tab:3
+keybind = super+digit_4=goto_tab:4
+keybind = super+digit_5=goto_tab:5
+keybind = super+digit_6=goto_tab:6
+keybind = super+digit_7=goto_tab:7
+keybind = super+digit_8=goto_tab:8
+keybind = super+digit_9=last_tab

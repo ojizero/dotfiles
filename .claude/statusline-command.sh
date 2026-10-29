@@ -38,6 +38,15 @@ circle_for_pct() {
   fi
 }
 
+# BSD date (macOS) takes -r <epoch>; GNU date (Linux) takes -d @<epoch>
+date_from_epoch() {
+  if [[ "$(uname -s)" == "Darwin" ]]; then
+    date -j -r "$1" "$2" 2>/dev/null
+  else
+    date -d "@$1" "$2" 2>/dev/null
+  fi
+}
+
 format_reset_time() {
   local iso_str="$1"
   [[ -z "$iso_str" || "$iso_str" == "null" ]] && return
@@ -46,19 +55,20 @@ format_reset_time() {
   stripped="${stripped%%Z}"
   stripped="${stripped%%+*}"
 
-  local epoch
-  if [[ "$iso_str" == *"Z"* || "$iso_str" == *"+00:00"* ]]; then
-    epoch=$(TZ=UTC date -j -f "%Y-%m-%dT%H:%M:%S" "$stripped" +%s 2>/dev/null)
+  local epoch tz=""
+  [[ "$iso_str" == *"Z"* || "$iso_str" == *"+00:00"* ]] && tz=UTC
+  if [[ "$(uname -s)" == "Darwin" ]]; then
+    epoch=$(env ${tz:+TZ=$tz} date -j -f "%Y-%m-%dT%H:%M:%S" "$stripped" +%s 2>/dev/null)
   else
-    epoch=$(date -j -f "%Y-%m-%dT%H:%M:%S" "$stripped" +%s 2>/dev/null)
+    epoch=$(env ${tz:+TZ=$tz} date -d "$stripped" +%s 2>/dev/null)
   fi
   [[ -z "$epoch" ]] && return
 
   local today=$(date +%Y-%m-%d)
-  local reset_day=$(date -j -r "$epoch" +"%Y-%m-%d" 2>/dev/null)
-  local time_str=$(date -j -r "$epoch" +"%l:%M%p" 2>/dev/null | sed 's/^ //; s/\.//g' | tr '[:upper:]' '[:lower:]')
+  local reset_day=$(date_from_epoch "$epoch" +"%Y-%m-%d")
+  local time_str=$(date_from_epoch "$epoch" +"%l:%M%p" | sed 's/^ //; s/\.//g' | tr '[:upper:]' '[:lower:]')
   if [[ "$reset_day" != "$today" ]]; then
-    local day_str=$(date -j -r "$epoch" +"%a" 2>/dev/null)
+    local day_str=$(date_from_epoch "$epoch" +"%a")
     echo "${day_str} ${time_str}"
   else
     echo "$time_str"
@@ -135,6 +145,9 @@ token=""
 if command -v security &>/dev/null; then
   blob=$(security find-generic-password -s "$keychain_service" -w 2>/dev/null)
   [[ -n "$blob" ]] && token=$(echo "$blob" | jq -r '.claudeAiOauth.accessToken // empty' 2>/dev/null)
+elif [[ -f "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/.credentials.json" ]]; then
+  # Linux has no keychain; Claude Code keeps the same JSON in the config dir
+  token=$(jq -r '.claudeAiOauth.accessToken // empty' "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/.credentials.json" 2>/dev/null)
 fi
 
 # Derive a token-scoped suffix so that switching accounts (same CLAUDE_CONFIG_DIR,
@@ -184,7 +197,11 @@ needs_refresh=true
 usage_data=""
 
 if [[ -f "$cache_file" ]]; then
-  cache_mtime=$(stat -f %m "$cache_file" 2>/dev/null)
+  if [[ "$(uname -s)" == "Darwin" ]]; then
+    cache_mtime=$(stat -f %m "$cache_file" 2>/dev/null)
+  else
+    cache_mtime=$(stat -c %Y "$cache_file" 2>/dev/null)
+  fi
   now=$(date +%s)
   cache_age=$(( now - cache_mtime ))
   if [[ "$cache_age" -lt "$cache_max_age" ]]; then

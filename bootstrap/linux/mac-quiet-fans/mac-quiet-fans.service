@@ -1,0 +1,25 @@
+[Unit]
+Description=neofand Quiet curve adapted for macsmc_hwmon
+After=systemd-modules-load.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=notify
+NotifyAccess=main
+ExecStart=/usr/bin/python3 /usr/local/lib/mac-quiet-fans/controller.py
+ExecStopPost=/usr/bin/python3 /usr/local/lib/mac-quiet-fans/controller.py restore
+Restart=on-failure
+RestartSec=10s
+WatchdogSec=30s
+TimeoutStartSec=30s
+TimeoutStopSec=15s
+RuntimeDirectory=mac-quiet-fans
+RuntimeDirectoryPreserve=yes
+UMask=0022
+NoNewPrivileges=yes
+ProtectHome=yes
+ProtectSystem=full
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

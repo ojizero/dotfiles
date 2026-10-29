@@ -1,0 +1,14 @@
+#!/usr/bin/env zsh
+#MISE description="Install specific system updates"
+#MISE raw=true
+
+if [[ -z "$1" ]]; then
+  echo "usage: m update:install <update-name> [...]" >&2
+  exit 1
+fi
+
+if [[ "$(uname -s)" == "Linux" ]]; then
+  sudo apt-get install --only-upgrade "$@"
+else
+  sudo softwareupdate --install "$@"
+fi

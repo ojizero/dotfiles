@@ -1,0 +1,17 @@
+# Linux module: system packages and login shell for every Ubuntu device.
+# Loaded automatically on Linux by `auto_env = true` in the device file
+# (devices/<name>.toml, linked to ~/.config/mise/miserc.local.toml).
+
+[bootstrap.packages]
+
+# zsh: login shell. libnss3-tools: certutil for mkcert. libfuse2t64: AppImage casks.
+# libssl-dev, libncurses-dev: mise compiles Erlang from source on Linux.
+"apt:libfuse2t64" = "latest"
+"apt:libncurses-dev" = "latest"
+"apt:libnss3-tools" = "latest"
+"apt:libssl-dev" = "latest"
+"apt:zsh" = "latest"
+
+[bootstrap.user]
+
+login_shell = "/usr/bin/zsh"
