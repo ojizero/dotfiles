@@ -131,7 +131,6 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "brew:mkcert" = "latest"
 "brew:ncdu" = "latest"
 "brew:neovim" = "latest"
-"brew:oh-my-posh" = "latest"
 "brew:ripgrep" = "latest"
 "brew:sheets" = "latest"
 "brew:shellcheck" = "latest"

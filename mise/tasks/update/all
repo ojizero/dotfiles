@@ -3,7 +3,7 @@
 #MISE raw=true
 
 if [[ ! -z "$1" ]] && [[ "$1" = '--with-brew' ]]; then
-  brew update && brew upgrade && brew upgrade --casks
+  mise run update:brew
 elif [[ ! -z "$1" ]]; then
   echo "Unknown option: ${1}" >&2
   exit 1

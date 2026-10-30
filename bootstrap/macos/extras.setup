@@ -8,6 +8,12 @@ gatekeeper_cache="${cache_dir}/gatekeeper-oh-my-posh"
 sudo pmset -b powermode 1 # on battery always run low power mode
 sudo pmset -c powermode 0 # on ac use auto mode and let the OS decide
 
+# Oh My Posh from the maintainer's tap, ahead of the Gatekeeper approval below
+if ! brew list --cask oh-my-posh &>/dev/null; then
+  brew trust --tap jandedobbeleer/oh-my-posh
+  brew install --cask jandedobbeleer/oh-my-posh/oh-my-posh
+fi
+
 # Allow Oh My Posh to run on system (once per machine)
 if [[ ! -f "${gatekeeper_cache}" ]]; then
   omp="$(which oh-my-posh)"

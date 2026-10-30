@@ -11,6 +11,8 @@
 "apt:libnss3-tools" = "latest"
 "apt:libssl-dev" = "latest"
 "apt:zsh" = "latest"
+# macOS takes the maintainer's cask from extras.setup instead.
+"brew:oh-my-posh" = "latest"
 
 [bootstrap.user]
 

@@ -2,3 +2,8 @@
 #MISE description="Update and upgrade all Homebrew packages"
 
 brew update && brew upgrade && brew upgrade --casks
+
+# The oh-my-posh cask auto-updates, so `brew upgrade` skips it without --greedy
+if brew list --cask oh-my-posh &>/dev/null; then
+  brew upgrade --cask --greedy oh-my-posh
+fi
