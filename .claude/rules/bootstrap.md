@@ -12,7 +12,7 @@ Bootstrap conventions (Mise):
 - Each device has `devices/<name>.toml` (`auto_env = true` loads the OS module, `env` lists machine modules), linked to `~/.config/mise/miserc.local.toml`
 - Converge with `mise bootstrap --yes` or `m dotfiles:bootstrap`
 - New devices: `bootstrap/install.sh` installs Homebrew + mise, links `devices/$DEVICE.toml` (default: short hostname), then runs `mise bootstrap --yes --force-dotfiles`
-- Devices from before `devices/` and the undotted paths: `zsh "${DOTFILES_PATH}/mise-tasks/dotfiles/migrate-devices" [device]` once
+- Devices from before `devices/` and the undotted paths: `zsh "${DOTFILES_PATH}/mise/tasks/dotfiles/migrate-devices" [device]` once
 - Existing devices: `m dotfiles:sync` after pull; avoid `--force-dotfiles` unless status shows conflicts
 - `[bootstrap.hooks.pre-packages]` installs Homebrew only; it stays for day-to-day use and casks mise cannot install
 - Homebrew packages are `brew:` / `brew-cask:` entries in `[bootstrap.packages]` (see `packages.md`); there is no Brewfile

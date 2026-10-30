@@ -237,7 +237,7 @@ Devices set up before `devices/` (with `MISE_ENV`, dotted `.mise.*` paths and a 
 migrate once after pulling. The pull breaks the `~/.config/mise/tasks` link, so run the task directly:
 
 ```bash
-zsh "${DOTFILES_PATH}/mise-tasks/dotfiles/migrate-devices" [device]
+zsh "${DOTFILES_PATH}/mise/tasks/dotfiles/migrate-devices" [device]
 ```
 
 It moves `.mise.local.toml` to `mise.local.toml`, links the device file, re-points the
@@ -354,7 +354,7 @@ to disable the inhibitor and screen-lock behavior on future GNOME logins.
 
 ### Housekeeping
 
-Disk cleanup for macOS, as global mise tasks in [`mise-tasks/housekeeping`](./mise-tasks/housekeeping).
+Disk cleanup for macOS, as global mise tasks in [`mise/tasks/housekeeping`](./mise/tasks/housekeeping).
 Reports and history go to `~/.local/state/housekeeping/`.
 
 | Task | Description |

@@ -3,7 +3,7 @@
 
 # One-time move from MISE_ENV/.miserc.local.toml, the dotted .mise.* paths and the
 # Brewfile. Safe to repeat. The pull breaks the ~/.config/mise/tasks link, so run it
-# directly the first time: zsh "${DOTFILES_PATH}/mise-tasks/dotfiles/migrate-devices" [device]
+# directly the first time: zsh "${DOTFILES_PATH}/mise/tasks/dotfiles/migrate-devices" [device]
 export DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/workspace/self/dotfiles}"
 device="${1:-${(L)$(hostname -s)}}"
 device_file="${DOTFILES_PATH}/devices/${device}.toml"
@@ -31,7 +31,7 @@ rm -f "${DOTFILES_PATH}/.miserc.local.toml"
 echo "Linked devices/${device}.toml to ~/.config/mise/miserc.local.toml"
 
 # Trust the renamed configs, then re-point the dotfile links (config, tasks, skills) at them
-zsh "${DOTFILES_PATH}/mise-tasks/dotfiles/trust"
+zsh "${DOTFILES_PATH}/mise/tasks/dotfiles/trust"
 mise bootstrap dotfiles apply --yes -C "${DOTFILES_PATH}"
 
 # ~/.Brewfile pointed at the removed Brewfile
@@ -60,7 +60,7 @@ if [[ -f "${local_brewfile}" ]]; then
   echo "Moved .local/Brewfile to .local/Brewfile.migrated"
 fi
 
-zsh "${DOTFILES_PATH}/mise-tasks/dotfiles/trust"
+zsh "${DOTFILES_PATH}/mise/tasks/dotfiles/trust"
 
 # Homebrew already installed everything from the Brewfile, so nothing should be missing
 if mise bootstrap packages status --missing -C "${DOTFILES_PATH}"; then

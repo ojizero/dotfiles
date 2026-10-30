@@ -13,7 +13,7 @@ mise install
 mise run dotfiles:migrate-aube
 
 if [[ "$(readlink ~/.config/mise/miserc.local.toml)" != "${DOTFILES_PATH}/devices/"* ]]; then
-  echo "This machine is not migrated yet: run \`zsh \"\${DOTFILES_PATH}/mise-tasks/dotfiles/migrate-devices\" <device>\`." >&2
+  echo "This machine is not migrated yet: run \`zsh \"\${DOTFILES_PATH}/mise/tasks/dotfiles/migrate-devices\" <device>\`." >&2
 elif git -C "${DOTFILES_PATH}" diff --name-only "${old_ref}" HEAD -- 'mise.toml' 'mise.*.toml' devices | grep -q .; then
   mise bootstrap packages apply --yes -C "${DOTFILES_PATH}"
 fi

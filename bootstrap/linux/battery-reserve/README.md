@@ -27,7 +27,7 @@ disabled timer across bootstrap, explicitly skip this step with value 0;
 
 The GNOME `local.gnome-inhibit-and-lock` process is an existing separate
 desktop setup, not created by this installer. Its deployment is already
-tracked on origin/master in `mise-tasks/linux/lib/gnome-login.sh` (commits
+tracked on origin/master in `mise/tasks/linux/lib/gnome-login.sh` (commits
 93aa354 and 38bf395), used by `mise linux:unlock <device>` from the originating
 machine. On a replacement machine, run that existing workflow to reestablish
 GNOME's autostart/inhibitor before relying on uninterrupted operation above

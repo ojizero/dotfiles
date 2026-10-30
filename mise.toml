@@ -74,7 +74,7 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.bunfig.toml" = "bunfig.toml"
 "~/.config/mise/config.toml" = "mise.toml"
 "~/.config/mise/config.local.toml" = "mise.local.toml"
-"~/.config/mise/tasks" = "mise-tasks"
+"~/.config/mise/tasks" = "mise/tasks"
 "~/.claude/settings.json" = ".claude/settings.json"
 "~/.claude/statusline-command.sh" = ".claude/statusline-command.sh"
 "~/.claude-x/settings.json" = ".claude-x/settings.json"
@@ -95,7 +95,7 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.cursor/rules/agents.mdc" = "agents/AGENTS.md"
 "~/.agents/agents.toml" = "dotagent/agents.toml"
 # dotagents refuses local skills outside `~/.agents`, so link this one directly.
-"~/.agents/skills/housekeeping" = "mise-tasks/housekeeping/skill"
+"~/.agents/skills/housekeeping" = "mise/tasks/housekeeping/skill"
 
 # dotagents only links `~/.claude/skills`, so mirror it for the alternate
 # profile. The source is generated, not repo content, so the pre-dotfiles hook
