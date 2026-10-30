@@ -36,3 +36,8 @@ name = "unslop"
 source = "cursor/plugins"
 path = "pstack/skills/unslop"
 
+
+[[skills]]
+name = "retro"
+source = "mattpocock/skills"
+path = "skills/engineering/retro"
