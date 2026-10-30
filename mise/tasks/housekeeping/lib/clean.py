@@ -23,7 +23,7 @@ ROUTINE = [
 ]
 DEEP = [
     ('uv-all', 'caches', 'uv entire cache', ['uv', 'cache', 'clean'], r'(^|/)uv (pip|sync|add|lock|tool)', 900),
-    ('bun', 'caches', 'Bun package cache', ['bun', 'pm', 'cache', 'rm'], r'bun (install|i|add)( |$)', 600),
+    ('bun', 'caches', 'Bun package cache', ['bun', 'pm', 'cache', 'rm', '-g'], r'bun (install|i|add)( |$)', 600),
     ('npm', 'caches', 'npm package cache', ['npm', 'cache', 'clean', '--force'], r'npm (install|ci|i)( |$)', 600),
     ('nuget', 'caches', 'NuGet local caches', ['dotnet', 'nuget', 'locals', 'all', '--clear'], r'dotnet (restore|build|test)', 600),
     ('go', 'caches', 'Go build cache', ['go', 'clean', '-cache'], r'go (build|test|run)( |$)', 600),
