@@ -77,7 +77,9 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.config/mise/config.toml" = "mise.toml"
 "~/.config/mise/config.local.toml" = "mise.local.toml"
 "~/.config/mise/tasks" = "mise/tasks"
-"~/.claude/settings.json" = ".claude/settings.json"
+# Merged, not linked: each OS adds its own keys (mise.<os>.toml), and keys
+# Claude Code writes stay on the machine. Keys removed here stay there too.
+"~/.claude/settings.json/shared" = { source = ".claude/settings.json", merge = true }
 "~/.claude/statusline-command.sh" = ".claude/statusline-command.sh"
 "~/.claude-x/settings.json" = ".claude-x/settings.json"
 "~/.claude-x/statusline-command.sh" = ".claude/statusline-command.sh"

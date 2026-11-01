@@ -88,3 +88,9 @@ run = "killall Dock 2>/dev/null || true"
 [tasks.bootstrap]
 
 run = 'zsh "${DOTFILES_PATH}/bootstrap/macos/extras.setup"'
+
+[dotfiles]
+
+# Claude Code runs its Bash tool in bash 5. It needs a full path: it also
+# exports the value as SHELL, and ssh runs ProxyCommand through SHELL.
+"~/.claude/settings.json/macos" = { source = ".claude/settings.macos.json", merge = true }
