@@ -7,7 +7,9 @@ export DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/workspace/self/dotfiles}"
 # Non-login shells on Linux (e.g. `ssh host cmd`) skip .bash_profile, load Homebrew here as a fallback
 [[ -z "${HOMEBREW_PREFIX}" && -x /home/linuxbrew/.linuxbrew/bin/brew ]] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
-eval "$(mise activate bash)"
+# Full activation wraps `cd` and runs mise hooks on every directory change, which
+# prints into each agent command; non-interactive shells get the shims instead
+if [[ $- == *i* ]]; then eval "$(mise activate bash)"; else eval "$(mise activate bash --shims)"; fi
 source "${DOTFILES_PATH}/bash/misc.bash"
 
 # The rest is for terminals only. Agent shells are non-interactive and skip it,
