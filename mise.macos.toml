@@ -12,6 +12,8 @@ homebrew_metadata = true
 [bootstrap.packages]
 
 # GNU and macOS-only formulae (Linux ships these or gets them through apt)
+# bash: macOS ships bash 3.2; Claude Code runs its Bash tool in bash 5
+"brew:bash" = "latest"
 "brew:coreutils" = "latest"
 "brew:gawk" = "latest"
 "brew:gnu-tar" = "latest"

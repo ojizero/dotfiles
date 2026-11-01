@@ -1,0 +1,24 @@
+# Bash mirrors the zsh setup (.zshrc, omz/auto). Claude Code runs its Bash tool
+# in bash (CLAUDE_CODE_SHELL in .claude/settings.json) and sources this file.
+
+# Canonical clone path — keep in sync with mise.toml [env] DOTFILES_PATH
+export DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/workspace/self/dotfiles}"
+
+# Non-login shells on Linux (e.g. `ssh host cmd`) skip .bash_profile, load Homebrew here as a fallback
+[[ -z "${HOMEBREW_PREFIX}" && -x /home/linuxbrew/.linuxbrew/bin/brew ]] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+eval "$(mise activate bash)"
+source "${DOTFILES_PATH}/bash/misc.bash"
+
+# The rest is for terminals only. Agent shells are non-interactive and skip it,
+# so aliases, functions and the zoxide `cd` stay out of agent commands.
+[[ $- == *i* ]] || return 0
+
+source <(zoxide init --cmd "${ZOXIDE_CMD_OVERRIDE:-cd}" bash)
+
+for file in "${DOTFILES_PATH}/bash/"{aliases,history,keybindings,view}.bash; do
+  source "${file}"
+done
+unset file
+
+source <(oh-my-posh init bash --config "${DOTFILES_PATH}/omp.toml")

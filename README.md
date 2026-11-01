@@ -284,7 +284,7 @@ All personal repos live under `~/workspace/`. Dotfiles are cloned to:
 ~/workspace/self/dotfiles
 ```
 
-This path is declared in `mise.toml` as `[env].DOTFILES_PATH` and `[bootstrap.repos]`, exported in `.zshrc`, and used by `bootstrap/install.sh`.
+This path is declared in `mise.toml` as `[env].DOTFILES_PATH` and `[bootstrap.repos]`, exported in `.zshrc` and `.bashrc`, and used by `bootstrap/install.sh`.
 
 ### Local configurations
 

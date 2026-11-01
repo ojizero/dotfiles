@@ -69,6 +69,8 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.brew-aliases" = ".brew-aliases"
 "~/.zshrc" = ".zshrc"
 "~/.zprofile" = ".zprofile"
+"~/.bashrc" = ".bashrc"
+"~/.bash_profile" = ".bash_profile"
 "~/.gitconfig" = ".gitconfig"
 "~/.config/git/ignore" = "git/ignore"
 "~/.bunfig.toml" = "bunfig.toml"
