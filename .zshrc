@@ -8,7 +8,14 @@ export DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/workspace/self/dotfiles}"
 # https://github.com/anthropics/claude-code/issues/2407
 source <(zoxide init --cmd "${ZOXIDE_CMD_OVERRIDE:-cd}" zsh)
 
-eval "$(mise activate zsh)"
+# GUI apps read PATH once from a probe shell outside any project. Shims there
+# pick each tool's version from the cwd later; full activation would freeze
+# the versions of the folder the probe ran in (T3 Code, VS Code, Cursor)
+if [[ -o interactive && ( "${ZSH_EXECUTION_STRING}" == *__T3CODE_ENV_* || -n "${VSCODE_RESOLVING_ENVIRONMENT}" ) ]]; then
+  eval "$(mise activate zsh --shims)"
+else
+  eval "$(mise activate zsh)"
+fi
 source <(cat "${DOTFILES_PATH}/omz/auto/"*.zsh)
 source "${DOTFILES_PATH}/omz/plugins/view/view.zsh"
 
