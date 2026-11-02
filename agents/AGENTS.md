@@ -1,27 +1,39 @@
----
-alwaysApply: true
----
+## Communication
 
-I'm Amir, a software engineer. We build ambitious ideas as simple, readable systems that "feel obvious": measure twice, cut once, YAGNI, and fight scope creep.
+- Back claims with evidence: file:line, command output, or a doc link. When you have none, mark the claim as an assumption or go verify it.
+- Disagree directly when the evidence supports it.
+- Use ASD-STE100 for English docs, code comments, and technical replies such as planning or scoping.
+- Use a diagram or graph when it makes an idea faster to understand.
 
-Back claims with evidence: file:line, command output, or a doc link. When you have none, mark the claim as an assumption or go verify it.
+## Engineering
 
-## Language in Use
+- Solve complex problems with simple, readable systems that "feel obvious".
+- Be ambitious in depth, minimal in scope.
+  - Depth: fix the root cause and remove complexity that does not earn its place, even when it already exists.
+  - Scope: add only what the request needs. Measure twice, cut once, YAGNI.
+- Understand the real constraint, then fight for the smallest model that makes the correct behavior unsurprising. Add machinery only for a need, never for how it looks.
 
-Disagree directly when the evidence supports it. Use ASD-STE100 for English docs, code comments, and technical replies such as planning or scoping.
+## Git
 
-## Workspaces Used
+- Commit messages follow the repository's existing style. With no consistent style, follow Conventional Commits.
+  - Keep the subject line at 50 characters or fewer and wrap the body at 72, even where the history breaks these limits.
+- Pull request titles, or equivalent, follow the same rules as commit subjects.
+- Comments on pull requests, or equivalent, follow Conventional Comments.
 
-Unless otherwise requested, code is cloned or developed under `~/workspace`. `~/workspace/self` holds my personal projects. Each org gets a sibling folder `~/workspace/<org>`, which can nest further for an org's clients (`~/workspace/<org>/<client>`). Any of these folders can have a `playground` folder for things cloned only to explore or play with in that context.
+## Environment
 
-"Self workspace", "<org> workspace", etc. refer to these folders. If it's unclear which workspace a clone belongs in, ask.
-
-## Installing Software
-
-The `~/workspace/self/dotfiles` project defines the environment, linked or copied outward where the system needs it. Mise is the one source of truth for development tooling (language runtimes included), and for CLIs only by exception. On macOS, Homebrew is the one source of truth for applications, and CLI apps are applications.
-
-Run tools through Mise, scoped to the project or folder: `mise use` for tools the project keeps, `mise exec <tool> -- <cmd>` for one-off runs, and the `npm:` or `pipx:` backends for npm and Python tools. In repos I don't own, write to `mise.local.toml` (`mise use --env local`) or to a parent folder's config. Project dependencies go through the project's own package manager. `npx`, `uvx`, `npm i -g`, `uv tool install`, and any other tool install outside Mise or Homebrew are off-limits. Adding anything at global scope needs my explicit ok first.
-
-## Commits
-
-Commit messages follow the repository's existing style. If the repository is new or has no consistent style, follow the [Conventional Commits](https://www.conventionalcommits.org/) specification. Always keep the subject line (the first line) at 50 characters or fewer and wrap the rest at 72, even where the history breaks these limits.
+- Projects live in workspaces under `~/workspace`, on all my machines.
+  - `~/workspace/self` holds my personal projects.
+  - `~/workspace/<org>` holds an org's work, and can nest per client or sub-org as `~/workspace/<org>/<client>`.
+  - Any workspace can have a `playground` folder for code cloned only to explore, and for experimental POCs.
+  - Create or clone new projects in a workspace. If the workspace is unclear, ask.
+- `~/workspace/self/dotfiles` defines the environment. Its configs are linked or copied into place: edit them in dotfiles, not at the target. Changes for this machine only go in its untracked local files.
+- Ask me before you add anything at global scope: the global Mise config, Homebrew, or system packages. One-off `mise exec` runs of trusted tools (well-known, from the official source) need no approval.
+- Mise is the one source of truth for development tools, runtimes included, and for CLIs that Homebrew does not ship (for example, npm packages or GitHub releases such as Pi).
+  - Use `mise use` for tools a project keeps, `mise exec <tool> -- <cmd>` for one-off runs, and the `npm:` or `pipx:` backends for npm and Python tools. These replace `npx`, `uvx`, `npm i -g`, and `uv tool install`.
+  - In repos I don't own, write to `mise.local.toml` (`mise use --env local`).
+  - Run ad-hoc Python scripts with `uv run`.
+  - Project dependencies go through the project's own package manager.
+- Applications, CLIs included, come from the platform's package manager.
+  - On macOS, use Homebrew (Casks for desktop apps). If only the App Store has an app, tell me and I install it.
+  - On Linux, use the distro package manager first, then Homebrew. Use AppImage, Flatpak, or Snap only when it is the sole official option.
