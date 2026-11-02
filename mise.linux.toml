@@ -5,7 +5,7 @@
 [bootstrap.packages]
 
 # zsh: login shell. libnss3-tools: certutil for mkcert. libfuse2t64: AppImage casks.
-# libssl-dev, libncurses-dev: mise compiles Erlang from source on Linux.
+# libssl-dev, libncurses-dev: Erlang source builds when no binary is available.
 "apt:libfuse2t64" = "latest"
 "apt:libncurses-dev" = "latest"
 "apt:libnss3-tools" = "latest"

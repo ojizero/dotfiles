@@ -1,0 +1,8 @@
+# Ubuntu 26.04 only: select this module in the device file.
+# Remove or review it when the device changes OS release.
+
+[settings.erlang]
+
+# mise does not auto-detect this target. Prefer Bob's binaries when available.
+# Leave compile unset so releases without a binary can still build from source.
+precompiled_os = "ubuntu-26.04"

@@ -26,7 +26,7 @@ so the OS module loads by itself, and lists the device's machine modules:
 ```toml
 # devices/sagittarius-a.toml
 auto_env = true
-env = ["linux-desktop", "computer-use"]
+env = ["ubuntu-26.04", "linux-desktop", "computer-use"]
 ```
 
 | Module | Loaded | Covers |
@@ -34,8 +34,14 @@ env = ["linux-desktop", "computer-use"]
 | [base](./mise.toml) | always | Tools, dotfiles, Homebrew formulae and fonts for every device |
 | [`macos`](./mise.macos.toml) | on macOS | macOS formulae and app casks, macOS defaults, [`bootstrap/macos/extras.setup`](./bootstrap/macos/extras.setup) |
 | [`linux`](./mise.linux.toml) | on Linux | apt basics (zsh, build libraries), login shell |
+| [`ubuntu-26.04`](./mise.ubuntu-26.04.toml) | device file, Ubuntu 26.04 only | Erlang precompiled target; source fallback stays enabled |
 | [`linux-desktop`](./mise.linux-desktop.toml) | device file | Tailscale, Cursor, Helium (apt), Zen, Obsidian, Smile, Secrets, KeePassXC (Flatpak), automatic light/dark mode (Night Theme Switcher), T3 Code (pinned so it updates itself), Docker (apt), Claude Code, Cursor CLI and Zed (Homebrew casks), Mac-style keyboard (xremap + GNOME shortcuts + Mac layouts), lid and sleep policy, via [`bootstrap/linux/extras.setup`](./bootstrap/linux/extras.setup) |
 | [`computer-use`](./mise.computer-use.toml) | device file | An agent desktop for AI agents next to GNOME: headless Sway, VNC on localhost, the Cua Driver daemon and its MCP server for Claude Code and Codex, agent-only Zen and Helium profiles, via [`agent-desktop/`](./agent-desktop) and [`bootstrap/linux/computer-use.setup`](./bootstrap/linux/computer-use.setup). Needs `linux-desktop` (`env = ["linux-desktop", "computer-use"]`) |
+
+Select `ubuntu-26.04` only for devices that run Ubuntu 26.04. Remove or review
+this module when the device changes OS release. Mise does not detect this
+[Erlang binary target](https://mise.jdx.dev/lang/erlang.html#how-mise-installs-erlang)
+automatically. Other Linux releases keep Mise's default target selection.
 
 Machine-specific values in the `linux-desktop` module, to adjust for another machine or place:
 
