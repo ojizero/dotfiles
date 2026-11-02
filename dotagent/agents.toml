@@ -17,22 +17,14 @@ git_domains = ["ssh-forge.ojizero.dev/ojizero"]
 name = "cortex"
 source = "git:git@ssh-forge.ojizero.dev:ojizero/cortex.git"
 
-# dotagents scans only the repo root and `skills/` (recursively) for skills,
-# so the `<group>/<skill>` folders need an explicit `path`.
+# dotagents scans only the repo root and `skills/` for a bare wildcard, so
+# `path = "."` makes it walk the `<group>/<skill>` folders recursively.
+# `housekeeping` comes from this repo instead (see `mise.toml`).
 [[skills]]
-name = "attribution"
+name = "*"
 source = "git:git@ssh-forge.ojizero.dev:ojizero/skills.git"
-path = "behaviour/attribution"
-
-[[skills]]
-name = "babysit"
-source = "git:git@ssh-forge.ojizero.dev:ojizero/skills.git"
-path = "behaviour/babysit"
-
-[[skills]]
-name = "pull-request"
-source = "git:git@ssh-forge.ojizero.dev:ojizero/skills.git"
-path = "delivery/pull-request"
+path = "."
+exclude = ["housekeeping", "explain"]
 
 [[skills]]
 name = "writing-for-agents"
