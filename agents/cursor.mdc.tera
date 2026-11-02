@@ -1,0 +1,5 @@
+---
+alwaysApply: true
+---
+
+{{ read_file(path="agents/AGENTS.md") }}

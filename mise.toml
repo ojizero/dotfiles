@@ -95,8 +95,8 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.claude/CLAUDE.md" = "agents/AGENTS.md"
 "~/.claude-x/CLAUDE.md" = "agents/AGENTS.md"
 # Cursor has no global AGENTS.md; it reads `.cursor/rules` in ancestor dirs,
-# and needs the `alwaysApply` frontmatter at the top of AGENTS.md.
-"~/.cursor/rules/agents.mdc" = "agents/AGENTS.md"
+# and needs the `alwaysApply` frontmatter, so render it on top of AGENTS.md.
+"~/.cursor/rules/agents.mdc" = { source = "agents/cursor.mdc.tera", mode = "template" }
 "~/.agents/agents.toml" = "dotagent/agents.toml"
 # dotagents refuses local skills outside `~/.agents`, so link this one directly.
 "~/.agents/skills/housekeeping" = "mise/tasks/housekeeping/skill"
