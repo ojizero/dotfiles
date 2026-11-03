@@ -7,11 +7,12 @@
 
 ## Engineering
 
-- Solve complex problems with simple, readable systems that "feel obvious".
-- Be ambitious in depth, minimal in scope.
-  - Depth: fix the root cause and remove complexity that does not earn its place, even when it already exists.
-  - Scope: add only what the request needs. Measure twice, cut once, YAGNI.
-- Understand the real constraint, then fight for the smallest model that makes the correct behavior unsurprising. Add machinery only for a need, never for how it looks.
+- Solve complex problems with simple, readable systems that "feel obvious". Simple and readable means easy to read and easy to change, not the fewest files or functions. Hold all code to this.
+- Measure twice, cut once: find the real constraint and the right shape before you write code. Do not copy the shape of a brief or schema into the code structure.
+- YAGNI: do not build features or options that no current need asks for. YAGNI never permits code that is less simple or readable.
+- Give each job its own home. When the code has several things of one kind, such as commands, add the next one as a new unit, not as a new branch in shared code.
+- Add machinery only for a real need. Machinery is code that connects or configures other code but does no work itself: layers, interfaces, registries, plugin systems, generic wrappers. A real need is two or more uses that exist now, or a request that asks for it. A module for each job is not machinery.
+- Fix the root cause. In the code you change, remove complexity that does not earn its place. Tell me about a larger mess before you fix it.
 
 ## Git
 
