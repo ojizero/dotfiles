@@ -170,6 +170,23 @@ recovery path available, then check:
 3. Enter the LUKS passphrase through the forced prompt and verify the transition
    to normal Ubuntu, including normal SSH and the saved network configuration.
 
+#### Sagittarius A*: Forgejo runner
+
+Sagittarius A* runs a Forgejo runner from [Island](https://forge.ojizero.dev/ojizero/island)
+(Compose project `forge`, profile `sagittarius-a`, Docker context `default`).
+Docker starts its containers at boot through their `restart: unless-stopped`
+policy, so there is no unit or autostart entry for it. It needs:
+
+- Docker enabled, from the `linux-desktop` module.
+- The machine kept awake: the closed-lid guard (`DOTFILES_BATTERY_RESERVE=1`
+  in `mise.local.toml`) holds a system inhibitor with no login.
+- The disk unlocked after each power-on (`mise linux:unlock sagittarius-a`).
+  Until then, nothing starts.
+
+A container stopped with `docker stop` or `docker compose stop` stays stopped
+at boot. Start it again with `docker --context default compose up -d` in
+`~/.local/share/island/forge`.
+
 #### The computer-use module
 
 AI agents keep running in GNOME (for example in T3 Code). They drive apps in a second
