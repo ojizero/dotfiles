@@ -357,15 +357,3 @@ the task does not reboot or change LUKS credentials.
 
 Remove `~/.config/autostart/gnome-inhibit-and-lock.desktop` on the remote host
 to disable the inhibitor and screen-lock behavior on future GNOME logins.
-
-### Housekeeping
-
-Disk cleanup for macOS, as global mise tasks in [`mise/tasks/housekeeping`](./mise/tasks/housekeeping).
-Reports and history go to `~/.local/state/housekeeping/`.
-
-| Task | Description |
-|------|-------------|
-| `m housekeeping` | Clean caches, merged worktrees and old build output, then write an HTML report (`--dry-run` to preview) |
-| `m housekeeping:periodic` | Run it weekly through launchd, Saturdays 03:00 by default (`--day`, `--at`, `--remove`) |
-| `m housekeeping:status` | Show the schedule, a run in progress, and the last run |
-| `m housekeeping:disk` | Show disk and memory health and where the space goes; removes nothing |
