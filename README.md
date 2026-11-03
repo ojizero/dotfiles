@@ -369,6 +369,3 @@ Reports and history go to `~/.local/state/housekeeping/`.
 | `m housekeeping:periodic` | Run it weekly through launchd, Saturdays 03:00 by default (`--day`, `--at`, `--remove`) |
 | `m housekeeping:status` | Show the schedule, a run in progress, and the last run |
 | `m housekeeping:disk` | Show disk and memory health and where the space goes; removes nothing |
-
-The `housekeeping` agent skill next to them is linked into `~/.agents/skills`, so agents in any
-project can check on it and diagnose disk space.

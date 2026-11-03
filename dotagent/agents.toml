@@ -19,12 +19,12 @@ source = "git:git@ssh-forge.ojizero.dev:ojizero/cortex.git"
 
 # dotagents scans only the repo root and `skills/` for a bare wildcard, so
 # `path = "."` makes it walk the `<group>/<skill>` folders recursively.
-# `housekeeping` and `explain` are not ready yet, so exclude them for now.
+# `explain` is not ready yet, so exclude it for now.
 [[skills]]
 name = "*"
 source = "git:git@ssh-forge.ojizero.dev:ojizero/skills.git"
 path = "."
-exclude = ["housekeeping", "explain"]
+exclude = ["explain"]
 
 [[skills]]
 name = "writing-for-agents"
