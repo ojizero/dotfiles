@@ -22,4 +22,4 @@ login_shell = "/usr/bin/zsh"
 
 # Claude Code runs its Bash tool in bash 5. It needs a full path: it also
 # exports the value as SHELL, and ssh runs ProxyCommand through SHELL.
-"~/.claude/settings.json/linux" = { source = ".claude/settings.linux.json", merge = true }
+"~/.claude/settings.json/linux" = { source = "claude/settings.linux.json", merge = true }

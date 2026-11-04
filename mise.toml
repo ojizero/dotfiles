@@ -79,16 +79,16 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.config/mise/tasks" = "mise/tasks"
 # Merged, not linked: each OS adds its own keys (mise.<os>.toml), and keys
 # Claude Code writes stay on the machine. Keys removed here stay there too.
-"~/.claude/settings.json/shared" = { source = ".claude/settings.json", merge = true }
-"~/.claude/statusline-command.sh" = ".claude/statusline-command.sh"
+"~/.claude/settings.json/shared" = { source = "claude/settings.json", merge = true }
+"~/.claude/statusline-command.sh" = "claude/statusline-command.sh"
 "~/.config/uv" = "uv"
 "~/.config/ghostty" = "ghostty"
 "~/.config/nvim" = "nvim"
 "~/.config/zed" = "zed"
 "~/.config/worktrunk" = "worktrunk"
-"~/.pi/agent/settings.json" = ".pi/agent/settings.json"
-"~/.pi/agent/extensions" = ".pi/agent/extensions"
-"~/.codex/rules/host-tools.rules" = ".codex/rules/host-tools.rules"
+"~/.pi/agent/settings.json" = "pi/agent/settings.json"
+"~/.pi/agent/extensions" = "pi/agent/extensions"
+"~/.codex/rules/host-tools.rules" = "codex/rules/host-tools.rules"
 "~/.codex/AGENTS.md" = "agents/AGENTS.md"
 "~/.claude/CLAUDE.md" = "agents/AGENTS.md"
 # Cursor has no global AGENTS.md; it reads `.cursor/rules` in ancestor dirs,

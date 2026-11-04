@@ -1,5 +1,5 @@
 # Bash mirrors the zsh setup (.zshrc, omz/auto). Claude Code runs its Bash tool
-# in bash (CLAUDE_CODE_SHELL in .claude/settings.json) and sources this file.
+# in bash (CLAUDE_CODE_SHELL in claude/settings.json) and sources this file.
 
 # Canonical clone path — keep in sync with mise.toml [env] DOTFILES_PATH
 export DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/workspace/self/dotfiles}"
