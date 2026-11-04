@@ -31,6 +31,7 @@ homebrew_metadata = true
 "brew-cask:bartender" = "latest"
 "brew-cask:claude" = "latest"
 "brew-cask:claude-code@latest" = "latest"
+"brew-cask:codex" = "latest"
 "brew-cask:cursor" = "latest"
 "brew-cask:cursor-cli" = "latest"
 "brew-cask:discord" = "latest"
