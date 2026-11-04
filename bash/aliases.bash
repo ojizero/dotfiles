@@ -106,8 +106,6 @@ function claude {
   printf '\e[?2004l\e[?1l\e[?25h'
 }
 alias cc='claude --dangerously-skip-permissions'
-alias xclaude='CLAUDE_CONFIG_DIR="$HOME/.claude-x" claude --dangerously-skip-permissions'
-alias xcc='xclaude'
 
 alias cx='codex'
 

@@ -81,8 +81,6 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 # Claude Code writes stay on the machine. Keys removed here stay there too.
 "~/.claude/settings.json/shared" = { source = ".claude/settings.json", merge = true }
 "~/.claude/statusline-command.sh" = ".claude/statusline-command.sh"
-"~/.claude-x/settings.json" = ".claude-x/settings.json"
-"~/.claude-x/statusline-command.sh" = ".claude/statusline-command.sh"
 "~/.config/uv" = "uv"
 "~/.config/ghostty" = "ghostty"
 "~/.config/nvim" = "nvim"
@@ -93,16 +91,10 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 "~/.codex/rules/host-tools.rules" = ".codex/rules/host-tools.rules"
 "~/.codex/AGENTS.md" = "agents/AGENTS.md"
 "~/.claude/CLAUDE.md" = "agents/AGENTS.md"
-"~/.claude-x/CLAUDE.md" = "agents/AGENTS.md"
 # Cursor has no global AGENTS.md; it reads `.cursor/rules` in ancestor dirs,
 # and needs the `alwaysApply` frontmatter, so render it on top of AGENTS.md.
 "~/.cursor/rules/agents.mdc" = { source = "agents/cursor.mdc.tera", mode = "template" }
 "~/.agents/agents.toml" = "dotagent/agents.toml"
-
-# dotagents only links `~/.claude/skills`, so mirror it for the alternate
-# profile. The source is generated, not repo content, so the pre-dotfiles hook
-# below guarantees it exists — a missing source aborts the whole apply.
-"~/.claude-x/skills" = "~/.agents/skills"
 
 [bootstrap.repos]
 
@@ -168,13 +160,13 @@ fi
 
 [bootstrap.hooks.pre-dotfiles]
 
-# Both entries create a `[dotfiles]` source that is not repo content. A missing
-# source aborts the whole apply, so they must exist before it runs. This also
-# fires on the standalone `mise bootstrap dotfiles apply`, so both self-heal.
+# `seed-local` creates a `[dotfiles]` source that is not repo content. A missing
+# source aborts the whole apply, so it must exist before it runs. This also
+# fires on the standalone `mise bootstrap dotfiles apply`, so it self-heals.
 # `seed-local` is a task because hooks get neither `[env]` nor templates.
 # Hooks before the tools step skip `mise run`'s tool auto-install, which would
 # otherwise install (and on Linux, compile) every tool before dotfiles exist.
-run = ["mkdir -p ~/.agents/skills", "MISE_TASK_RUN_AUTO_INSTALL=0 mise run dotfiles:seed-local"]
+run = "MISE_TASK_RUN_AUTO_INSTALL=0 mise run dotfiles:seed-local"
 
 [bootstrap.hooks.post-dotfiles]
 
