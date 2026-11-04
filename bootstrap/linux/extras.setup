@@ -45,7 +45,7 @@ if ! dpkg-query -W cursor >/dev/null 2>&1; then
 fi
 
 # App casks through Homebrew itself: on Linux, mise's cask installer only handles fonts
-for cask in claude-code cursor-cli t3-code zed; do
+for cask in claude-code@latest cursor-cli t3-code zed; do
   brew list --cask "${cask}" &>/dev/null || brew install --cask "${cask}"
 done
 
