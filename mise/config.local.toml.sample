@@ -1,6 +1,5 @@
-# System-specific mise configuration
-# This file is git-ignored and serves as a local override layer
-# on top of the base config (~/.config/mise/config.toml)
+# Copy this sample to config.local.toml for machine-specific overrides.
+# The copy is gitignored and linked to ~/.config/mise/config.local.toml.
 
 [env]
 # MacBookPro16,1 closed-lid server reserve policy (linux-desktop bootstrap).

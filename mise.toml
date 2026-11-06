@@ -1,81 +1,21 @@
 min_version = "2026.7.14"
 
-[tools]
+[settings.dotfiles]
+default_mode = "symlink"
 
-# Primary tech stacks
-uv = "latest"
-bun = "1.4.2"
-erlang = "29"
-elixir = "1.20.4-otp-29"
-
-# Tooling managed via mise (Aube package manager)
-"github:earendil-works/pi" = "latest"
-"npm:@agentclientprotocol/codex-acp" = "latest"
-"npm:@agentclientprotocol/claude-agent-acp" = "latest"
-"npm:@sentry/dotagents" = "latest"
-
-# Needed as runtime for some NPM based tooling
-node = "lts"
-
-[env]
-
-# Canonical dotfiles clone path (all repos live under ~/workspace/...)
-DOTFILES_PATH = "{{ env.HOME }}/workspace/self/dotfiles"
-
-MISE_ENV_FILE = ".env"
-ERL_AFLAGS = "-kernel shell_history enabled"
-
-[settings]
-
-minimum_release_age = "7d"
-
-# Install npm: tools with the Aube package manager embedded in mise. This does
-# not install or require the standalone Aube CLI.
-npm.package_manager = "aube"
-
-# mise applies its minimum release age while resolving fuzzy top-level tool
-# versions (such as "latest"). For npm: and pipx: tools it also forwards the
-# cutoff to Aube/uv for transitive dependency resolution. Exclusions here match
-# mise tool IDs and disable mise's cutoff for those tools. GitHub release tools
-# do not need an Aube exclusion.
-minimum_release_age_excludes = [
-  "npm:@agentclientprotocol/claude-agent-acp",
-  "npm:@playwright/cli",
-  "npm:@zed-industries/codex-acp",
-  "github:earendil-works/pi",
-]
-
-dotfiles.default_mode = "symlink"
-
-[settings.github]
-
-credential_command = "gh auth token"
-
-[settings.pipx]
-
-uvx = true
-
-[hooks]
-
-# Inline run (not `{ task = "auto:git-sync" }`) because:
-# 1. Task hooks execute via `mise run`, which does not forward MISE_ORIGINAL_CWD,
-#    so the script would check the wrong directory and silently skip.
-# 2. Inline run avoids the mise task wrapper line for quieter cd hooks.
-cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
+[task_config]
+includes = ["bootstrap/tasks"]
 
 [dotfiles]
 
-"~/.local" = ".local"
-"~/.brew-aliases" = ".brew-aliases"
-"~/.zshrc" = ".zshrc"
-"~/.zprofile" = ".zprofile"
-"~/.bashrc" = ".bashrc"
-"~/.bash_profile" = ".bash_profile"
-"~/.gitconfig" = ".gitconfig"
-"~/.config/git/ignore" = "git/ignore"
-"~/.bunfig.toml" = "bunfig.toml"
-"~/.config/mise/config.toml" = "mise.toml"
-"~/.config/mise/config.local.toml" = "mise.local.toml"
+"~/.zshrc" = "zsh/zshrc"
+"~/.zprofile" = "zsh/zprofile"
+"~/.bashrc" = "bash/bashrc"
+"~/.bash_profile" = "bash/bash_profile"
+"~/.config/git" = "git"
+"~/.bunfig.toml" = "bun/bunfig.toml"
+"~/.config/mise/config.toml" = "mise/config.toml"
+"~/.config/mise/config.local.toml" = "mise/config.local.toml"
 "~/.config/mise/tasks" = "mise/tasks"
 # Merged, not linked: each OS adds its own keys (mise.<os>.toml), and keys
 # Claude Code writes stay on the machine. Keys removed here stay there too.
@@ -94,7 +34,7 @@ cd = { run = "{{ env.HOME }}/.config/mise/tasks/auto/git-sync" }
 # Cursor has no global AGENTS.md; it reads `.cursor/rules` in ancestor dirs,
 # and needs the `alwaysApply` frontmatter, so render it on top of AGENTS.md.
 "~/.cursor/rules/agents.mdc" = { source = "agents/cursor.mdc.tera", mode = "template" }
-"~/.agents/agents.toml" = "dotagent/agents.toml"
+"~/.agents/agents.toml" = "agents/agents.toml"
 
 [bootstrap.repos]
 

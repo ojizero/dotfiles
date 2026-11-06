@@ -1,12 +1,12 @@
 # macOS module: Homebrew apps, system preferences and extras for every Mac.
 # Loaded automatically on macOS by `auto_env = true` in the device file
-# (devices/<name>.toml, linked to ~/.config/mise/miserc.local.toml).
+# (devices/<name>.toml, linked to ~/.config/mise/miserc.toml).
 
 [bootstrap.brew]
 
 # Casks mise installs get Homebrew's metadata, so `brew upgrade` takes them over
 # after bootstrap. Needs mise 2026.10.20 (older versions warn and skip it).
-# Third-party tap casks are left out, so extras.setup installs those with brew.
+# Third-party tap casks are left out, so the setup task installs those with brew.
 homebrew_metadata = true
 
 [bootstrap.packages]
@@ -86,9 +86,9 @@ tap_to_click = true
 
 run = "killall Dock 2>/dev/null || true"
 
-[tasks.bootstrap]
+[bootstrap.hooks.final]
 
-run = 'zsh "${DOTFILES_PATH}/bootstrap/macos/extras.setup"'
+run = "MISE_TASK_RUN_AUTO_INSTALL=0 mise run setup:macos"
 
 [dotfiles]
 

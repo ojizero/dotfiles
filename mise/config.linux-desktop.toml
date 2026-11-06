@@ -1,0 +1,4 @@
+[tools]
+
+# Key remapper behind the Mac-style shortcuts (GNOME build); mise keeps it updated
+"github:xremap/xremap" = { version = "latest", matching = "gnome" }

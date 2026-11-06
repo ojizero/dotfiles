@@ -1,7 +1,17 @@
 #!/usr/bin/env zsh
-#MISE description="Seed mise.local.toml from the tracked sample if missing"
+#MISE description="Seed the machine's local Mise config"
+set -e
 
-# A task, not an inline bootstrap hook: hooks get neither `[env]` nor template
-# rendering, so `${DOTFILES_PATH}` is empty there.
-[[ -f "${DOTFILES_PATH}/mise.local.toml" ]] ||
-  cp "${DOTFILES_PATH}/mise.local.toml.sample" "${DOTFILES_PATH}/mise.local.toml"
+DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/workspace/self/dotfiles}"
+local_config="${DOTFILES_PATH}/mise/config.local.toml"
+
+# Preserve overrides from either earlier layout before using the sample.
+if [[ ! -f "${local_config}" ]]; then
+  if [[ -f "${DOTFILES_PATH}/mise.local.toml" ]]; then
+    mv "${DOTFILES_PATH}/mise.local.toml" "${local_config}"
+  elif [[ -f "${DOTFILES_PATH}/.mise.local.toml" ]]; then
+    mv "${DOTFILES_PATH}/.mise.local.toml" "${local_config}"
+  else
+    cp "${DOTFILES_PATH}/mise/config.local.toml.sample" "${local_config}"
+  fi
+fi

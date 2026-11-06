@@ -2,7 +2,7 @@
 if command -v brew >/dev/null 2>&1; then
   fpath+=("$(brew --prefix)/share/zsh/site-functions")
 fi
-fpath+=("${DOTFILES_PATH}/omz/completions")
+fpath+=("${DOTFILES_PATH}/zsh/omz/completions")
 autoload -U compinit && compinit
 autoload -U +X bashcompinit && bashcompinit
 

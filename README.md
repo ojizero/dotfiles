@@ -14,7 +14,7 @@ Run [`bootstrap/install.sh`](./bootstrap/install.sh). It will:
 
 1. Clone this repo from Forgejo to `~/workspace/self/dotfiles` using the existing SSH setup
 2. Install Homebrew (if missing) and `brew install mise`
-3. Link the device file (below) to `~/.config/mise/miserc.local.toml`
+3. Link the device file to `~/.config/mise/miserc.toml`, seed local overrides, and link the runtime Mise config and global tasks
 4. Run `mise bootstrap --yes --force-dotfiles` (packages, symlinks, tools, login shell, macOS defaults, extras)
 
 ### Devices and modules
@@ -31,12 +31,25 @@ env = ["ubuntu-26.04", "linux-desktop", "computer-use"]
 
 | Module | Loaded | Covers |
 |--------|--------|--------|
-| [base](./mise.toml) | always | Tools, dotfiles, Homebrew formulae and fonts for every device |
-| [`macos`](./mise.macos.toml) | on macOS | macOS formulae and app casks, macOS defaults, [`bootstrap/macos/extras.setup`](./bootstrap/macos/extras.setup) |
+| [base](./mise.toml) | inside this repo | Dotfiles, Homebrew formulae and fonts for every device |
+| [`macos`](./mise.macos.toml) | on macOS | macOS formulae and app casks, macOS defaults, [`bootstrap/tasks/setup/macos`](./bootstrap/tasks/setup/macos) |
 | [`linux`](./mise.linux.toml) | on Linux | apt basics (zsh, build libraries), login shell |
-| [`ubuntu-26.04`](./mise.ubuntu-26.04.toml) | device file, Ubuntu 26.04 only | Erlang precompiled target; source fallback stays enabled |
-| [`linux-desktop`](./mise.linux-desktop.toml) | device file | Tailscale, Cursor, Helium (apt), Zen, Obsidian, Smile, Secrets, KeePassXC (Flatpak), automatic light/dark mode (Night Theme Switcher), T3 Code (pinned so it updates itself), Docker (apt), Claude Code, Codex, Cursor CLI and Zed (Homebrew casks), Mac-style keyboard (xremap + GNOME shortcuts + Mac layouts), lid and sleep policy, via [`bootstrap/linux/extras.setup`](./bootstrap/linux/extras.setup) |
-| [`computer-use`](./mise.computer-use.toml) | device file | An agent desktop for AI agents next to GNOME: headless Sway, VNC on localhost, the Cua Driver daemon and its MCP server for Claude Code and Codex, agent-only Zen and Helium profiles, via [`agent-desktop/`](./agent-desktop) and [`bootstrap/linux/computer-use.setup`](./bootstrap/linux/computer-use.setup). Needs `linux-desktop` (`env = ["linux-desktop", "computer-use"]`) |
+| [`ubuntu-26.04`](./mise.ubuntu-26.04.toml) | device file, Ubuntu 26.04 only | Links the [runtime Erlang settings](./mise/config.ubuntu-26.04.toml); source fallback stays enabled |
+| [`linux-desktop`](./mise.linux-desktop.toml) | device file | Tailscale, Cursor, Helium (apt), Zen, Obsidian, Smile, Secrets, KeePassXC (Flatpak), automatic light/dark mode (Night Theme Switcher), T3 Code (pinned so it updates itself), Docker (apt), Claude Code, Codex, Cursor CLI and Zed (Homebrew casks), Mac-style keyboard (xremap + GNOME shortcuts + Mac layouts), lid and sleep policy, via [`bootstrap/tasks/setup/linux`](./bootstrap/tasks/setup/linux) |
+| [`computer-use`](./mise.computer-use.toml) | device file | An agent desktop for AI agents next to GNOME: headless Sway, VNC on localhost, the Cua Driver daemon and its MCP server for Claude Code and Codex, agent-only Zen and Helium profiles, via [`agent-desktop/`](./agent-desktop) and [`bootstrap/tasks/setup/computer-use`](./bootstrap/tasks/setup/computer-use). Needs `linux-desktop` (`env = ["linux-desktop", "computer-use"]`) |
+
+The root `mise.toml` and `mise.<module>.toml` files describe setup. They load
+inside this repo, or with `mise -C "$DOTFILES_PATH" ...`. The files under
+[`mise/`](./mise) provide runtime tools, settings, environment variables, and
+hooks in every directory through links in `~/.config/mise/`.
+
+The Linux desktop module also links `mise/config.linux-desktop.toml`, which
+keeps xremap available outside this repo.
+
+All tasks are executable files. Global tasks live in `mise/tasks/`, linked to
+`~/.config/mise/tasks`. Repo tasks live in `bootstrap/tasks/`, selected by
+`[task_config].includes`. Each setup module calls its own `setup:*` task from
+its final hook. These setup tasks run only inside this repo.
 
 Select `ubuntu-26.04` only for devices that run Ubuntu 26.04. Remove or review
 this module when the device changes OS release. Mise does not detect this
@@ -179,7 +192,7 @@ policy, so there is no unit or autostart entry for it. It needs:
 
 - Docker enabled, from the `linux-desktop` module.
 - The machine kept awake: the closed-lid guard (`DOTFILES_BATTERY_RESERVE=1`
-  in `mise.local.toml`) holds a system inhibitor with no login.
+  in `mise/config.local.toml`) holds a system inhibitor with no login.
 - The disk unlocked after each power-on (`mise linux:unlock sagittarius-a`).
   Until then, nothing starts.
 
@@ -263,9 +276,10 @@ migrate once after pulling. The pull breaks the `~/.config/mise/tasks` link, so 
 zsh "${DOTFILES_PATH}/mise/tasks/dotfiles/migrate-devices" [device]
 ```
 
-It moves `.mise.local.toml` to `mise.local.toml`, links the device file, re-points the
-dotfile links at the renamed paths, removes `~/.Brewfile`, moves `.local/Brewfile`
-entries to `mise.local.toml` and checks nothing is missing.
+It moves existing `mise.local.toml` or `.mise.local.toml` overrides to
+`mise/config.local.toml`, links the device file and runtime config, and applies
+the dotfile links. It also moves old Brewfile entries into the local config.
+It does not migrate the contents of `~/.local`; see Local configurations below.
 
 After pulling changes, converge with:
 
@@ -307,20 +321,32 @@ All personal repos live under `~/workspace/`. Dotfiles are cloned to:
 ~/workspace/self/dotfiles
 ```
 
-This path is declared in `mise.toml` as `[env].DOTFILES_PATH` and `[bootstrap.repos]`, exported in `.zshrc` and `.bashrc`, and used by `bootstrap/install.sh`.
+This path is declared in `mise/config.toml` as `[env].DOTFILES_PATH` and in
+`mise.toml` as `[bootstrap.repos]`. The shell files `zsh/zshrc` and `bash/bashrc`
+export it too. The installer uses the same path.
 
 ### Local configurations
 
-Anything living under [`.local`](./.local) folder is ignored from git. This folder is intended
-for storing anything system specific that isn't from the dotfiles repo.
+`~/.local` is a real directory owned by the machine. Bootstrap does not link or
+replace it. Git reads machine settings from `~/.local/.gitconfig`, and zsh
+reads `~/.local/.zprofile` when that file exists.
 
-Currently the only special thing there is the system specific Git configurations, which
-are included as `~/.local/.gitconfig` in the main `.gitconfig` file. During bootstrap
-a symlink is created pointing `~/.local` to `./.local`, and you can add
-`./.local/.gitconfig` with machine-specific Git settings.
+Older machines can still have `~/.local` linked to this repo's `.local/`.
+Before replacing that link, copy all contents, including hidden files, state,
+permissions, and internal links, into a new directory. Check the copy and any
+active writers before switching paths. Keep the original repo directory as a
+backup. It remains gitignored. Bootstrap does not perform this data migration.
 
-Per-machine mise overrides live in `mise.local.toml` (git-ignored). Copy from
-`mise.local.toml.sample` or let bootstrap seed it on first run.
+AWS config and Homebrew aliases are no longer managed by this repo. Preserve
+any machine files behind their old repo links before removing those links.
+
+Per-machine Mise overrides live in `mise/config.local.toml` (gitignored).
+Copy from [`mise/config.local.toml.sample`](./mise/config.local.toml.sample), or
+let bootstrap seed it. The seed task preserves overrides from the old paths.
+
+Shared agent instructions, skill sources, and the Cursor instruction template
+live together in [`agents/`](./agents): `AGENTS.md`, `agents.toml`, and
+`cursor.mdc.tera`. App-specific settings remain in their app folders.
 
 Codex execution-policy rules live under [`codex/rules`](./codex/rules).
 Mise links them into `~/.codex/rules` without replacing Codex's machine-local

@@ -1,5 +1,6 @@
 #!/usr/bin/env zsh
-#MISE description="Move this machine to its devices/ file, undotted mise paths and mise-managed Homebrew packages"
+#MISE description="Move this machine to the current device and config layout"
+set -e
 
 # One-time move from MISE_ENV/.miserc.local.toml, the dotted .mise.* paths and the
 # Brewfile. Safe to repeat. The pull breaks the ~/.config/mise/tasks link, so run it
@@ -13,11 +14,8 @@ if [[ ! -f "${device_file}" ]]; then
   exit 1
 fi
 
-# The git-ignored local config follows the rename; the pull leaves only caches in .mise/
-if [[ -f "${DOTFILES_PATH}/.mise.local.toml" && ! -e "${DOTFILES_PATH}/mise.local.toml" ]]; then
-  mv "${DOTFILES_PATH}/.mise.local.toml" "${DOTFILES_PATH}/mise.local.toml"
-  echo "Moved .mise.local.toml to mise.local.toml"
-fi
+# Keep existing local overrides when the layout changes.
+zsh "${DOTFILES_PATH}/mise/tasks/dotfiles/seed-local"
 if [[ -d "${DOTFILES_PATH}/.mise" ]]; then
   find "${DOTFILES_PATH}/.mise" -type d -name __pycache__ -prune -exec rm -rf {} +
   find "${DOTFILES_PATH}/.mise" -depth -type d -empty -delete
@@ -26,12 +24,38 @@ fi
 
 # The device file replaces the generated .miserc.local.toml
 mkdir -p ~/.config/mise
-ln -sfn "${device_file}" ~/.config/mise/miserc.local.toml
+ln -sfn "${device_file}" ~/.config/mise/miserc.toml
 rm -f "${DOTFILES_PATH}/.miserc.local.toml"
-echo "Linked devices/${device}.toml to ~/.config/mise/miserc.local.toml"
+# Remove only the old selector link for this same device.
+if [[ -L ~/.config/mise/miserc.local.toml && "$(readlink ~/.config/mise/miserc.local.toml)" == "${device_file}" ]]; then
+  rm ~/.config/mise/miserc.local.toml
+fi
+echo "Linked devices/${device}.toml to ~/.config/mise/miserc.toml"
+
+# Load runtime config and tasks before applying the setup links.
+ln -sfn "${DOTFILES_PATH}/mise/config.toml" ~/.config/mise/config.toml
+ln -sfn "${DOTFILES_PATH}/mise/config.local.toml" ~/.config/mise/config.local.toml
+ln -sfn "${DOTFILES_PATH}/mise/tasks" ~/.config/mise/tasks
 
 # Trust the renamed configs, then re-point the dotfile links (config, tasks, skills) at them
 zsh "${DOTFILES_PATH}/mise/tasks/dotfiles/trust"
+# The old layout linked one Git file and only the ignore file under ~/.config/git.
+# Keep that directory as a backup before linking the complete Git config folder.
+if [[ -L ~/.gitconfig && "$(readlink ~/.gitconfig)" == "${DOTFILES_PATH}/.gitconfig" ]]; then
+  if [[ -d ~/.config/git && ! -L ~/.config/git ]]; then
+    if [[ "$(ls -A ~/.config/git)" != "ignore" || "$(readlink ~/.config/git/ignore)" != "${DOTFILES_PATH}/git/ignore" ]]; then
+      echo "~/.config/git has unmanaged files. Preserve and merge them before migration." >&2
+      exit 1
+    fi
+    if [[ -e ~/.config/git.before-layout || -L ~/.config/git.before-layout ]]; then
+      echo "~/.config/git.before-layout already exists. Preserve it before migration." >&2
+      exit 1
+    fi
+    mv ~/.config/git ~/.config/git.before-layout
+  fi
+  rm ~/.gitconfig
+fi
+
 mise bootstrap dotfiles apply --yes -C "${DOTFILES_PATH}"
 
 # ~/.Brewfile pointed at the removed Brewfile
@@ -40,7 +64,7 @@ if [[ -L ~/.Brewfile && "$(readlink ~/.Brewfile)" == "${DOTFILES_PATH}/Brewfile"
   echo "Removed the ~/.Brewfile link"
 fi
 
-# Machine-specific Brewfile entries move to mise.local.toml
+# Machine-specific Brewfile entries move to the runtime local config
 local_brewfile="${DOTFILES_PATH}/.local/Brewfile"
 if [[ -f "${local_brewfile}" ]]; then
   packages=()
@@ -54,7 +78,7 @@ if [[ -f "${local_brewfile}" ]]; then
     fi
   done < "${local_brewfile}"
   if (( ${#packages[@]} )); then
-    mise bootstrap packages use --no-install -p "${DOTFILES_PATH}/mise.local.toml" "${packages[@]}"
+    mise bootstrap packages use --no-install -p "${DOTFILES_PATH}/mise/config.local.toml" "${packages[@]}"
   fi
   mv "${local_brewfile}" "${local_brewfile}.migrated"
   echo "Moved .local/Brewfile to .local/Brewfile.migrated"

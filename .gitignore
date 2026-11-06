@@ -87,9 +87,10 @@ Temporary Items
 
 # End of https://www.gitignore.io/api/git,zsh,visualstudiocode
 
-### AWSCLI ###
-.aws
-!.aws/cli/alias
+### Unmanaged machine data ###
+/.aws/
+/.brew-aliases/
+/.local/
 
 ### Claude Code ###
 .claude/worktrees/
@@ -98,8 +99,9 @@ CLAUDE.local.md
 
 ### Mise ###
 
-mise.local.toml
-!mise.local.toml.sample
+/mise/config.local.toml
+!/mise/config.local.toml.sample
+/mise.local.toml
 # Pre-rename name, until `m dotfiles:migrate-devices` moves it
 .mise.local.toml
 .miserc.local.toml

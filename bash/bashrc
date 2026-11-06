@@ -1,7 +1,7 @@
 # Bash mirrors the zsh setup (.zshrc, omz/auto). Claude Code runs its Bash tool
 # in bash (CLAUDE_CODE_SHELL in claude/settings.json) and sources this file.
 
-# Canonical clone path — keep in sync with mise.toml [env] DOTFILES_PATH
+# Canonical clone path — keep in sync with mise/config.toml [env] DOTFILES_PATH
 export DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/workspace/self/dotfiles}"
 
 # Non-login shells on Linux (e.g. `ssh host cmd`) skip .bash_profile, load Homebrew here as a fallback
@@ -23,4 +23,4 @@ for file in "${DOTFILES_PATH}/bash/"{aliases,history,keybindings,view}.bash; do
 done
 unset file
 
-source <(oh-my-posh init bash --config "${DOTFILES_PATH}/omp.toml")
+source <(oh-my-posh init bash --config "${DOTFILES_PATH}/oh-my-posh/config.toml")

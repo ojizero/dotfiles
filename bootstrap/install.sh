@@ -1,8 +1,9 @@
 #! /bin/bash
+set -e
 
-# Canonical paths — keep in sync with mise.toml [env] DOTFILES_PATH and [bootstrap.repos]
+# Keep these paths in sync with mise/config.toml [env] and mise.toml [bootstrap.repos].
 DOTFILES_CLONE_PATH=${DOTFILES_CLONE_PATH:-~/workspace/self}
-DOTFILES_PATH=${DOTFILES_PATH:-${DOTFILES_CLONE_PATH}/dotfiles}
+export DOTFILES_PATH=${DOTFILES_PATH:-${DOTFILES_CLONE_PATH}/dotfiles}
 
 # Simply here as a workaround to allow HomeBrew installation to proceed while not being run as root.
 # Ref: https://github.com/orgs/Homebrew/discussions/4311#discussioncomment-5240151
@@ -39,13 +40,6 @@ if ! command -v mise >/dev/null 2>&1; then
   brew install mise
 fi
 
-# Point mise at repo config before symlinks exist
-export MISE_CONFIG_FILE="${DOTFILES_PATH}/mise.toml"
-mise trust "${DOTFILES_PATH}/mise.toml"
-for module in "${DOTFILES_PATH}"/mise.*.toml; do
-  [[ "${module}" == *mise.local.toml ]] || mise trust "${module}"
-done
-
 # Device file (devices/<name>.toml, default: the short hostname) picks the OS and machine
 # modules; linked where mise reads it before any config, for later runs
 DEVICE=${DEVICE:-$(hostname -s | tr '[:upper:]' '[:lower:]')}
@@ -54,10 +48,14 @@ if [[ ! -f "${DOTFILES_PATH}/devices/${DEVICE}.toml" ]]; then
   exit 1
 fi
 mkdir -p ~/.config/mise
-ln -sfn "${DOTFILES_PATH}/devices/${DEVICE}.toml" ~/.config/mise/miserc.local.toml
+ln -sfn "${DOTFILES_PATH}/devices/${DEVICE}.toml" ~/.config/mise/miserc.toml
 
-# Seed local config if first run
-[[ -f mise.local.toml ]] || cp mise.local.toml.sample mise.local.toml
+# Make the runtime config and global tasks available before bootstrap.
+zsh "${DOTFILES_PATH}/mise/tasks/dotfiles/seed-local"
+ln -sfn "${DOTFILES_PATH}/mise/config.toml" ~/.config/mise/config.toml
+ln -sfn "${DOTFILES_PATH}/mise/config.local.toml" ~/.config/mise/config.local.toml
+ln -sfn "${DOTFILES_PATH}/mise/tasks" ~/.config/mise/tasks
+zsh "${DOTFILES_PATH}/mise/tasks/dotfiles/trust"
 
 # Single convergence command (packages, symlinks, tools, macOS extras)
 mise bootstrap --yes --force-dotfiles

@@ -14,7 +14,6 @@ export HOMEBREW_NO_ANALYTICS=1
 export EDITOR="${EDITOR:-nvim}"
 
 export PAGER='less -RFX'
-export AWS_PAGER='less -RFX'
 
 # Misc configs, taken from OhMyZsh
 # https://github.com/ohmyzsh/ohmyzsh/blob/2056aeeeaddd977eb205619c6f236b94dac896be/lib/misc.zsh

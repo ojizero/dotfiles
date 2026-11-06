@@ -1,6 +1,6 @@
 # Linux module: system packages and login shell for every Ubuntu device.
 # Loaded automatically on Linux by `auto_env = true` in the device file
-# (devices/<name>.toml, linked to ~/.config/mise/miserc.local.toml).
+# (devices/<name>.toml, linked to ~/.config/mise/miserc.toml).
 
 [bootstrap.packages]
 
@@ -11,7 +11,7 @@
 "apt:libnss3-tools" = "latest"
 "apt:libssl-dev" = "latest"
 "apt:zsh" = "latest"
-# macOS takes the maintainer's cask from extras.setup instead.
+# macOS takes the maintainer's cask from the setup task instead.
 "brew:oh-my-posh" = "latest"
 
 [bootstrap.user]

@@ -1,4 +1,5 @@
 #!/usr/bin/env zsh
+#MISE description="Install the Cua Driver and start the agent desktop"
 
 # Agent desktop for the computer-use module, run by its final bootstrap hook: the
 # Cua Driver, the agent-desktop user services, and the Cua MCP server for the

@@ -1,4 +1,4 @@
-# Canonical clone path — keep in sync with mise.toml [env] DOTFILES_PATH
+# Canonical clone path — keep in sync with mise/config.toml [env] DOTFILES_PATH
 export DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/workspace/self/dotfiles}"
 
 # Non-login shells on Linux (e.g. `ssh host cmd`) skip .zprofile, load Homebrew here as a fallback
@@ -16,9 +16,9 @@ if [[ -o interactive && ( "${ZSH_EXECUTION_STRING}" == *__T3CODE_ENV_* || -n "${
 else
   eval "$(mise activate zsh)"
 fi
-source <(cat "${DOTFILES_PATH}/omz/auto/"*.zsh)
-source "${DOTFILES_PATH}/omz/plugins/view/view.zsh"
+source <(cat "${DOTFILES_PATH}/zsh/omz/auto/"*.zsh)
+source "${DOTFILES_PATH}/zsh/omz/plugins/view/view.zsh"
 
 # This ideally is run earlier on, but for some reason the keybindings bit
 # breaks the transient mode, no idea why but moving this here fixes it.
-source <(oh-my-posh init zsh --config "${DOTFILES_PATH}/omp.toml")
+source <(oh-my-posh init zsh --config "${DOTFILES_PATH}/oh-my-posh/config.toml")

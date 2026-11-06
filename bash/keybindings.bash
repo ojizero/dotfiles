@@ -1,4 +1,4 @@
-# Readline settings, same intent as omz/auto/keybindings.zsh and completions.zsh
+# Readline settings, same intent as zsh/omz/auto/keybindings.zsh and completions.zsh
 
 set -o emacs
 

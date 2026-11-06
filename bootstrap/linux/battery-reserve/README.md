@@ -7,11 +7,11 @@ or module unload hooks.
 
 ## Linux bootstrap integration
 
-`bootstrap/linux/extras.setup` calls `battery-reserve/bootstrap.sh`. It runs
+`bootstrap/tasks/setup/linux` calls `battery-reserve/bootstrap.sh`. It runs
 the same reviewed installer when `/etc/battery-reserve.conf` already exists,
 or when `DOTFILES_BATTERY_RESERVE=1` opts in on a fresh machine. Other desktops
 skip it by default. Set `DOTFILES_BATTERY_RESERVE=0` to skip it explicitly.
-The optional `[env]` entry is documented in `mise.local.toml.sample`.
+The optional `[env]` entry is documented in `mise/config.local.toml.sample`.
 For a fresh device, use a device file that selects `linux-desktop` and opt in, for example:
 
 ```sh

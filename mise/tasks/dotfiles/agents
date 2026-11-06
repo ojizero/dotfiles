@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
-#MISE description="Install agent skills from dotagent/agents.toml"
+#MISE description="Install agent skills from agents/agents.toml"
 
 # `mise x` puts the tool on PATH even when the shell is not activated.
 mise x -- dotagents install

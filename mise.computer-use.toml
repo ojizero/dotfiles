@@ -30,13 +30,6 @@
 "~/.agent-desktop/data/applications/helium.desktop" = "agent-desktop/applications/helium.desktop"
 "~/.agent-desktop/data/applications/app.zen_browser.zen.desktop" = "agent-desktop/applications/app.zen_browser.zen.desktop"
 
-# A second `[tasks.bootstrap]` would replace linux-desktop's, so this module hooks in
-# its own task; hooks from every module run
 [bootstrap.hooks.final]
 
-run = "MISE_TASK_RUN_AUTO_INSTALL=0 mise run computer-use:setup"
-
-[tasks."computer-use:setup"]
-
-description = "Install the Cua Driver and start the agent desktop (headless Sway, VNC, Cua daemon)"
-run = 'zsh "${DOTFILES_PATH}/bootstrap/linux/computer-use.setup"'
+run = "MISE_TASK_RUN_AUTO_INSTALL=0 mise run setup:computer-use"

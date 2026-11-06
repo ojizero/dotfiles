@@ -1,4 +1,5 @@
 #!/usr/bin/env zsh
+#MISE description="Set up macOS preferences and extra applications"
 
 DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/workspace/self/dotfiles}"
 cache_dir="${DOTFILES_PATH}/bootstrap/.cache"

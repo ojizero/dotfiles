@@ -1,7 +1,8 @@
 #!/usr/bin/env zsh
+#MISE description="Set up the Linux desktop"
 
-# Ubuntu desktop counterpart to bootstrap/macos/extras.setup, run by the
-# linux-desktop module's bootstrap task. Every step is safe to repeat.
+# Ubuntu desktop counterpart to bootstrap/tasks/setup/macos, run by the
+# linux-desktop module's final hook. Every step is safe to repeat.
 
 DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/workspace/self/dotfiles}"
 
@@ -31,7 +32,7 @@ for app in app.zen_browser.zen md.obsidian.Obsidian it.mijorus.smile org.gnome.W
   flatpak info --user "${app}" >/dev/null 2>&1 || flatpak install --user --noninteractive flathub "${app}"
 done
 
-# ~/.local is already a whole-directory dotfile, so deploy this launcher here.
+# Install the launcher into the machine-owned local directory.
 if ! cmp -s "${DOTFILES_PATH}/bootstrap/linux/bin/keepassxc-cli" "${HOME}/.local/bin/keepassxc-cli" || [[ ! -x "${HOME}/.local/bin/keepassxc-cli" ]]; then
   install -Dm755 "${DOTFILES_PATH}/bootstrap/linux/bin/keepassxc-cli" "${HOME}/.local/bin/keepassxc-cli"
 fi

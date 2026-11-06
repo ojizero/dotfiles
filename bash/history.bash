@@ -1,4 +1,4 @@
-# History settings, same intent as omz/auto/history.zsh
+# History settings, same intent as zsh/omz/auto/history.zsh
 
 HISTFILE="${HOME}/.bash_history"
 HISTSIZE=50000

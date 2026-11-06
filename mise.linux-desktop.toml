@@ -2,11 +2,6 @@
 # Select it per device in devices/<name>.toml (env = ["linux-desktop"]); servers
 # leave it out and get only the base and linux configs.
 
-[tools]
-
-# Key remapper behind the Mac-style shortcuts (GNOME build); mise keeps it updated
-"github:xremap/xremap" = { version = "latest", matching = "gnome" }
-
 # Vendor apt repositories (mise writes /etc/apt/sources.list.d/mise-<name>.sources)
 [bootstrap.apt.sources.tailscale]
 uris = "https://pkgs.tailscale.com/stable/ubuntu"
@@ -28,7 +23,7 @@ fingerprint = "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
 [bootstrap.packages]
 
 # Apps whose daemon or Chromium sandbox needs a system install (AppArmor profiles ship with the .deb).
-# Cursor manages its own apt source, so extras.setup installs its .deb instead.
+# Cursor manages its own apt source, so the setup task installs its .deb instead.
 "apt:tailscale" = "latest"
 "apt:helium-bin" = "latest"
 # Lists, toggles and opens the settings of GNOME extensions (GNOME Tweaks no longer does)
@@ -66,9 +61,11 @@ state = "running"
 
 [dotfiles]
 
+"~/.config/mise/config.linux-desktop.toml" = "mise/config.linux-desktop.toml"
+
 "~/.config/xremap" = "xremap"
 "~/.config/systemd/user/mac-keyboard.service" = "xremap/mac-keyboard.service"
 
-[tasks.bootstrap]
+[bootstrap.hooks.final]
 
-run = 'zsh "${DOTFILES_PATH}/bootstrap/linux/extras.setup"'
+run = "MISE_TASK_RUN_AUTO_INSTALL=0 mise run setup:linux"

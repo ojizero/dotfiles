@@ -1,4 +1,4 @@
-# Aliases and functions, same as omz/auto/aliases.zsh
+# Aliases and functions, same as zsh/omz/auto/aliases.zsh
 #
 
 if type gls > /dev/null 2>&1; then

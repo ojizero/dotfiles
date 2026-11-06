@@ -1,4 +1,4 @@
-# Tool related environment variables, same as omz/auto/misc.zsh
+# Tool related environment variables, same as zsh/omz/auto/misc.zsh
 #
 
 export HOMEBREW_NO_ANALYTICS=1
@@ -10,7 +10,6 @@ export HOMEBREW_NO_ANALYTICS=1
 export EDITOR="${EDITOR:-nvim}"
 
 export PAGER='less -RFX'
-export AWS_PAGER='less -RFX'
 
 [[ $- == *i* ]] || return 0
 
