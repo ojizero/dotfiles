@@ -42,4 +42,4 @@
   - Polaris (`polaris`, no SSH): the main MacBook Pro.
   - Obsidian (`fts-macbook`, hostname `Amir-Alkam`): a MacBook Pro.
   - Sagittarius A* (`sagittarius-a`): a MacBook running Ubuntu Pro.
-  - Atlas (`atlas`): a Synology DSM server.
+  - Atlas (`atlas`, no agents or dotfiles): a Synology DSM server.
