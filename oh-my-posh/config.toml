@@ -8,7 +8,8 @@ final_space = true
   background = 'transparent'
 
 [transient_prompt]
-  template = '❯ '
+  # Segments do not run here, so read the env vars the session segment uses.
+  template = '{{ if or .Env.SSH_CONNECTION .Env.SSH_CLIENT }}<cyan>󰒋</> {{ else if .Env.REX_SESSION }}<magenta>󰞷</> {{ end }}❯ '
   background = 'transparent'
   foreground_templates = ['{{if gt .Code 0}}red{{end}}', '{{if eq .Code 0}}green{{end}}']
 
