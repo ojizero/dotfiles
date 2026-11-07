@@ -38,3 +38,8 @@
 - Applications, CLIs included, come from the platform's package manager.
   - On macOS, use Homebrew (Casks for desktop apps). If only the App Store has an app, tell me and I install it.
   - On Linux, use the distro package manager first, then Homebrew. Use AppImage, Flatpak, or Snap only when it is the sole official option.
+- I call my machines by name. Reach each one by the name in brackets: its Tailnet name, SSH host, and hostname, unless noted.
+  - Polaris (`polaris`, no SSH): the main MacBook Pro.
+  - Obsidian (`fts-macbook`, hostname `Amir-Alkam`): a MacBook Pro.
+  - Sagittarius A* (`sagittarius-a`): a MacBook running Ubuntu Pro.
+  - Atlas (`atlas`): a Synology DSM server.
