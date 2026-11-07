@@ -18,7 +18,7 @@ final_space = true
   newline = true
 
   [[blocks.segments]]
-    template = '{{ if .SSHSession }}<cyan>󰒋</> <yellow>{{ .HostName }}</>: {{ end }}'
+    template = '{{ if .SSHSession }}<cyan>󰒋</> <yellow>{{ .HostName }}</>: {{ else if .Env.REX_SESSION }}<magenta>󰞷</> {{ end }}'
     background = 'transparent'
     type = 'session'
     style = 'plain'
