@@ -23,6 +23,7 @@ includes = ["bootstrap/tasks"]
 "~/.claude/statusline-command.sh" = "claude/statusline-command.sh"
 "~/.config/uv" = "uv"
 "~/.config/ghostty" = "ghostty"
+"~/.config/rex" = "rex"
 "~/.config/nvim" = "nvim"
 "~/.config/zed" = "zed"
 "~/.config/worktrunk" = "worktrunk"
@@ -35,6 +36,7 @@ includes = ["bootstrap/tasks"]
 # and needs the `alwaysApply` frontmatter, so render it on top of AGENTS.md.
 "~/.cursor/rules/agents.mdc" = { source = "agents/cursor.mdc.tera", mode = "template" }
 "~/.agents/agents.toml" = "agents/agents.toml"
+"~/.agents/sources/rex" = "rex/skills/rex"
 
 [bootstrap.repos]
 

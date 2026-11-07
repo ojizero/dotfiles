@@ -17,6 +17,11 @@ git_domains = ["ssh-forge.ojizero.dev/ojizero"]
 name = "cortex"
 source = "git:git@ssh-forge.ojizero.dev:ojizero/cortex.git"
 
+# Local sources resolve from ~/.agents; Mise links this source directory.
+[[skills]]
+name = "rex"
+source = "path:sources/rex"
+
 # dotagents scans only the repo root and `skills/` for a bare wildcard, so
 # `path = "."` makes it walk the `<group>/<skill>` folders recursively.
 [[skills]]
