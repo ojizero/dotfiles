@@ -92,6 +92,9 @@ run = "MISE_TASK_RUN_AUTO_INSTALL=0 mise run setup:macos"
 
 [dotfiles]
 
+# Use the CLI bundled with Rex Beta outside Rex terminals.
+"~/.local/bin/rex" = "/Applications/Rex Beta.app/Contents/Helpers/Rex Server.rex/Contents/MacOS/rex"
+
 # Claude Code runs its Bash tool in bash 5. It needs a full path: it also
 # exports the value as SHELL, and ssh runs ProxyCommand through SHELL.
 "~/.claude/settings.json/macos" = { source = "claude/settings.macos.json", merge = true }
