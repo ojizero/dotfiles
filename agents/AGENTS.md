@@ -41,5 +41,5 @@
 - I call my machines by name. Reach each one by the name in brackets: its Tailnet name, SSH host, and hostname, unless noted.
   - Polaris (`polaris`, no SSH): the main MacBook Pro.
   - Obsidian (`fts-macbook`, hostname `Amir-Alkam`): a MacBook Pro.
-  - Sagittarius A* (`sagittarius-a`): a MacBook running Ubuntu Pro.
+  - Sagittarius A* (`sagittarius-a`): a MacBook Pro running Ubuntu.
   - Atlas (`atlas`, no agents or dotfiles): a Synology DSM server.
