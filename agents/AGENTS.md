@@ -29,6 +29,9 @@
   - Any workspace can have a `playground` folder for code cloned only to explore, and for experimental POCs.
   - Create or clone new projects in a workspace. If the workspace is unclear, ask.
 - `~/workspace/self/dotfiles` defines the environment. Its configs are linked or copied into place: edit them in dotfiles, not at the target. Changes for this machine only go in its untracked local files.
+- Files you make for a task, such as logs, evidence, notes, and backups, are temporary, on every machine. Put them in the task's scratch folder, or in a temporary folder when there is no scratch folder.
+  - On another machine, use a temporary folder there, or copy the files back to the local scratch or temporary folder.
+  - When a file must stay after the task, keep it there too and give its path in your report. I move it later if I need to.
 - Ask me before you add anything at global scope: the global Mise config, Homebrew, or system packages. One-off `mise exec` runs of trusted tools (well-known, from the official source) need no approval.
 - Mise is the one source of truth for development tools, runtimes included, and for CLIs that Homebrew does not ship (for example, npm packages or GitHub releases such as Pi).
   - Use `mise use` for tools a project keeps, `mise exec <tool> -- <cmd>` for one-off runs, and the `npm:` or `pipx:` backends for npm and Python tools. These replace `npx`, `uvx`, `npm i -g`, and `uv tool install`.
