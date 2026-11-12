@@ -1,7 +1,8 @@
+#!/usr/bin/env bun
 // Print the dotagents config: the shared agents.toml with the machine's
 // agents.local.toml merged on top. The local file is optional.
 //
-// Usage: bun agents/merge-config.ts SHARED LOCAL
+// Usage: agents/merge-config.ts SHARED LOCAL
 //
 // The rules follow Mise's local configs, except for arrays:
 // - A value in LOCAL replaces the one in SHARED.
