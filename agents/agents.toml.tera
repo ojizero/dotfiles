@@ -1,0 +1,1 @@
+{{ exec(command="mise x bun -- bun agents/merge-config.ts agents/agents.toml agents/agents.local.toml") }}

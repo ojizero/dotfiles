@@ -2,6 +2,9 @@
 #MISE description="Pull dotfiles and converge machine state"
 
 old_ref="$(git -C "${DOTFILES_PATH}" rev-parse HEAD)"
+# The apply renders agents.toml from the shared and local files, so compare
+# the result: a change in either file needs a new `dotagents install`.
+old_agents="$(cat ~/.agents/agents.toml 2>/dev/null)"
 git -C "${DOTFILES_PATH}" pull -p
 # Apply dotfiles + tools only — avoid full bootstrap (defaults, extras); packages only when configs changed
 # Load the setup config from the repo; it is separate from the global runtime config.
@@ -17,6 +20,6 @@ elif git -C "${DOTFILES_PATH}" diff --name-only "${old_ref}" HEAD -- 'mise.toml'
   mise bootstrap packages apply --yes -C "${DOTFILES_PATH}"
 fi
 
-if git -C "${DOTFILES_PATH}" diff --name-only "${old_ref}" HEAD -- agents/agents.toml | grep -q .; then
+if [[ "$(cat ~/.agents/agents.toml 2>/dev/null)" != "${old_agents}" ]]; then
   mise run dotfiles:agents
 fi

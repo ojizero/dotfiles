@@ -348,6 +348,14 @@ Shared agent instructions, skill sources, and the Cursor instruction template
 live together in [`agents/`](./agents): `AGENTS.md`, `agents.toml`, and
 `cursor.mdc.tera`. App-specific settings remain in their app folders.
 
+Private skill sources and trust entries go in `agents/agents.local.toml`
+(gitignored, optional). Mise renders `~/.agents/agents.toml` from both files
+with [`agents/merge-config.ts`](./agents/merge-config.ts): local values win,
+tables merge by key, and arrays concatenate without duplicates. Edit the repo
+files, not `~/.agents/agents.toml`, then run `m dotfiles:sync` or
+`mise dot apply && m dotfiles:agents`. A mutating `dotagents` command such as
+`dotagents add` edits the rendered file, and the next apply overwrites it.
+
 Codex execution-policy rules live under [`codex/rules`](./codex/rules).
 Mise links them into `~/.codex/rules` without replacing Codex's machine-local
 configuration, credentials, plugins, or runtime state.

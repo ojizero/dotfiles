@@ -35,7 +35,9 @@ includes = ["bootstrap/tasks"]
 # Cursor has no global AGENTS.md; it reads `.cursor/rules` in ancestor dirs,
 # and needs the `alwaysApply` frontmatter, so render it on top of AGENTS.md.
 "~/.cursor/rules/agents.mdc" = { source = "agents/cursor.mdc.tera", mode = "template" }
-"~/.agents/agents.toml" = "agents/agents.toml"
+# Rendered, not linked: agents/merge-config.ts merges the machine's optional,
+# gitignored agents/agents.local.toml on top of agents/agents.toml.
+"~/.agents/agents.toml" = { source = "agents/agents.toml.tera", mode = "template" }
 "~/.agents/sources/rex" = "rex/skills/rex"
 
 [bootstrap.repos]
