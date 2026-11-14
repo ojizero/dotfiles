@@ -48,8 +48,12 @@ else
   printf '%s is already unlocked; continuing with the GNOME session.\n' "$device"
 fi
 
-# Transfer the versioned helper separately so the final SSH session has a real
-# terminal for sudo. Passwords and private keys stay with SSH/PAM, never argv.
-ssh "$device" 'umask 077; mkdir -p "$HOME/.local/lib/dotfiles"; cat > "$HOME/.local/lib/dotfiles/gnome-login.sh"' \
-  < "$task_dir/lib/gnome-login.sh"
+# Transfer the versioned helpers separately so the final SSH session has a real
+# terminal for sudo and the keyring passphrase. Passwords and private keys are
+# typed into that terminal, never put in argv.
+for helper in gnome-login.sh unlock-login-keyring.py; do
+  # shellcheck disable=SC2029 # $helper is a fixed file name, expanded locally.
+  ssh "$device" "umask 077; mkdir -p ~/.local/lib/dotfiles; cat > ~/.local/lib/dotfiles/$helper" \
+    < "$task_dir/lib/$helper"
+done
 ssh -t "$device" 'bash "$HOME/.local/lib/dotfiles/gnome-login.sh"'

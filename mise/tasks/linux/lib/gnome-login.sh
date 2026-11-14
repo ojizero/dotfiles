@@ -141,6 +141,12 @@ PY
   runtime_dir=
 fi
 
+# GDM autologin unlocks the login keyring only while systemd-cryptsetup still
+# caches the LUKS passphrase. Ask for it here when that cache had expired.
+# Report a locked keyring only after the screen is locked.
+keyring_unlocked=true
+python3 "$(dirname -- "${BASH_SOURCE[0]}")/unlock-login-keyring.py" || keyring_unlocked=false
+
 # Autostart normally launches Ghostty. If GNOME was already running, start the
 # same helper using its imported graphical environment. The helper is singleton.
 inhibitor_running() {
@@ -170,4 +176,6 @@ until screen_locked; do
   sleep 1
 done
 echo 'GNOME is running with idle/suspend inhibited and the screen locked.'
-echo 'Keep the Ghostty inhibitor window open. Apps using the login keyring may still require its password.'
+echo 'Keep the Ghostty inhibitor window open.'
+[[ $keyring_unlocked == true ]] || fail 'The login keyring is still locked. Run this task again to retry.'
+echo 'The login keyring is unlocked.'
