@@ -22,12 +22,9 @@ source = "git:git@ssh-forge.ojizero.dev:ojizero/cortex.git"
 name = "rex"
 source = "path:sources/rex"
 
-# dotagents scans only the repo root and `skills/` for a bare wildcard, so
-# `path = "."` makes it walk the `<group>/<skill>` folders recursively.
 [[skills]]
 name = "*"
 source = "git:git@ssh-forge.ojizero.dev:ojizero/skills.git"
-path = "."
 
 [[skills]]
 name = "writing-for-agents"
