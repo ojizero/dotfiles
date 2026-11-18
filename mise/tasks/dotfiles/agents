@@ -3,4 +3,14 @@
 
 # `mise x` puts the tool on PATH even when the shell is not activated.
 mise x -- dotagents install
+
+# dotagents names the installed folder after the agents.toml entry, but
+# copies SKILL.md as is. Agents that read the frontmatter `name` show the
+# upstream name, so make it match the folder of each renamed skill.
+for skill in ~/.agents/skills/*/SKILL.md(N); do
+  name="${skill:h:t}"
+  grep -qx "name: ${name}" "${skill}" && continue
+  perl -0pi -e "s/\\A(---\\n(?:(?!---\\n).*\\n)*?)name:[^\\n]*/\${1}name: ${name}/" "${skill}"
+done
+
 mise x -- dotagents doctor
