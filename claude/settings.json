@@ -7,6 +7,7 @@
     "defaultMode": "auto"
   },
   "disableClaudeAiConnectors": true,
+  "syncClaudeAiSkills": false,
   "statusLine": {
     "type": "command",
     "command": "zsh ~/.claude/statusline-command.sh"
