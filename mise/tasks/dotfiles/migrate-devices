@@ -64,26 +64,6 @@ if [[ -L ~/.Brewfile && "$(readlink ~/.Brewfile)" == "${DOTFILES_PATH}/Brewfile"
   echo "Removed the ~/.Brewfile link"
 fi
 
-# Machine-specific Brewfile entries move to the runtime local config
-local_brewfile="${DOTFILES_PATH}/.local/Brewfile"
-if [[ -f "${local_brewfile}" ]]; then
-  packages=()
-  while IFS= read -r line; do
-    if [[ "${line}" =~ '^ *brew "([^"]+)"' ]]; then
-      packages+=("brew:${match[1]}")
-    elif [[ "${line}" =~ '^ *cask "([^"]+)"' ]]; then
-      packages+=("brew-cask:${match[1]}")
-    elif [[ "${line}" =~ '^ *mas ' ]]; then
-      echo "Skipped (no Mac App Store support): ${line}" >&2
-    fi
-  done < "${local_brewfile}"
-  if (( ${#packages[@]} )); then
-    mise bootstrap packages use --no-install -p "${DOTFILES_PATH}/mise/config.local.toml" "${packages[@]}"
-  fi
-  mv "${local_brewfile}" "${local_brewfile}.migrated"
-  echo "Moved .local/Brewfile to .local/Brewfile.migrated"
-fi
-
 zsh "${DOTFILES_PATH}/mise/tasks/dotfiles/trust"
 
 # Homebrew already installed everything from the Brewfile, so nothing should be missing

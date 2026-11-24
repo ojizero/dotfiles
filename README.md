@@ -278,7 +278,9 @@ zsh "${DOTFILES_PATH}/mise/tasks/dotfiles/migrate-devices" [device]
 
 It moves existing `mise.local.toml` or `.mise.local.toml` overrides to
 `mise/config.local.toml`, links the device file and runtime config, and applies
-the dotfile links. It also moves old Brewfile entries into the local config.
+the dotfile links. It removes the old `~/.Brewfile` link, but it does not move
+`.local/Brewfile` entries. Add the packages that bootstrap must install to a
+setup module such as `mise.macos.toml`, and manage the others with `brew`.
 It does not migrate the contents of `~/.local`; see Local configurations below.
 
 After pulling changes, converge with:
