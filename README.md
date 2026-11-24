@@ -346,6 +346,14 @@ Per-machine Mise overrides live in `mise/config.local.toml` (gitignored).
 Copy from [`mise/config.local.toml.sample`](./mise/config.local.toml.sample), or
 let bootstrap seed it. The seed task preserves overrides from the old paths.
 
+Tools that one workspace needs go in that workspace's `mise.toml`, for
+example `~/workspace/<org>/mise.toml`. These files are not in this repo.
+Mise loads them only under that folder and merges them with the global
+and local configs. When two configs set the same tool, the nearer config
+wins and its version list replaces the other one. Run
+`mise trust` on a new workspace file once. Do not use `~/mise.toml`: it
+is a second global config that this repo does not manage.
+
 Shared agent instructions, skill sources, and the Cursor instruction template
 live together in [`agents/`](./agents): `AGENTS.md`, `agents.toml`, and
 `cursor.mdc.tera`. App-specific settings remain in their app folders.

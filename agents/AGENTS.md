@@ -36,6 +36,7 @@
 - Mise is the one source of truth for development tools, runtimes included, and for CLIs that Homebrew does not ship (for example, npm packages or GitHub releases such as Pi).
   - Use `mise use` for tools a project keeps, `mise exec <tool> -- <cmd>` for one-off runs, and the `npm:` or `pipx:` backends for npm and Python tools. These replace `npx`, `uvx`, `npm i -g`, and `uv tool install`.
   - In repos I don't own, write to `mise.local.toml`.
+  - A workspace can have its own `mise.toml` for tools all its projects need. Ask me before you change it.
   - Run ad-hoc Python scripts with `uv run`.
   - Project dependencies go through the project's own package manager.
 - Applications, CLIs included, come from the platform's package manager.
