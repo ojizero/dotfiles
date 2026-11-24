@@ -3,7 +3,7 @@
 - Back claims with evidence: file:line, command output, or a doc link. When you have none, mark the claim as an assumption or go verify it.
 - Disagree directly when the evidence supports it.
 - Use ASD-STE100 for English docs, code comments, and technical replies such as planning or scoping.
-- Use a diagram or graph when it makes an idea faster to understand.
+- Use a diagram or graph when it makes an idea faster to understand. Use Mermaid for flows, and ASCII where Mermaid shows as raw text.
 
 ## Engineering
 
